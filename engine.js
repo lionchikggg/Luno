@@ -13,8 +13,8 @@
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
-        crashMax: 50, crashSpeed: 0.7,
-        edges: { crash: 0.07, mines: 0.06, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05 }, wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
+        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10,
+        edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05 }, wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
         hat: { name: 'Шляпа мага', img: '', value: 30, wd: false, up: true }, ring: { name: 'Кольцо', img: '', value: 60, wd: false, up: true },
@@ -29,7 +29,7 @@
       ],
       skins: {
         card_rocket: '', card_slots: '', card_mines: '', mines_closed: art.minedog || '', mines_safe: '', mines_bomb: '', card_upgrade: '', card_coin: '', card_plinko: '',
-        sprite_rocket: art.pepe || '', rocket_body: '', plinko_ball: art.plum || '', slot_s6: art.arm || '', slot_s7: art.dog || '', slot_s8: art.plum || '', slot_sc: art.pepe || '', coin_a: '', coin_b: '', upgrade_idle: art.pepe || ''
+        sprite_rocket: art.minedog || art.pepe || '', rocket_body: '', plinko_ball: art.plum || '', slot_s6: art.arm || '', slot_s7: art.dog || '', slot_s8: art.plum || '', slot_sc: art.pepe || '', coin_a: '', coin_b: '', upgrade_idle: art.pepe || ''
       },
       promos: { LUNO: { caseId: 'free', uses: 1000 } }
     };
@@ -76,6 +76,7 @@
     (function migrate() {
       var DS = defaultConfig({}).settings, st = S.cfg.settings; Object.keys(DS).forEach(function (k) { if (st[k] === undefined) st[k] = DS[k]; });
       st.edges = st.edges || {}; Object.keys(DS.edges).forEach(function (g) { if (st.edges[g] === undefined) st.edges[g] = DS.edges[g]; });
+      S.flags = S.flags || {}; if (!S.flags.m10) { S.flags.m10 = 1; var ed0 = S.cfg.settings.edges || {}; if (ed0.mines === 0.06) ed0.mines = 0.10; var sk1 = S.cfg.skins || {}; if (!sk1.sprite_rocket || /pepe\.webp$/.test(sk1.sprite_rocket)) sk1.sprite_rocket = '/art/minedog.webp'; }
       var sk0 = S.cfg.skins = S.cfg.skins || {}; if (sk0.mines_closed === undefined) sk0.mines_closed = '/art/minedog.webp'; ['mines_safe', 'mines_bomb', 'card_mines'].forEach(function (k) { if (sk0[k] === undefined) sk0[k] = ''; });
       Object.keys(S.cfg.items).forEach(function (k) { var it = S.cfg.items[k]; if (it.wd === undefined) it.wd = !!it.img; if (it.up === undefined) it.up = true; });
     })();
@@ -100,7 +101,8 @@
       if (u.balance < bet) throw new Err('Не хватает звёзд'); u.balance -= bet; return bet;
     }
     function pay(u, game, bet, payout) { payout = Math.min(Math.floor(payout), set('maxPayout')); u.balance += payout; book(u, game, bet, payout); u.stats.profit += payout - bet; return payout; }
-    var mmult = function (k, M) { var r = 1 - edgeOf('mines'); for (var j = 0; j < k; j++) r *= (25 - j) / (25 - M - j); return r; };
+    var mmult = function (k, M) { var r = 1 - edgeOf('mines'); for (var j = 0; j < k; j++) r *= (25 - j) / (25 - M - j); return Math.min(r, set('minesMaxMult') || 10); };
+    var mnext = function (k, M) { var cap = set('minesMaxMult') || 10; return (k >= 25 - M || mmult(k, M) >= cap) ? 0 : mmult(k + 1, M); };
     var growth = function (ms, k) { return Math.exp((k || 0.00009) * ms); };
     var inv = function (u, id) { for (var i = 0; i < u.inv.length; i++) if (u.inv[i].id === id) return i; return -1; };
     var BET_MS = 8000, CRASH_MS = 3500, maskName = function (n) { n = String(n || 'И'); return n.length <= 2 ? n[0] + '*' : n[0] + '***' + n[n.length - 1]; };
@@ -185,19 +187,19 @@
       'deposit/info': function (u) { return { tonAddress: o.tonAddress || '', comment: 'luno' + u.id, tonToStars: set('tonToStars'), minDeposit: set('minDeposit'), test: !!o.allowTest }; },
       'deposit/test': function (u, b) { if (!o.allowTest) throw new Err('Недоступно'); var a = Math.floor(+b.amount); if (!(a >= 1 && a <= 10000)) throw new Err('От 1 до 10000'); credit(u.id, a); return { added: a }; },
       'mines/start': function (u, b) {
-        if (u.round) throw new Err('Игра уже идёт'); var M = Math.floor(+b.mines); if (!(M >= 1 && M <= 20)) throw new Err('Мин от 1 до 20');
+        if (u.round) throw new Err('Игра уже идёт'); var M = Math.floor(+b.mines); var mn = Math.max(1, set('minesMin') || 5); if (!(M >= mn && M <= 20)) throw new Err('Мин можно выбрать от ' + mn + ' до 20');
         var bet = take(u, b.bet), c = []; for (var i = 0; i < 25; i++) c.push(i);
         for (i = 24; i > 0; i--) { var j = Math.floor(roll(u) * (i + 1)), t = c[i]; c[i] = c[j]; c[j] = t; }
-        u.round = { game: 'mines', bet: bet, M: M, mines: c.slice(0, M), opened: [] }; return { started: true };
+        u.round = { game: 'mines', bet: bet, M: M, mines: c.slice(0, M), opened: [] }; return { started: true, next: mnext(0, M) };
       },
-      'mines/state': function (u) { var r = u.round; if (!r || r.game !== 'mines') return { active: false }; return { active: true, M: r.M, bet: r.bet, opened: r.opened, mult: r.opened.length ? mmult(r.opened.length, r.M) : 1 }; },
+      'mines/state': function (u) { var r = u.round; if (!r || r.game !== 'mines') return { active: false }; return { active: true, M: r.M, bet: r.bet, opened: r.opened, mult: r.opened.length ? mmult(r.opened.length, r.M) : 1, next: mnext(r.opened.length, r.M) }; },
       'mines/pick': function (u, b) {
         var r = u.round; if (!r || r.game !== 'mines') throw new Err('Нет игры'); var i = Math.floor(+b.i);
         if (!(i >= 0 && i < 25) || r.opened.indexOf(i) >= 0) throw new Err('Неверная клетка');
         if (r.mines.indexOf(i) >= 0) { book(u, 'mines', r.bet, 0); u.stats.profit -= r.bet; u.round = null; return { boom: true, mines: r.mines }; }
         r.opened.push(i); var mult = mmult(r.opened.length, r.M);
-        if (r.opened.length === 25 - r.M) { u.round = null; return { safe: true, done: true, mult: mult, payout: pay(u, 'mines', r.bet, r.bet * mult), mines: r.mines }; }
-        return { safe: true, mult: mult };
+        if (r.opened.length === 25 - r.M || mnext(r.opened.length, r.M) === 0) { u.round = null; return { safe: true, done: true, mult: mult, payout: pay(u, 'mines', r.bet, r.bet * mult), mines: r.mines }; }
+        return { safe: true, mult: mult, next: mnext(r.opened.length, r.M) };
       },
       'mines/cashout': function (u) {
         var r = u.round; if (!r || r.game !== 'mines' || !r.opened.length) throw new Err('Сначала открой клетку');
@@ -250,7 +252,7 @@
     }
     function publicConfig() {
       var c = cfg(); return {
-        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
+        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
         cases: c.cases.filter(function (x) { return x.active; }).map(function (x) { return { id: x.id, name: x.name, img: x.img, hue: x.hue, price: x.price, free: x.free, items: x.items.map(function (y) { return { k: y.k, weight: y.weight }; }) }; }),
         slots: slotInfo()
       };
@@ -262,10 +264,12 @@
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      ['edge', 'minBet', 'maxBet', 'demoBalance', 'maxPayout', 'maxCaseRtp', 'startBalance', 'tonToStars', 'minDeposit', 'refPercent', 'wdFeePct', 'wdMinValue', 'wdWagerMult', 'crashMax', 'crashSpeed'].forEach(function (k) { var v = +s[k]; if (!(v >= 0)) throw new Err('Неверная настройка: ' + k); out.settings[k] = v; });
+      ['edge', 'minBet', 'maxBet', 'demoBalance', 'maxPayout', 'maxCaseRtp', 'startBalance', 'tonToStars', 'minDeposit', 'refPercent', 'wdFeePct', 'wdMinValue', 'wdWagerMult', 'crashMax', 'crashSpeed', 'minesMin', 'minesMaxMult'].forEach(function (k) { var v = +s[k]; if (!(v >= 0)) throw new Err('Неверная настройка: ' + k); out.settings[k] = v; });
       ['botUsername', 'supportUsername'].forEach(function (k) { var v = String(s[k] || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{0,32}$/.test(v)) throw new Err('Имя в Telegram: латиница, цифры, _ (' + k + ')'); out.settings[k] = v; });
       out.settings.wdNote = String(s.wdNote || '').slice(0, 80); out.settings.edges = {};
       ['crash', 'mines', 'plinko', 'coin', 'upgrade', 'slots'].forEach(function (g) { var v = +((s.edges || {})[g]); if (!(v >= 0 && v <= 0.25)) throw new Err('Преимущество казино по игре ' + g + ' должно быть от 0 до 0.25'); out.settings.edges[g] = v; });
+      if (out.settings.minesMin < 1 || out.settings.minesMin > 20) throw new Err('Минимум мин от 1 до 20');
+      if (out.settings.minesMaxMult < 1.1 || out.settings.minesMaxMult > 1000) throw new Err('Потолок выигрыша в минах от ×1.1 до ×1000');
       if (out.settings.crashMax < 2 || out.settings.crashMax > 100) throw new Err('Максимум ракеты должен быть от ×2 до ×100');
       if (out.settings.crashSpeed < 0.2 || out.settings.crashSpeed > 2) throw new Err('Скорость ракеты от 0.2 до 2 (1 = базовая)');
       if (out.settings.wdFeePct > 0.5) throw new Err('Комиссия за вывод не больше 0.5');

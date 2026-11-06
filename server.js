@@ -10,7 +10,7 @@ if (!ADMIN) console.warn('ADMIN_TOKEN не задан: админка выклю
 try { fs.mkdirSync(path.dirname(DATA), { recursive: true }); } catch {}
 let state;
 try { state = JSON.parse(fs.readFileSync(DATA, 'utf8')); }
-catch { state = Engine.newState({ pepe: '/art/pepe.webp', plum: '/art/plum.webp', dog: '/art/dog.webp', arm: '/art/arm.webp' }); }
+catch { state = Engine.newState({ pepe: '/art/pepe.webp', plum: '/art/plum.webp', dog: '/art/dog.webp', arm: '/art/arm.webp', minedog: '/art/minedog.webp' }); }
 let dirty = false;
 const markDirty = () => { dirty = true; };
 setInterval(() => { if (!dirty) return; dirty = false; const tmp = DATA + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(state)); fs.renameSync(tmp, DATA); }, 1000).unref();

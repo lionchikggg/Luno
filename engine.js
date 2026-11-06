@@ -13,7 +13,7 @@
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
-        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, bjOn: 1, bjPay: 1.2, bjH17: 1,
+        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, bjOn: 1, bjPay: 1.2, bjH17: 1, duOn: 1, duFee: 0.05,
         edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05 }, wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
@@ -240,6 +240,97 @@
         seats: T.seats.map(function (s) { return s ? { name: s.uid === u.id ? s.name : maskName(s.name), me: s.uid === u.id, bet: s.bet, hands: s.hands.map(function (h) { return { c: h.c.slice(), bet: h.bet, done: !!h.done, res: h.res || '', pay: h.pay || 0, split: !!h.split }; }) } : null; }) } };
     }
     function bjMine(u) { var T = u.bjt && bjTable(u.bjt), i = T ? bjSeatOf(T, u.id) : -1; if (i < 0) throw new Err('Сначала сядь за стол'); return { T: T, i: i, s: T.seats[i] }; }
+
+    // ---- Дурак подкидной: игроки играют между собой на ставку, платформа берёт комиссию с проигрыша ----
+    var DU_ST = [10, 50, 100, 500, 1000, 5000, 10000], DU_SZ = [2, 3, 4], DU_R = '6789TJQKA', DU_MOVE = 30000, DU_THROW = 9000, DU_TAKE = 6000, DU_START = 4000, DU_IDLE = 45000, DU_END = 12000;
+    function duAll(demo) { var D = S.du || (S.du = {}), k = demo ? 'demo' : 'real'; return D[k] || (D[k] = { seq: 0, t: {} }); }
+    function duFind(id) { var D = S.du || {}; return (D.real && D.real.t[id]) || (D.demo && D.demo.t[id]) || null; }
+    var duRk = function (c) { return DU_R.indexOf(c[0]); };
+    var duBeats = function (d, a, tr) { return d[1] === a[1] ? duRk(d) > duRk(a) : (d[1] === tr && a[1] !== tr); };
+    function duSeat(T, uid) { for (var i = 0; i < T.size; i++) if (T.seats[i] && T.seats[i].uid === uid) return i; return -1; }
+    function duNext(T, i) { for (var k = 1; k <= T.size; k++) { var j = (i + k) % T.size; if (T.act[j]) return j; } return -1; }
+    function duRanks(T) { var r = {}; T.tbl.forEach(function (p) { r[p.a[0]] = 1; if (p.d) r[p.d[0]] = 1; }); return r; }
+    var duUnb = function (T) { return T.tbl.filter(function (p) { return !p.d; }).length; };
+    function duCanThrow(T, i) {
+      if (!T.act[i] || i === T.def || !T.tbl.length || T.tbl.length >= T.lim) return false;
+      if (!T.taking && duUnb(T) >= T.hands[T.def].length) return false;
+      var r = duRanks(T); return T.hands[i].some(function (c) { return r[c[0]]; });
+    }
+    function duStart(T, t) {
+      T.seats.forEach(function (s, i) { var u = s && S.users[s.uid]; if (s && (!u || u.balance < T.stake)) { if (u) u.dut = ''; T.seats[i] = null; } });
+      if (T.seats.some(function (s) { return !s; })) { T.phase = 'wait'; return; }
+      var d = [], i, j; for (i = 0; i < 9; i++) for (j = 0; j < 4; j++) d.push(DU_R[i] + 'shdc'[j]);
+      for (i = d.length - 1; i > 0; i--) { j = Math.floor(roll(S.sys) * (i + 1)); var x = d[i]; d[i] = d[j]; d[j] = x; }
+      T.deck = d; T.trump = d[0]; T.disc = 0; T.hands = []; T.act = []; T.miss = []; T.out = [];
+      for (i = 0; i < T.size; i++) { var u = S.users[T.seats[i].uid]; u.balance -= T.stake; T.hands.push([]); T.act.push(true); T.miss.push(0); }
+      for (j = 0; j < 6; j++) for (i = 0; i < T.size; i++) T.hands[i].push(T.deck.pop());
+      var tr = T.trump[1], best = -1, br = 99; // первым ходит тот, у кого младший козырь
+      for (i = 0; i < T.size; i++) T.hands[i].forEach(function (c) { if (c[1] === tr && duRk(c) < br) { br = duRk(c); best = i; } });
+      T.att = best >= 0 ? best : Math.floor(roll(S.sys) * T.size); T.def = duNext(T, T.att);
+      T.tbl = []; T.taking = false; T.passed = {}; T.lim = Math.min(6, T.hands[T.def].length); T.phase = 'play'; T.round = (T.round || 0) + 1; T.ev = (T.ev || 0) + 1; T.last = { k: T.ev, type: 'deal' };
+      T.dl = t + DU_MOVE + 3500; T.res = null; T.durak = -1;
+    }
+    function duFinish(T, t, durak) {
+      T.phase = 'done'; T.dl = t + DU_END; T.durak = durak; var S0 = T.stake, n = T.size, fee = durak >= 0 ? Math.min(S0, Math.ceil(S0 * set('duFee'))) : 0, share = durak >= 0 && n > 1 ? Math.floor((S0 - fee) / (n - 1)) : 0, res = [];
+      T.seats.forEach(function (s, i) {
+        var p = durak < 0 ? S0 : i === durak ? 0 : S0 + share, u = s && S.users[s.uid]; res.push(p - S0);
+        if (u) { u.balance += p; book(u, 'durak', S0, p); u.stats.profit += p - S0; }
+      });
+      T.res = res; T.ev++; T.last = { k: T.ev, type: 'end' };
+    }
+    function duEndBout(T, t) {
+      var cards = []; T.tbl.forEach(function (p) { cards.push(p.a); if (p.d) cards.push(p.d); });
+      var took = T.taking, def = T.def; T.ev++; T.last = { k: T.ev, type: took ? 'take' : 'bito', seat: def };
+      if (took) T.hands[def] = T.hands[def].concat(cards); else T.disc += cards.length;
+      T.tbl = []; T.taking = false; T.passed = {};
+      var order = [T.att], k; for (k = 1; k < T.size; k++) { var j = (T.att + k) % T.size; if (j !== def) order.push(j); } order.push(def); // добор: сначала ходивший, защитник последним
+      order.forEach(function (i) { if (!T.act[i]) return; while (T.hands[i].length < 6 && T.deck.length) T.hands[i].push(T.deck.pop()); });
+      if (!T.deck.length) for (k = 0; k < T.size; k++) if (T.act[k] && !T.hands[k].length) { T.act[k] = false; T.out.push(k); }
+      var left = []; for (k = 0; k < T.size; k++) if (T.act[k]) left.push(k);
+      if (left.length <= 1) return duFinish(T, t, left.length ? left[0] : -1);
+      var na = took ? duNext(T, def) : (T.act[def] ? def : duNext(T, def));
+      T.att = na; T.def = duNext(T, na); T.lim = Math.min(6, T.hands[T.def].length); T.dl = t + DU_MOVE + 1200;
+    }
+    function duCheck(T, t) { // бито или взял, когда подкидывать больше никто не может или все сказали «хватит»
+      if (T.phase !== 'play' || !T.tbl.length) return;
+      if (!T.taking && duUnb(T)) return;
+      for (var i = 0; i < T.size; i++) if (T.act[i] && i !== T.def && !T.passed[i] && duCanThrow(T, i)) return;
+      duEndBout(T, t);
+    }
+    function duMiss(T, t, i) { T.miss[i] = (T.miss[i] || 0) + 1; if (T.miss[i] >= 3) { duFinish(T, t, i); return true; } return false; } // три пропуска хода подряд = поражение
+    function duAdvance(T, t) {
+      T.seats.forEach(function (s, i) { if (s && (T.phase === 'wait' || T.phase === 'start') && t - s.seen > DU_IDLE) { var u = S.users[s.uid]; if (u && u.dut === T.id) u.dut = ''; T.seats[i] = null; if (T.phase === 'start') T.phase = 'wait'; } });
+      if (T.phase === 'start' && t >= T.dl) duStart(T, t);
+      if (T.phase === 'play' && t >= T.dl) {
+        if (!T.tbl.length) { var h = T.hands[T.att], tr = T.trump[1]; if (duMiss(T, t, T.att)) return; var c = h.slice().sort(function (a, b) { return ((a[1] === tr) - (b[1] === tr)) || duRk(a) - duRk(b); })[0];
+          h.splice(h.indexOf(c), 1); T.tbl.push({ a: c, d: null, by: T.att }); T.dl = t + DU_MOVE; }
+        else if (duUnb(T) && !T.taking) { if (duMiss(T, t, T.def)) return; T.taking = true; T.passed = {}; T.dl = t + DU_TAKE; duCheck(T, t); }
+        else duEndBout(T, t);
+      }
+    }
+    function duTick() {
+      var t = now(), D = S.du || {};
+      ['real', 'demo'].forEach(function (k) { var A = D[k]; if (!A) return; Object.keys(A.t).forEach(function (id) { var T = A.t[id];
+        if (T.phase === 'done' && t >= T.dl) { T.seats.forEach(function (s) { var u = s && S.users[s.uid]; if (u && u.dut === id) u.dut = ''; }); delete A.t[id]; return; }
+        if (T.phase !== 'done') duAdvance(T, t);
+        if (T.phase === 'wait' && !T.seats.some(Boolean)) delete A.t[id]; }); });
+    }
+    function duLeaveU(u) {
+      var T = u.dut && duFind(u.dut); if (!T) { u.dut = ''; return; } var i = duSeat(T, u.id); if (i < 0) { u.dut = ''; return; }
+      if (T.phase === 'wait' || T.phase === 'start') { T.seats[i] = null; T.phase = 'wait'; u.dut = ''; return; }
+      if (T.phase === 'play' && T.act[i]) { T.seats[i].left = true; duFinish(T, now(), i); return; } // сдался: остаётся за столом, чтобы увидеть итог
+      u.dut = '';
+    }
+    function duSort(h, tr) { return h.slice().sort(function (a, b) { return ((a[1] === tr) - (b[1] === tr)) || ('shdc'.indexOf(a[1]) - 'shdc'.indexOf(b[1])) || duRk(a) - duRk(b); }); }
+    function duView(u, T) {
+      var t = now(), me = duSeat(T, u.id); if (me >= 0) T.seats[me].seen = t; var pl = T.phase === 'play' || T.phase === 'done';
+      return { du: { id: T.id, stake: T.stake, size: T.size, phase: T.phase, dl: T.dl, now: t, me: me, fee: set('duFee'), round: T.round || 0,
+        trump: pl ? T.trump : '', deck: pl ? T.deck.length : 0, disc: T.disc || 0, tbl: pl ? T.tbl.map(function (p) { return { a: p.a, d: p.d, by: p.by }; }) : [],
+        att: pl ? T.att : -1, def: pl ? T.def : -1, taking: !!T.taking, lim: T.lim || 0, last: T.last || null, durak: T.durak, res: T.res || null,
+        hand: pl && me >= 0 ? duSort(T.hands[me], T.trump[1]) : [], can: pl && me >= 0 && T.phase === 'play' ? duCanThrow(T, me) : false,
+        seats: T.seats.map(function (s, i) { return s ? { name: s.uid === u.id ? s.name : maskName(s.name), me: s.uid === u.id, n: pl ? T.hands[i].length : 0, act: pl ? !!T.act[i] : true, out: pl ? T.out.indexOf(i) : -1, passed: !!(T.passed && T.passed[i]), left: !!s.left } : null; }) } };
+    }
+    function duMine(u) { var T = u.dut && duFind(u.dut), i = T ? duSeat(T, u.id) : -1; if (i < 0) throw new Err('Ты не за столом'); return { T: T, i: i }; }
     var H = {
       me: function (u, b) {
         if (b.ref && !u.refSet) { u.refSet = 1; var rf = S.users[String(b.ref)]; if (rf && rf.id !== u.id) { u.ref = rf.id; rf.refCount = (rf.refCount || 0) + 1; } }
@@ -299,6 +390,45 @@
       'mines/cashout': function (u) {
         var r = u.round; if (!r || r.game !== 'mines' || !r.opened.length) throw new Err('Сначала открой клетку');
         var mult = mmult(r.opened.length, r.M); u.round = null; return { mult: mult, payout: pay(u, 'mines', r.bet, r.bet * mult), mines: r.mines };
+      },
+      'du/lobby': function (u) {
+        var A = duAll(u.demo); return { on: !!set('duOn'), fee: set('duFee'), at: u.dut || '', stakes: DU_ST.map(function (st) { return { stake: st, sizes: DU_SZ.map(function (sz) {
+          var w = 0, g = 0; Object.keys(A.t).forEach(function (id) { var T = A.t[id]; if (T.stake !== st || T.size !== sz) return; if (T.phase === 'wait' || T.phase === 'start') w += T.seats.filter(Boolean).length; else if (T.phase === 'play') g++; });
+          return { size: sz, waiting: w, games: g }; }) }; }) };
+      },
+      'du/join': function (u, b) {
+        if (!set('duOn')) throw new Err('Дурак временно закрыт');
+        var st = Math.floor(+b.stake), sz = Math.floor(+b.size); if (DU_ST.indexOf(st) < 0 || DU_SZ.indexOf(sz) < 0) throw new Err('Нет такого стола');
+        if (u.balance < st) throw new Err('Не хватает звёзд на ставку');
+        var cur = u.dut && duFind(u.dut); if (cur && duSeat(cur, u.id) >= 0 && cur.phase !== 'done') { if (cur.phase === 'play') return duView(u, cur); duLeaveU(u); }
+        if (u.bjt) bjLeaveU(u);
+        var A = duAll(u.demo), T = null; Object.keys(A.t).some(function (id) { var x = A.t[id]; if (x.stake === st && x.size === sz && x.phase === 'wait' && x.seats.some(function (s) { return !s; })) { T = x; return true; } return false; });
+        if (!T) { var id = (u.demo ? 'dd' : 'dr') + (++A.seq); T = A.t[id] = { id: id, stake: st, size: sz, seats: [], phase: 'wait', dl: 0, tbl: [], round: 0, ev: 0 }; for (var k = 0; k < sz; k++) T.seats.push(null); }
+        var i = T.seats.indexOf(null); T.seats[i] = { uid: u.id, name: u.name, seen: now() }; u.dut = T.id;
+        if (T.seats.every(Boolean)) { T.phase = 'start'; T.dl = now() + DU_START; }
+        return duView(u, T);
+      },
+      'du/state': function (u) { var T = u.dut && duFind(u.dut); if (!T || duSeat(T, u.id) < 0) { u.dut = ''; return { gone: true }; } return duView(u, T); },
+      'du/leave': function (u) { duLeaveU(u); return { ok: true }; },
+      'du/act': function (u, b) {
+        var m = duMine(u), T = m.T, i = m.i, t = now(), a = String(b.a || ''), c = String(b.c || ''); if (T.phase !== 'play') throw new Err('Партия ещё не идёт');
+        if (!T.act[i]) throw new Err('Ты уже вышел из игры'); var h = T.hands[i], tr = T.trump[1]; T.miss[i] = 0;
+        if (a === 'attack') {
+          if (i === T.def) throw new Err('Ты отбиваешься'); if (h.indexOf(c) < 0) throw new Err('Нет такой карты');
+          if (!T.tbl.length) { if (i !== T.att) throw new Err('Сейчас ходит другой игрок'); }
+          else { if (!duRanks(T)[c[0]]) throw new Err('Подкинуть можно только карту того же достоинства, что на столе'); if (T.tbl.length >= T.lim) throw new Err('Больше подкидывать нельзя');
+            if (!T.taking && duUnb(T) >= T.hands[T.def].length) throw new Err('У защитника не хватит карт'); }
+          h.splice(h.indexOf(c), 1); T.tbl.push({ a: c, d: null, by: i }); T.passed = {}; T.dl = T.taking ? t + DU_TAKE : t + DU_MOVE;
+        } else if (a === 'defend') {
+          if (i !== T.def || T.taking) throw new Err('Сейчас ты не отбиваешься'); var p = T.tbl[Math.floor(+b.i)];
+          if (!p || p.d) throw new Err('Эту карту уже побили'); if (h.indexOf(c) < 0) throw new Err('Нет такой карты'); if (!duBeats(c, p.a, tr)) throw new Err('Этой картой не побить');
+          h.splice(h.indexOf(c), 1); p.d = c; T.dl = duUnb(T) ? t + DU_MOVE : t + DU_THROW;
+        } else if (a === 'take') {
+          if (i !== T.def || T.taking || !duUnb(T)) throw new Err('Сейчас нельзя взять'); T.taking = true; T.passed = {}; T.dl = t + DU_TAKE;
+        } else if (a === 'pass') {
+          if (i === T.def || !T.tbl.length || (!T.taking && duUnb(T))) throw new Err('Сейчас нельзя'); T.passed[i] = 1;
+        } else throw new Err('Неизвестное действие');
+        duCheck(T, t); return duView(u, T);
       },
       'bj/lobby': function (u) {
         var B = bjAll(u.demo), p = u.demo ? 'd' : 'r';
@@ -386,7 +516,7 @@
     var DEMO_NO = ['wd/info', 'wd/request', 'deposit/info', 'deposit/test', 'ref', 'seed/rotate', 'promo'];
     function handle(path, id, body, name, username, demo) {
       try {
-        advance(); bjTick(); var u = user(id, name, username, demo), f = H[path]; if (!f) throw new Err('Нет такого метода');
+        advance(); bjTick(); duTick(); var u = user(id, name, username, demo), f = H[path]; if (!f) throw new Err('Нет такого метода');
         if (u.demo && DEMO_NO.indexOf(path) >= 0) throw new Err('В демо-режиме это недоступно. Переключись на реальный счёт');
         if (u.banned && ['me', 'live', 'crash/state', 'leaders', 'wd/list'].indexOf(path) < 0) throw new Err('Аккаунт заблокирован. Напиши в поддержку.');
         var r = f(u, body || {}) || {}; r.balance = u.balance; r.inv = u.inv; r.stats = u.stats; save(); return r;
@@ -394,7 +524,7 @@
     }
     function publicConfig() {
       var c = cfg(); return {
-        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), bjOn: set('bjOn'), bjPay: set('bjPay'), bjH17: set('bjH17'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
+        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), bjOn: set('bjOn'), bjPay: set('bjPay'), bjH17: set('bjH17'), duOn: set('duOn'), duFee: set('duFee'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
         cases: c.cases.filter(function (x) { return x.active; }).map(function (x) { return { id: x.id, name: x.name, img: x.img, hue: x.hue, price: x.price, free: x.free, items: x.items.map(function (y) { return { k: y.k, weight: y.weight }; }) }; }),
         slots: slotInfo(), wheel: { on: (c.wheel || {}).on ? 1 : 0, secs: ((c.wheel || defaultWheel()).secs).slice() }
       };
@@ -406,12 +536,12 @@
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.wheelMaxRtp = WHEEL_MAX_RTP; c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17' };
+      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17', duOn: 'дурак включён', duFee: 'комиссия в дураке' };
       Object.keys(LBL).forEach(function (k) {
         var raw = s[k], cur = set(k); if (!(cur >= 0)) cur = Number(DS0[k]); // поле не пришло или пустое: оставляем текущее значение
         var v = (raw === undefined || raw === null || raw === '' || isNaN(+raw)) ? cur : +raw; if (!(v >= 0)) throw new Err('Неверная настройка: ' + LBL[k]); out.settings[k] = v;
       });
-      out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
+      out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.duOn = out.settings.duOn ? 1 : 0; if (out.settings.duFee > 0.2) throw new Err('Комиссия в дураке не больше 0.2 (20%)'); out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
       if (!(out.settings.bjPay >= 1 && out.settings.bjPay <= 1.5)) throw new Err('Выплата за блэкджек от 1 до 1.5 (6 к 5 = 1.2, 3 к 2 = 1.5)');
       ['botUsername', 'supportUsername'].forEach(function (k) { var v = String(s[k] || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{0,32}$/.test(v)) throw new Err('Имя в Telegram: латиница, цифры, _ (' + k + ')'); out.settings[k] = v; });
       out.settings.wdNote = String(s.wdNote || '').slice(0, 80); out.settings.edges = {};
@@ -474,7 +604,7 @@
     }
     function userAdjust(id, delta) { var u = S.users[String(id)]; if (!u) throw new Err('Игрок не найден'); delta = Math.floor(+delta); if (!delta) throw new Err('Укажи сумму'); u.balance = Math.max(0, u.balance + delta); save(); return { balance: u.balance }; }
     function userBan(id, flag) { var u = S.users[String(id)]; if (!u) throw new Err('Игрок не найден'); u.banned = !!flag; save(); return { banned: u.banned }; }
-    function tick() { advance(); bjTick(); save(); }
+    function tick() { advance(); bjTick(); duTick(); save(); }
     function seedHistory(n) { if (S.hist.length) return; for (var i = 0; i < n; i++) S.hist.push(Math.max(1, Math.min(set('crashMax') || 50, Math.floor(100 * (1 - edgeOf('crash')) / (1 - roll(S.sys))) / 100))); }
     return { tick: tick, seedHistory: seedHistory, wdList: wdList, wdResolve: wdResolve, usersList: usersList, userAdjust: userAdjust, userBan: userBan, credit: credit, creditOnce: creditOnce, setting: set, handle: handle, publicConfig: publicConfig, adminConfig: adminConfig, putConfig: putConfig, stats: stats, Err: Err };
   }

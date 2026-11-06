@@ -96,13 +96,14 @@ http.createServer(async (req, res) => {
       let b = {}; try { b = JSON.parse((await body(req, 20000)).toString() || '{}'); } catch { return send(res, 400, { error: 'Неверный запрос' }); }
       if (p === '/api/me' && /^ref_\d+$/.test(u.sp || '')) b.ref = u.sp.slice(4);
       if (p === '/api/deposit/stars') {
+        if (req.headers['x-demo'] === '1') return send(res, 400, { error: 'В демо-режиме пополнение недоступно' });
         const a = Math.floor(+b.amount), min = engine.setting('minDeposit');
         if (!BOT) return send(res, 400, { error: 'Оплата Stars работает только в боевом режиме' });
         if (!(a >= min && a <= 50000)) return send(res, 400, { error: 'Сумма от ' + min + ' до 50000 ★' });
         let r; try { r = await tg('createInvoiceLink', { title: 'Пополнение LunoCase', description: a + ' ★ на игровой баланс', payload: 'dep:' + u.id + ':' + a, currency: 'XTR', prices: [{ label: a + ' ★', amount: a }] }); } catch (e) { console.error('createInvoiceLink', e.message); return send(res, 502, { error: 'Не удалось связаться с Telegram. Проверь BOT_TOKEN на Render' }); }
         return r.ok ? send(res, 200, { link: r.result }) : send(res, 502, { error: 'Telegram: ' + r.description });
       }
-      const r = engine.handle(p.slice(5), u.id, b, u.name, u.username); return send(res, r.error ? 400 : 200, r);
+      const r = engine.handle(p.slice(5), u.id, b, u.name, u.username, req.headers['x-demo'] === '1'); return send(res, r.error ? 400 : 200, r);
     }
     if (p.startsWith('/admin/')) {
       if (!adminOk(req)) return send(res, 403, { error: 'Неверный токен' });

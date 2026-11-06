@@ -12,7 +12,7 @@
     art = art || {};
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
-      settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
+      settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
         crashMax: 50, crashSpeed: 0.7,
         edges: { crash: 0.07, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05 }, wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
@@ -22,8 +22,8 @@
         arm: { name: 'Силач', img: art.arm || '', value: 600, wd: true, up: true }, pepe: { name: 'Жаба с сердцем', img: art.pepe || '', value: 1500, wd: true, up: true }
       },
       cases: [
-        { id: 'free', name: 'Бесплатный', img: '', hue: 0, price: 0, free: true, active: true, items: [W('clover', 70), W('gem', 24), W('hat', 5), W('ring', 1)] },
-        { id: 'farm', name: 'Farm', img: '', hue: -140, price: 10, free: false, active: true, items: [W('clover', 70), W('gem', 24), W('hat', 5), W('ring', 1)] },
+        { id: 'free', name: 'Бесплатный', img: '', hue: 0, price: 0, free: true, active: true, items: [W('clover', 60), W('gem', 28), W('hat', 9), W('ring', 2.5), W('plum', 0.5)] },
+        { id: 'farm', name: 'Farm', img: '', hue: -140, price: 10, free: false, active: true, items: [W('clover', 78), W('gem', 15), W('hat', 5), W('ring', 1.7), W('plum', 0.3)] },
         { id: 'neko', name: 'Neko', img: '', hue: 60, price: 50, free: false, active: true, items: [W('gem', 25), W('hat', 38), W('ring', 27), W('plum', 9), W('dog', 1)] },
         { id: 'power', name: 'Power', img: '', hue: 100, price: 150, free: false, active: true, items: [W('hat', 19.5), W('ring', 36), W('plum', 25), W('dog', 14), W('arm', 5), W('pepe', 0.5)] }
       ],
@@ -80,13 +80,15 @@
     })();
     var edgeOf = function (g) { var e = S.cfg.settings.edges && S.cfg.settings.edges[g]; return e !== undefined && !isNaN(+e) ? +e : set('edge'); };
     function weekStart() { var d = new Date(now()); d.setUTCHours(0, 0, 0, 0); return d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5; }
-    function user(id, name, username) {
+    function user(id, name, username, demo) {
+      if (demo) id = 'd' + id;
       var u = S.users[id];
-      if (!u) u = S.users[id] = { id: id, name: name || 'Игрок', username: '', wagered: 0, balance: set('startBalance') || 0, inv: [], nid: 1, tickets: {}, redeemed: {}, round: null, stats: { opened: 0, profit: 0 }, week: { start: 0, profit: 0 } };
+      if (!u) u = S.users[id] = { id: id, demo: !!demo, name: name || 'Игрок', username: '', wagered: 0, balance: (demo ? set('demoBalance') : set('startBalance')) || 0, inv: [], nid: 1, tickets: {}, redeemed: {}, round: null, stats: { opened: 0, profit: 0 }, week: { start: 0, profit: 0 } };
       if (name && u.name !== name) u.name = name; if (username !== undefined && u.username !== username) u.username = username || '';
       return u;
     }
     function book(u, game, bet, payout) {
+      if (u.demo) return; // демо-игры не попадают ни в статистику, ни в лидеры, ни в Live
       var t = S.totals[game] || (S.totals[game] = { n: 0, wagered: 0, paid: 0 }); t.n++; t.wagered += bet; t.paid += payout;
       u.wagered = (u.wagered || 0) + bet; var day = new Date(now()).toISOString().slice(0, 10), dd = S.daily[day] || (S.daily[day] = { wagered: 0, paid: 0, deposited: 0 }); dd.wagered += bet; dd.paid += payout;
       var ws = weekStart(); if (u.week.start !== ws) u.week = { start: ws, profit: 0, wagered: 0 }; u.week.profit += payout - bet; u.week.wagered = (u.week.wagered || 0) + bet;
@@ -142,8 +144,9 @@
     var H = {
       me: function (u, b) {
         if (b.ref && !u.refSet) { u.refSet = 1; var rf = S.users[String(b.ref)]; if (rf && rf.id !== u.id) { u.ref = rf.id; rf.refCount = (rf.refCount || 0) + 1; } }
-        return { id: u.id, name: u.name, username: u.username || '', fair: o.fairInfo ? o.fairInfo(u) : null };
+        return { id: u.demo ? String(u.id).slice(1) : u.id, demo: !!u.demo, name: u.name, username: u.username || '', fair: o.fairInfo ? o.fairInfo(u) : null };
       },
+      'demo/refill': function (u) { if (!u.demo) throw new Err('Только для демо-счёта'); u.balance = Math.max(u.balance, set('demoBalance')); return { balance: u.balance }; },
       live: function () { return { live: S.live.slice(-10).reverse() }; },
       'seed/rotate': function (u, b) { if (!o.rotate) throw new Err('Недоступно в демо'); return o.rotate(u, b.clientSeed); },
       coin: function (u, b) {
@@ -188,12 +191,12 @@
       },
       'case/open': function (u, b) {
         var c = cfg().cases.filter(function (x) { return x.id === b.id && x.active; })[0]; if (!c) throw new Err('Кейс недоступен');
-        if (c.free) { if (!(u.tickets[c.id] > 0)) throw new Err('Нужен промокод'); u.tickets[c.id]--; }
+        if (c.free) { if (!u.demo) { if (!(u.tickets[c.id] > 0)) throw new Err('Нужен промокод'); u.tickets[c.id]--; } }
         else { if (u.balance < c.price) throw new Err('Не хватает звёзд'); u.balance -= c.price; }
         var tot = 0; c.items.forEach(function (x) { tot += x.weight; }); var t = roll(u) * tot, got = c.items[c.items.length - 1].k;
         for (var j = 0; j < c.items.length; j++) { if (t < c.items[j].weight) { got = c.items[j].k; break; } t -= c.items[j].weight; }
         var v = cfg().items[got].value, id = u.nid++; u.inv.push({ id: id, k: got }); u.stats.opened++; u.stats.profit += v - c.price;
-        book(u, 'case:' + c.id, c.price, v); S.live.push(got); if (S.live.length > 30) S.live.shift();
+        book(u, 'case:' + c.id, c.price, v); if (!u.demo) { S.live.push(got); if (S.live.length > 30) S.live.shift(); }
         return { item: { id: id, k: got } };
       },
       'wd/info': function (u, b) { var i = inv(u, +b.id); if (i < 0) throw new Err('Нет такого подарка'); var it = cfg().items[u.inv[i].k], c = wdCheck(u, it);
@@ -210,21 +213,23 @@
         u.redeemed[code] = 1; p.uses--; u.tickets[p.caseId] = (u.tickets[p.caseId] || 0) + 1; return { caseId: p.caseId };
       },
       leaders: function () {
-        var ws = weekStart(), rows = Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return u.week.start === ws && u.week.profit > 0; })
+        var ws = weekStart(), rows = Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return !u.demo && u.week.start === ws && u.week.profit > 0; })
           .sort(function (a, b) { return b.week.profit - a.week.profit; }).slice(0, 20).map(function (u) { return { name: maskName(u.name), profit: u.week.profit, wagered: u.week.wagered || 0 }; });
         return { rows: rows, endsAt: ws + 7 * 864e5, now: now() };
       }
     };
-    function handle(path, id, body, name, username) {
+    var DEMO_NO = ['wd/info', 'wd/request', 'deposit/info', 'deposit/test', 'ref', 'seed/rotate', 'promo'];
+    function handle(path, id, body, name, username, demo) {
       try {
-        advance(); var u = user(id, name, username), f = H[path]; if (!f) throw new Err('Нет такого метода');
+        advance(); var u = user(id, name, username, demo), f = H[path]; if (!f) throw new Err('Нет такого метода');
+        if (u.demo && DEMO_NO.indexOf(path) >= 0) throw new Err('В демо-режиме это недоступно. Переключись на реальный счёт');
         if (u.banned && ['me', 'live', 'crash/state', 'leaders', 'wd/list'].indexOf(path) < 0) throw new Err('Аккаунт заблокирован. Напиши в поддержку.');
         var r = f(u, body || {}) || {}; r.balance = u.balance; r.inv = u.inv; r.stats = u.stats; save(); return r;
       } catch (e) { if (e instanceof Err) return { error: e.message }; throw e; }
     }
     function publicConfig() {
       var c = cfg(); return {
-        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), edges: cfg().settings.edges, minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
+        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
         cases: c.cases.filter(function (x) { return x.active; }).map(function (x) { return { id: x.id, name: x.name, img: x.img, hue: x.hue, price: x.price, free: x.free, items: x.items.map(function (y) { return { k: y.k, weight: y.weight }; }) }; }),
         slots: slotInfo()
       };
@@ -236,7 +241,7 @@
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      ['edge', 'minBet', 'maxBet', 'maxPayout', 'maxCaseRtp', 'startBalance', 'tonToStars', 'minDeposit', 'refPercent', 'wdFeePct', 'wdMinValue', 'wdWagerMult', 'crashMax', 'crashSpeed'].forEach(function (k) { var v = +s[k]; if (!(v >= 0)) throw new Err('Неверная настройка: ' + k); out.settings[k] = v; });
+      ['edge', 'minBet', 'maxBet', 'demoBalance', 'maxPayout', 'maxCaseRtp', 'startBalance', 'tonToStars', 'minDeposit', 'refPercent', 'wdFeePct', 'wdMinValue', 'wdWagerMult', 'crashMax', 'crashSpeed'].forEach(function (k) { var v = +s[k]; if (!(v >= 0)) throw new Err('Неверная настройка: ' + k); out.settings[k] = v; });
       ['botUsername', 'supportUsername'].forEach(function (k) { var v = String(s[k] || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{0,32}$/.test(v)) throw new Err('Имя в Telegram: латиница, цифры, _ (' + k + ')'); out.settings[k] = v; });
       out.settings.wdNote = String(s.wdNote || '').slice(0, 80); out.settings.edges = {};
       ['crash', 'plinko', 'coin', 'upgrade', 'slots'].forEach(function (g) { var v = +((s.edges || {})[g]); if (!(v >= 0 && v <= 0.25)) throw new Err('Преимущество казино по игре ' + g + ' должно быть от 0 до 0.25'); out.settings.edges[g] = v; });
@@ -256,6 +261,7 @@
         if (!/^[a-z0-9_]{1,24}$/.test(c.id) || ids[c.id]) throw new Err('Id кейса должен быть уникальным (латиница): ' + c.id); ids[c.id] = 1;
         if (!String(c.name || '').trim() || !(+c.price >= 0) || !okImg(c.img || '')) throw new Err('Проверь название, цену и картинку кейса ' + c.id);
         if (!Array.isArray(c.items) || !c.items.length) throw new Err('В кейсе ' + c.name + ' нет предметов');
+        if (c.active !== false && c.items.length < 5) throw new Err('В кейсе «' + c.name + '» должно быть не меньше 5 подарков (сейчас ' + c.items.length + ')');
         c.items.forEach(function (x) { if (!out.items[x.k] || !(+x.weight > 0)) throw new Err('Кейс ' + c.name + ': неверный предмет или вес'); x.weight = +x.weight; });
         var free = !!c.free, price = free ? 0 : Math.floor(+c.price); if (!free && price < 1) throw new Err('У платного кейса ' + c.name + ' нужна цена');
         var oc = { id: c.id, name: String(c.name).slice(0, 30), img: c.img || '', hue: +c.hue || 0, price: price, free: free, active: c.active !== false, items: c.items.map(function (x) { return { k: x.k, weight: x.weight }; }) };
@@ -274,7 +280,7 @@
       var tot = g.reduce(function (a, x) { a.n += x.n; a.wagered += x.wagered; a.paid += x.paid; a.profit += x.profit; return a; }, { n: 0, wagered: 0, paid: 0, profit: 0 });
       var days = Object.keys(S.daily).sort().slice(-14).map(function (d) { var x = S.daily[d]; return { day: d, wagered: x.wagered, paid: x.paid, profit: x.wagered - x.paid, deposited: x.deposited }; });
       var now2 = S.wd.filter(function (x) { return x.status === 'pending'; });
-      return { total: tot, byGame: g, players: Object.keys(S.users).length, deposited: S.deposited, fees: S.fees, days: days, wdPending: now2.length, wdPendingValue: now2.reduce(function (a, x) { return a + x.value; }, 0) };
+      return { total: tot, byGame: g, players: Object.keys(S.users).filter(function (k) { return !S.users[k].demo; }).length, deposited: S.deposited, fees: S.fees, days: days, wdPending: now2.length, wdPendingValue: now2.reduce(function (a, x) { return a + x.value; }, 0) };
     }
     function wdList(st) { return S.wd.filter(function (x) { return !st || x.status === st; }).slice().reverse().slice(0, 100); }
     function wdResolve(id, action, note) {
@@ -285,7 +291,7 @@
     }
     function usersList(q) {
       q = String(q || '').toLowerCase().replace(/^@/, '');
-      return Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return !q || String(u.id).indexOf(q) >= 0 || String(u.name || '').toLowerCase().indexOf(q) >= 0 || String(u.username || '').toLowerCase().indexOf(q) >= 0; })
+      return Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return !u.demo && (!q || String(u.id).indexOf(q) >= 0 || String(u.name || '').toLowerCase().indexOf(q) >= 0 || String(u.username || '').toLowerCase().indexOf(q) >= 0); })
         .sort(function (a, b) { return (b.wagered || 0) - (a.wagered || 0); }).slice(0, 50).map(function (u) { return { id: u.id, name: u.name, username: u.username || '', balance: u.balance, deposited: u.deposited || 0, wagered: u.wagered || 0, profit: u.stats.profit, inv: u.inv.length, banned: !!u.banned }; });
     }
     function userAdjust(id, delta) { var u = S.users[String(id)]; if (!u) throw new Err('Игрок не найден'); delta = Math.floor(+delta); if (!delta) throw new Err('Укажи сумму'); u.balance = Math.max(0, u.balance + delta); save(); return { balance: u.balance }; }

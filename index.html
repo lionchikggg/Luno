@@ -297,6 +297,23 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
 @keyframes floatw{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-90%) scale(1)}}
 .bigw{font:800 38px Unbounded;color:var(--gold);margin:10px 0 4px;text-shadow:0 0 24px rgba(255,200,80,.5)}
 #gate{position:fixed;inset:0;z-index:100;background:#04051a;display:grid;place-items:center;text-align:center;padding:30px}#gate[hidden]{display:none}#gate h2{font-size:26px;margin-bottom:10px}#gate p{color:#ffd0da;font-weight:700;margin-bottom:10px}#gate small{color:var(--muted);line-height:1.5}
+
+.seg{display:flex;background:#080a26;border:1px solid var(--line);border-radius:16px;padding:4px;margin:2px 0 12px}.seg button{flex:1;border:0;background:none;padding:10px 6px;border-radius:12px;font-weight:700;color:var(--muted);font-size:14px}.seg button.on{background:var(--violet);color:#fff;box-shadow:0 0 16px rgba(139,107,255,.45)}
+.dmb{background:linear-gradient(135deg,#4a2a05,#2a1604);border:1px solid #b9782a;border-radius:18px;padding:12px 14px;margin:0 0 12px;color:#ffe3b8}.dmb b{display:block;font-size:15px;margin-bottom:4px}.dmb p{font-size:13px;line-height:1.45;margin:0 0 10px;color:#f3cf9c}.dmb .btn{padding:8px 14px;font-size:13px;background:#ffb54a;color:#3a2000}
+body.demo .bal{border-color:#ffb54a;background:linear-gradient(135deg,#3a2406,#1c1204)}.dml{font-style:normal;font-size:10px;font-weight:800;background:#ffb54a;color:#3a2000;border-radius:6px;padding:2px 6px;margin-right:2px}
+/* карточки кейсов: большая картинка, внутри не показываем */
+#cl{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.cx{padding:0;border:1px solid rgba(255,255,255,.1);border-radius:24px;overflow:hidden;background:#0d0f24;text-align:left;color:inherit;box-shadow:0 10px 24px rgba(0,0,0,.45);transition:transform .15s;display:block;width:100%}.cx:active{transform:scale(.97)}
+.ca{position:relative;height:176px;display:grid;place-items:center;background:radial-gradient(75% 75% at 50% 42%,hsl(var(--h) 75% 42% / .6),transparent 72%),linear-gradient(180deg,#14162e,#080918)}
+.ca::before{content:"";position:absolute;inset:0;background:radial-gradient(1.5px 1.5px at 20% 25%,#fff,transparent),radial-gradient(1.5px 1.5px at 78% 18%,#fff,transparent),radial-gradient(1px 1px at 65% 78%,#cfd6ff,transparent),radial-gradient(1px 1px at 12% 70%,#fff,transparent);opacity:.7}
+.cart{position:relative;width:80%;height:80%;animation:bob 3.6s ease-in-out infinite;filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}.cart svg,.cart img{width:100%;height:100%}
+.cb{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 12px 12px 14px;background:rgba(255,255,255,.06)}.cb strong{font:800 15px Manrope;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pp{display:inline-flex;align-items:center;gap:5px;flex:none;background:#7b68ee;color:#fff;border-radius:14px;padding:7px 12px;font-weight:800;font-size:14px}.pp i{display:block;width:15px;height:15px}
+/* апгрейд: цели не прячутся, прокручиваются и на ПК */
+#ps.pick,#pt.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:10px;max-height:300px;overflow-y:auto;overflow-x:hidden;padding:4px 2px 8px;scrollbar-width:thin;scrollbar-color:#3a3f9a transparent}
+#ps.pick .it,#pt.pick .it{width:auto}
+/* кнопки в спинах без лишних значков */
+.cd{justify-content:center}
 </style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
@@ -312,6 +329,8 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
 
 <section class="view on" id="home">
  <div class="live"><b>Live</b><span id="lv" style="display:contents"></span></div>
+ <div class="seg" id="seg"><button data-m="real">Реальный счёт</button><button data-m="demo">Демо-режим</button></div>
+ <div class="dmb" id="dmb" hidden><b>Демо-режим</b><p>Виртуальные звёзды. Шансы в играх такие же, как в реальной игре. Вывод подарков и пополнение недоступны.</p><button class="btn" id="dmr">Пополнить демо-баланс</button></div>
  <button class="free bn" id="freeb"><div class="mn" data-i="moonBig"></div><div class="gift" data-i="chest"></div><h2>Бесплатный кейс</h2><p>введи промокод из нашего канала</p></button>
  <h3>Игры</h3>
  <div class="grid">
@@ -371,7 +390,7 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
  <div class="stp big"><button data-s="-1" data-for="b-slots">−</button><div class="bv"><i data-i="star"></i><input id="b-slots" type="number" inputmode="numeric" value="10" min="10" aria-label="Ставка"></div><button data-s="1" data-for="b-slots">+</button></div>
  <div class="scost" id="scost"></div>
  <div class="spctl"><div class="spd"><small>Скорость</small><div class="bars" id="spdb"><i class="on"></i><i></i><i></i></div></div><button class="spinbtn" id="sgo" aria-label="Крутить"><span data-i="spin"></span></button><div class="aut"><small>Автоспин</small><button class="swt" id="sauto" aria-label="Автоспин"><i></i></button></div></div>
- <div class="cards2"><button class="cd cbuy" id="sbuy"><span class="ci2" data-i="crystal"></span><b>Купить бонус</b><span id="sbuyp"></span></button><button class="cd cdc" id="sdc"><span class="sw2"><i></i></span><b>Повышенный шанс</b><span id="sdcp"></span></button></div>
+ <div class="cards2"><button class="cd cbuy" id="sbuy"><b>Купить бонус</b><span id="sbuyp"></span></button><button class="cd cdc" id="sdc"><b>Повышенный шанс</b><span id="sdcp"></span></button></div>
 </section>
 <section class="view" id="upgrade">
  <div class="slots"><div id="us">Ставка</div><div class="ar" data-i="chev"></div><div id="ut">Цель</div></div>
@@ -412,7 +431,7 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
     art = art || {};
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
-      settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
+      settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
         crashMax: 50, crashSpeed: 0.7,
         edges: { crash: 0.07, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05 }, wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
@@ -422,8 +441,8 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
         arm: { name: 'Силач', img: art.arm || '', value: 600, wd: true, up: true }, pepe: { name: 'Жаба с сердцем', img: art.pepe || '', value: 1500, wd: true, up: true }
       },
       cases: [
-        { id: 'free', name: 'Бесплатный', img: '', hue: 0, price: 0, free: true, active: true, items: [W('clover', 70), W('gem', 24), W('hat', 5), W('ring', 1)] },
-        { id: 'farm', name: 'Farm', img: '', hue: -140, price: 10, free: false, active: true, items: [W('clover', 70), W('gem', 24), W('hat', 5), W('ring', 1)] },
+        { id: 'free', name: 'Бесплатный', img: '', hue: 0, price: 0, free: true, active: true, items: [W('clover', 60), W('gem', 28), W('hat', 9), W('ring', 2.5), W('plum', 0.5)] },
+        { id: 'farm', name: 'Farm', img: '', hue: -140, price: 10, free: false, active: true, items: [W('clover', 78), W('gem', 15), W('hat', 5), W('ring', 1.7), W('plum', 0.3)] },
         { id: 'neko', name: 'Neko', img: '', hue: 60, price: 50, free: false, active: true, items: [W('gem', 25), W('hat', 38), W('ring', 27), W('plum', 9), W('dog', 1)] },
         { id: 'power', name: 'Power', img: '', hue: 100, price: 150, free: false, active: true, items: [W('hat', 19.5), W('ring', 36), W('plum', 25), W('dog', 14), W('arm', 5), W('pepe', 0.5)] }
       ],
@@ -480,13 +499,15 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
     })();
     var edgeOf = function (g) { var e = S.cfg.settings.edges && S.cfg.settings.edges[g]; return e !== undefined && !isNaN(+e) ? +e : set('edge'); };
     function weekStart() { var d = new Date(now()); d.setUTCHours(0, 0, 0, 0); return d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5; }
-    function user(id, name, username) {
+    function user(id, name, username, demo) {
+      if (demo) id = 'd' + id;
       var u = S.users[id];
-      if (!u) u = S.users[id] = { id: id, name: name || 'Игрок', username: '', wagered: 0, balance: set('startBalance') || 0, inv: [], nid: 1, tickets: {}, redeemed: {}, round: null, stats: { opened: 0, profit: 0 }, week: { start: 0, profit: 0 } };
+      if (!u) u = S.users[id] = { id: id, demo: !!demo, name: name || 'Игрок', username: '', wagered: 0, balance: (demo ? set('demoBalance') : set('startBalance')) || 0, inv: [], nid: 1, tickets: {}, redeemed: {}, round: null, stats: { opened: 0, profit: 0 }, week: { start: 0, profit: 0 } };
       if (name && u.name !== name) u.name = name; if (username !== undefined && u.username !== username) u.username = username || '';
       return u;
     }
     function book(u, game, bet, payout) {
+      if (u.demo) return; // демо-игры не попадают ни в статистику, ни в лидеры, ни в Live
       var t = S.totals[game] || (S.totals[game] = { n: 0, wagered: 0, paid: 0 }); t.n++; t.wagered += bet; t.paid += payout;
       u.wagered = (u.wagered || 0) + bet; var day = new Date(now()).toISOString().slice(0, 10), dd = S.daily[day] || (S.daily[day] = { wagered: 0, paid: 0, deposited: 0 }); dd.wagered += bet; dd.paid += payout;
       var ws = weekStart(); if (u.week.start !== ws) u.week = { start: ws, profit: 0, wagered: 0 }; u.week.profit += payout - bet; u.week.wagered = (u.week.wagered || 0) + bet;
@@ -542,8 +563,9 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
     var H = {
       me: function (u, b) {
         if (b.ref && !u.refSet) { u.refSet = 1; var rf = S.users[String(b.ref)]; if (rf && rf.id !== u.id) { u.ref = rf.id; rf.refCount = (rf.refCount || 0) + 1; } }
-        return { id: u.id, name: u.name, username: u.username || '', fair: o.fairInfo ? o.fairInfo(u) : null };
+        return { id: u.demo ? String(u.id).slice(1) : u.id, demo: !!u.demo, name: u.name, username: u.username || '', fair: o.fairInfo ? o.fairInfo(u) : null };
       },
+      'demo/refill': function (u) { if (!u.demo) throw new Err('Только для демо-счёта'); u.balance = Math.max(u.balance, set('demoBalance')); return { balance: u.balance }; },
       live: function () { return { live: S.live.slice(-10).reverse() }; },
       'seed/rotate': function (u, b) { if (!o.rotate) throw new Err('Недоступно в демо'); return o.rotate(u, b.clientSeed); },
       coin: function (u, b) {
@@ -588,12 +610,12 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
       },
       'case/open': function (u, b) {
         var c = cfg().cases.filter(function (x) { return x.id === b.id && x.active; })[0]; if (!c) throw new Err('Кейс недоступен');
-        if (c.free) { if (!(u.tickets[c.id] > 0)) throw new Err('Нужен промокод'); u.tickets[c.id]--; }
+        if (c.free) { if (!u.demo) { if (!(u.tickets[c.id] > 0)) throw new Err('Нужен промокод'); u.tickets[c.id]--; } }
         else { if (u.balance < c.price) throw new Err('Не хватает звёзд'); u.balance -= c.price; }
         var tot = 0; c.items.forEach(function (x) { tot += x.weight; }); var t = roll(u) * tot, got = c.items[c.items.length - 1].k;
         for (var j = 0; j < c.items.length; j++) { if (t < c.items[j].weight) { got = c.items[j].k; break; } t -= c.items[j].weight; }
         var v = cfg().items[got].value, id = u.nid++; u.inv.push({ id: id, k: got }); u.stats.opened++; u.stats.profit += v - c.price;
-        book(u, 'case:' + c.id, c.price, v); S.live.push(got); if (S.live.length > 30) S.live.shift();
+        book(u, 'case:' + c.id, c.price, v); if (!u.demo) { S.live.push(got); if (S.live.length > 30) S.live.shift(); }
         return { item: { id: id, k: got } };
       },
       'wd/info': function (u, b) { var i = inv(u, +b.id); if (i < 0) throw new Err('Нет такого подарка'); var it = cfg().items[u.inv[i].k], c = wdCheck(u, it);
@@ -610,21 +632,23 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
         u.redeemed[code] = 1; p.uses--; u.tickets[p.caseId] = (u.tickets[p.caseId] || 0) + 1; return { caseId: p.caseId };
       },
       leaders: function () {
-        var ws = weekStart(), rows = Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return u.week.start === ws && u.week.profit > 0; })
+        var ws = weekStart(), rows = Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return !u.demo && u.week.start === ws && u.week.profit > 0; })
           .sort(function (a, b) { return b.week.profit - a.week.profit; }).slice(0, 20).map(function (u) { return { name: maskName(u.name), profit: u.week.profit, wagered: u.week.wagered || 0 }; });
         return { rows: rows, endsAt: ws + 7 * 864e5, now: now() };
       }
     };
-    function handle(path, id, body, name, username) {
+    var DEMO_NO = ['wd/info', 'wd/request', 'deposit/info', 'deposit/test', 'ref', 'seed/rotate', 'promo'];
+    function handle(path, id, body, name, username, demo) {
       try {
-        advance(); var u = user(id, name, username), f = H[path]; if (!f) throw new Err('Нет такого метода');
+        advance(); var u = user(id, name, username, demo), f = H[path]; if (!f) throw new Err('Нет такого метода');
+        if (u.demo && DEMO_NO.indexOf(path) >= 0) throw new Err('В демо-режиме это недоступно. Переключись на реальный счёт');
         if (u.banned && ['me', 'live', 'crash/state', 'leaders', 'wd/list'].indexOf(path) < 0) throw new Err('Аккаунт заблокирован. Напиши в поддержку.');
         var r = f(u, body || {}) || {}; r.balance = u.balance; r.inv = u.inv; r.stats = u.stats; save(); return r;
       } catch (e) { if (e instanceof Err) return { error: e.message }; throw e; }
     }
     function publicConfig() {
       var c = cfg(); return {
-        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), edges: cfg().settings.edges, minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
+        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
         cases: c.cases.filter(function (x) { return x.active; }).map(function (x) { return { id: x.id, name: x.name, img: x.img, hue: x.hue, price: x.price, free: x.free, items: x.items.map(function (y) { return { k: y.k, weight: y.weight }; }) }; }),
         slots: slotInfo()
       };
@@ -636,7 +660,7 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      ['edge', 'minBet', 'maxBet', 'maxPayout', 'maxCaseRtp', 'startBalance', 'tonToStars', 'minDeposit', 'refPercent', 'wdFeePct', 'wdMinValue', 'wdWagerMult', 'crashMax', 'crashSpeed'].forEach(function (k) { var v = +s[k]; if (!(v >= 0)) throw new Err('Неверная настройка: ' + k); out.settings[k] = v; });
+      ['edge', 'minBet', 'maxBet', 'demoBalance', 'maxPayout', 'maxCaseRtp', 'startBalance', 'tonToStars', 'minDeposit', 'refPercent', 'wdFeePct', 'wdMinValue', 'wdWagerMult', 'crashMax', 'crashSpeed'].forEach(function (k) { var v = +s[k]; if (!(v >= 0)) throw new Err('Неверная настройка: ' + k); out.settings[k] = v; });
       ['botUsername', 'supportUsername'].forEach(function (k) { var v = String(s[k] || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{0,32}$/.test(v)) throw new Err('Имя в Telegram: латиница, цифры, _ (' + k + ')'); out.settings[k] = v; });
       out.settings.wdNote = String(s.wdNote || '').slice(0, 80); out.settings.edges = {};
       ['crash', 'plinko', 'coin', 'upgrade', 'slots'].forEach(function (g) { var v = +((s.edges || {})[g]); if (!(v >= 0 && v <= 0.25)) throw new Err('Преимущество казино по игре ' + g + ' должно быть от 0 до 0.25'); out.settings.edges[g] = v; });
@@ -656,6 +680,7 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
         if (!/^[a-z0-9_]{1,24}$/.test(c.id) || ids[c.id]) throw new Err('Id кейса должен быть уникальным (латиница): ' + c.id); ids[c.id] = 1;
         if (!String(c.name || '').trim() || !(+c.price >= 0) || !okImg(c.img || '')) throw new Err('Проверь название, цену и картинку кейса ' + c.id);
         if (!Array.isArray(c.items) || !c.items.length) throw new Err('В кейсе ' + c.name + ' нет предметов');
+        if (c.active !== false && c.items.length < 5) throw new Err('В кейсе «' + c.name + '» должно быть не меньше 5 подарков (сейчас ' + c.items.length + ')');
         c.items.forEach(function (x) { if (!out.items[x.k] || !(+x.weight > 0)) throw new Err('Кейс ' + c.name + ': неверный предмет или вес'); x.weight = +x.weight; });
         var free = !!c.free, price = free ? 0 : Math.floor(+c.price); if (!free && price < 1) throw new Err('У платного кейса ' + c.name + ' нужна цена');
         var oc = { id: c.id, name: String(c.name).slice(0, 30), img: c.img || '', hue: +c.hue || 0, price: price, free: free, active: c.active !== false, items: c.items.map(function (x) { return { k: x.k, weight: x.weight }; }) };
@@ -674,7 +699,7 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
       var tot = g.reduce(function (a, x) { a.n += x.n; a.wagered += x.wagered; a.paid += x.paid; a.profit += x.profit; return a; }, { n: 0, wagered: 0, paid: 0, profit: 0 });
       var days = Object.keys(S.daily).sort().slice(-14).map(function (d) { var x = S.daily[d]; return { day: d, wagered: x.wagered, paid: x.paid, profit: x.wagered - x.paid, deposited: x.deposited }; });
       var now2 = S.wd.filter(function (x) { return x.status === 'pending'; });
-      return { total: tot, byGame: g, players: Object.keys(S.users).length, deposited: S.deposited, fees: S.fees, days: days, wdPending: now2.length, wdPendingValue: now2.reduce(function (a, x) { return a + x.value; }, 0) };
+      return { total: tot, byGame: g, players: Object.keys(S.users).filter(function (k) { return !S.users[k].demo; }).length, deposited: S.deposited, fees: S.fees, days: days, wdPending: now2.length, wdPendingValue: now2.reduce(function (a, x) { return a + x.value; }, 0) };
     }
     function wdList(st) { return S.wd.filter(function (x) { return !st || x.status === st; }).slice().reverse().slice(0, 100); }
     function wdResolve(id, action, note) {
@@ -685,7 +710,7 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
     }
     function usersList(q) {
       q = String(q || '').toLowerCase().replace(/^@/, '');
-      return Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return !q || String(u.id).indexOf(q) >= 0 || String(u.name || '').toLowerCase().indexOf(q) >= 0 || String(u.username || '').toLowerCase().indexOf(q) >= 0; })
+      return Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return !u.demo && (!q || String(u.id).indexOf(q) >= 0 || String(u.name || '').toLowerCase().indexOf(q) >= 0 || String(u.username || '').toLowerCase().indexOf(q) >= 0); })
         .sort(function (a, b) { return (b.wagered || 0) - (a.wagered || 0); }).slice(0, 50).map(function (u) { return { id: u.id, name: u.name, username: u.username || '', balance: u.balance, deposited: u.deposited || 0, wagered: u.wagered || 0, profit: u.stats.profit, inv: u.inv.length, banned: !!u.banned }; });
     }
     function userAdjust(id, delta) { var u = S.users[String(id)]; if (!u) throw new Err('Игрок не найден'); delta = Math.floor(+delta); if (!delta) throw new Err('Укажи сумму'); u.balance = Math.max(0, u.balance + delta); save(); return { balance: u.balance }; }
@@ -760,15 +785,17 @@ function rar(v){return v<20?'#6f78b8':v<70?'#4aa3ff':v<200?'#a66bff':v<500?'#ff5
 function copy(t){function fb(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('Скопировано')}catch(e){toast(t)}a.remove()}
  try{navigator.clipboard.writeText(t).then(function(){toast('Скопировано')},fb)}catch(e){fb()}}
 function openTG(u){if(TGW&&TGW.openTelegramLink&&/^https:\/\/t\.me\//.test(u))TGW.openTelegramLink(u);else window.open(u,'_blank')}
+var DEMO=false;try{DEMO=localStorage.getItem('luno_mode')==='demo'}catch(e){}
 var DEMO_UN=/nouser=1/.test(location.search)?'':(uname||'demo_user');
 function api(p,b){
- if(ONLINE)return fetch('/api/'+p,{method:'POST',headers:{'Content-Type':'application/json','x-init-data':INIT,'x-dev-user':DEVQ},body:JSON.stringify(b||{})}).then(function(r){return r.json().then(function(j){if(r.status===401)j.auth=true;return j})});
- return Promise.resolve(ENG.handle(p,'1',b||{},name,DEMO_UN))}
+ if(ONLINE)return fetch('/api/'+p,{method:'POST',headers:{'Content-Type':'application/json','x-init-data':INIT,'x-dev-user':DEVQ,'x-demo':DEMO?'1':''},body:JSON.stringify(b||{})}).then(function(r){return r.json().then(function(j){if(r.status===401)j.auth=true;return j})});
+ return Promise.resolve(ENG.handle(p,'1',b||{},name,DEMO_UN,DEMO))}
 function sync(r){if(r.balance!==undefined)ME.balance=r.balance;if(r.inv)ME.inv=r.inv;if(r.stats)ME.stats=r.stats;if($('bal'))$('bal').textContent=fmt(ME.balance)}
 function showGate(msg){var g=$('gate');g.hidden=false;g.querySelector('p').textContent=msg||'Открой приложение из Telegram';g.querySelector('.dbg').textContent='Данные Telegram: скрипт '+(TGW?'есть':'нет')+', в адресе '+(/tgWebAppData/.test(location.hash)?'есть':'нет')+', получено '+(INIT?INIT.length:0)+' символов'}
 function call(p,b,hold){return api(p,b).then(function(r){if(r.error){if(r.auth){showGate(r.error);throw r}toast(r.error);throw r}if(!hold)sync(r);return r},function(e){if(e&&e.error)throw e;toast('Нет связи с сервером');throw e})}
-function hdr(){var g=TT[cur];$('hd').innerHTML=(g?'<div class="me"><button class="back" aria-label="Назад" id="bk">'+I.back+'</button><h2 style="font-size:17px">'+g+'</h2></div>':'<div class="me"><div class="av">'+esc(name[0]||'И')+'</div><span>'+esc(name)+'</span></div>')+'<div class="bal"><i>'+I.star+'</i><span id="bal">'+fmt(ME.balance)+'</span><button id="plus" aria-label="Пополнить">'+I.plus+'</button></div>';
- $('plus').onclick=function(){go('deposit')};if(g)$('bk').onclick=function(){go(PARENT[cur]||'home')}}
+function hdr(){var g=TT[cur];$('hd').innerHTML=(g?'<div class="me"><button class="back" aria-label="Назад" id="bk">'+I.back+'</button><h2 style="font-size:17px">'+g+'</h2></div>':'<div class="me"><div class="av">'+esc(name[0]||'И')+'</div><span>'+esc(name)+'</span></div>')+'<div class="bal">'+(DEMO?'<em class="dml">ДЕМО</em>':'')+'<i>'+I.star+'</i><span id="bal">'+fmt(ME.balance)+'</span><button id="plus" aria-label="Пополнить">'+I.plus+'</button></div>';
+ $('plus').onclick=function(){if(DEMO)call('demo/refill').then(function(){toast('Демо-баланс пополнен')});else go('deposit')};if(g)$('bk').onclick=function(){go(PARENT[cur]||'home')}}
+function modeUI(){document.querySelectorAll('#seg button').forEach(function(b){b.classList.toggle('on',(b.dataset.m==='demo')===DEMO)});$('dmb').hidden=!DEMO;document.body.classList.toggle('demo',DEMO)}
 var RS=null,mon=0,upb=0,sp=0,fl=0,opening=0,plb=0,cdT=null,depTab='stars',curCase=null;
 function guard(){if(cur==='rocket'&&RS&&RS.my&&!RS.my.done&&RS.phase!=='crashed')return 'У тебя активная ставка в ракете';if(upb||sp||fl||opening||plb)return 'Подожди окончания игры';return ''}
 function go(v){var g=guard();if(g)return toast(g);clearInterval(cdT);if(cur==='rocket'&&v!=='rocket')stopRocket();if(cur==='slots'&&v!=='slots'){sauto=0;$('sauto').classList.remove('on')}cur=v;
@@ -778,6 +805,10 @@ function go(v){var g=guard();if(g)return toast(g);clearInterval(cdT);if(cur==='r
  hdr();scrollTo(0,0);
  ({home:rCases,casev:rCaseV,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit})[v]&&({home:rCases,casev:rCaseV,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit})[v]()}
 function betOf(g){var v=Math.floor(+$('b-'+g).value),mn=CFG.settings.minBet||1;if(!(v>=mn)){toast('Минимальная ставка ★'+mn);return 0}return v}
+function setMode(d){if(!!d===DEMO)return;var g=guard();if(g)return toast(g);DEMO=!!d;try{localStorage.setItem('luno_mode',d?'demo':'real')}catch(e){}
+ api('me').then(function(r){if(r.error){DEMO=!d;return toast(r.error)}sync(r);hdr();modeUI();rCases();toast(d?'Демо-режим: виртуальные звёзды':'Реальный счёт')})}
+document.querySelectorAll('#seg button').forEach(function(b){b.onclick=function(){setMode(b.dataset.m==='demo')}});
+$('dmr').onclick=function(){call('demo/refill').then(function(){toast('Демо-баланс пополнен')})};
 document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){go(b.dataset.v)}});
 document.querySelectorAll('.game').forEach(function(b){b.onclick=function(){go(b.dataset.g)}});
 document.querySelectorAll('[data-go]').forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
@@ -924,14 +955,14 @@ $('pgo').onclick=function(){if(plb)return;var b=betOf('plinko');if(!b)return;plb
    k+=r.path[i];i++;ball.style.transform='translate('+(150+(k-i/2)*22)+'px,'+(i===R?16+R*19+14:16+(i-.5)*19)+'px)';setTimeout(step,150)})()}).catch(function(){plb=0;$('pgo').disabled=false})};
 
 /* ===== КЕЙСЫ ===== */
-function rCases(){var g=$('cl');g.innerHTML='';CFG.cases.forEach(function(c){var b=document.createElement('button');b.className='cs';
- b.innerHTML='<div class="ch" style="'+(c.img?'':'filter:hue-rotate('+(+c.hue||0)+'deg)')+'">'+(c.img?imgH(c.img):I.chest)+'</div><strong>'+esc(c.name)+'</strong><div class="mini">'+c.items.slice(-4).map(function(x){return '<i>'+ik(x.k)+'</i>'}).join('')+'</div><span>'+(c.free?'по промокоду':'★ '+c.price)+'</span>';
+function rCases(){var g=$('cl');if(!g)return;g.innerHTML='';CFG.cases.forEach(function(c){var b=document.createElement('button'),h=((260+(+c.hue||0))%360+360)%360;b.className='cx';
+ b.innerHTML='<div class="ca" style="--h:'+h+'"><div class="cart" style="'+(c.img?'':'filter:hue-rotate('+(+c.hue||0)+'deg)')+'">'+(c.img?imgH(c.img):I.chest)+'</div></div><div class="cb"><strong>'+esc(c.name)+'</strong><span class="pp">'+(c.free?(DEMO?'Бесплатно':'По коду'):'<i>'+I.star+'</i>'+c.price)+'</span></div>';
  b.onclick=function(){curCase=c;TT.casev=c.name;go('casev')};g.appendChild(b)})}
 function rCaseV(){var c=curCase;if(!c)return go('home');$('cvi').style.filter=c.img?'':'hue-rotate('+(+c.hue||0)+'deg) drop-shadow(0 12px 24px rgba(139,107,255,.45))';$('cvi').innerHTML=c.img?imgH(c.img):I.chest;
- $('cvp').textContent=c.free?'Открывается по промокоду из нашего канала':'Цена открытия ★ '+c.price;
+ $('cvp').textContent=c.free?(DEMO?'Бесплатный кейс в демо-режиме':'Открывается по промокоду из нашего канала'):'Цена открытия ★ '+c.price;
  var tot=c.items.reduce(function(a,x){return a+x.weight},0),list=c.items.slice().sort(function(a,b){return itm(b.k).value-itm(a.k).value});
  $('cvg').innerHTML=list.map(function(x){var it=itm(x.k),p=x.weight/tot*100;return '<div class="ci" style="border-bottom-color:'+rar(it.value)+'"><i>'+ik(x.k)+'</i><b>'+esc(it.name)+'</b><span>★ '+it.value+'</span><em>'+(p>=10?p.toFixed(1):p>=1?p.toFixed(2):p.toFixed(3))+'%</em></div>'}).join('');
- var b=$('cvo');b.textContent=c.free?'Открыть по промокоду':'Открыть · ★ '+c.price;b.onclick=function(){if(c.free){go('profile');setTimeout(function(){$('code').focus()},80);toast('Введи промокод')}else openCase(c.id)}}
+ var b=$('cvo');b.textContent=c.free?(DEMO?'Открыть бесплатно':'Открыть по промокоду'):'Открыть · ★ '+c.price;b.onclick=function(){if(c.free&&!DEMO){go('profile');setTimeout(function(){$('code').focus()},80);toast('Введи промокод')}else openCase(c.id)}}
 function openCase(id){if(opening)return;var c=CFG.cases.filter(function(x){return x.id===id})[0];if(!c)return;opening=1;
  call('case/open',{id:id},true).then(function(r){var win=r.item.k,W=96,WI=34,strip=[],keys=c.items.map(function(x){return x.k});
   for(var j=0;j<42;j++)strip.push(j===WI?win:keys[Math.floor(rnd()*keys.length)]);var md=$('md');md.classList.add('on');
@@ -941,7 +972,7 @@ function openCase(id){if(opening)return;var c=CFG.cases.filter(function(x){retur
   setTimeout(function(){opening=0;sync(r);var it=itm(win);
    $('rs').innerHTML='<div class="won"><div class="wi">'+ik(win)+'</div><b>'+esc(it.name)+'</b><span>★ '+it.value+'</span><div class="row2"><button class="btn big" id="keep">Забрать</button><button class="btn" id="sell">Продать ★'+it.value+'</button></div></div>';
    $('keep').onclick=function(){md.classList.remove('on')};$('sell').onclick=function(){call('inv/sell',{id:r.item.id}).then(function(x){toast('Продано +'+x.sold+' ★');md.classList.remove('on')})}},4700)}).catch(function(){opening=0})}
-$('pf').onsubmit=function(e){e.preventDefault();var c=$('code').value.trim();if(!c)return toast('Введи промокод');call('promo',{code:c}).then(function(r){$('code').value='';openCase(r.caseId)}).catch(function(){})};
+$('pf').onsubmit=function(e){e.preventDefault();if(DEMO)return toast('Промокоды работают на реальном счёте');var c=$('code').value.trim();if(!c)return toast('Введи промокод');call('promo',{code:c}).then(function(r){$('code').value='';openCase(r.caseId)}).catch(function(){})};
 
 /* ===== ПРОФИЛЬ, ИНВЕНТАРЬ, ЛИДЕРЫ ===== */
 function stat(a,b){return '<div class="stt"><b>'+b+'</b><span>'+a+'</span></div>'}
@@ -949,13 +980,13 @@ function rProf(){$('pav').innerHTML=photo?imgH(photo):esc(name[0]||'И');$('pn')
  $('invs').textContent=ME.inv.length?'Подарков: '+ME.inv.length:'Ваши подарки и призы';$('hint').style.display=ONLINE?'none':''}
 var WDST={pending:['В обработке','st-p'],done:['Отправлен','st-d'],rejected:['Отклонён','st-r']};
 function rInv(){var val=ME.inv.reduce(function(a,x){return a+itm(x.k).value},0),p=ME.stats.profit;
- $('wdwarn').innerHTML=ME.username?'':'<div class="uwarn"><b>Нет username в Telegram.</b><br>Чтобы выводить подарки, нужен username: Telegram → Настройки → Имя пользователя. Укажи его и открой приложение заново.</div>';
+ $('wdwarn').innerHTML=DEMO?'<div class="uwarn" style="background:#3a2406;border-color:#b9782a;color:#ffe3b8"><b>Демо-режим.</b><br>Подарки демо-счёта можно продать или использовать в апгрейде, но вывести нельзя. Вывод доступен только на реальном счёте.</div>':ME.username?'':'<div class="uwarn"><b>Нет username в Telegram.</b><br>Чтобы выводить подарки, нужен username: Telegram → Настройки → Имя пользователя. Укажи его и открой приложение заново.</div>';
  $('st').innerHTML=stat('Кейсов',ME.stats.opened)+stat('Инвентарь','★ '+val)+stat('Прибыль',(p>=0?'+':'')+p);
  var g=$('iv');g.innerHTML='';if(!ME.inv.length)g.innerHTML='<p class="note" style="grid-column:1/-1">Пока пусто. Открой кейс, и подарок появится здесь.</p>';
  ME.inv.slice().reverse().forEach(function(x){var it=itm(x.k),d=document.createElement('div');d.className='ii';
   d.innerHTML='<div class="im" style="border-bottom-color:'+rar(it.value)+'">'+ik(x.k)+'</div><b>'+esc(it.name)+'</b><span>★ '+it.value+'</span><div class="bt"><button data-a="s">Продать</button><button data-a="w">Вывести</button></div>';
   d.querySelector('[data-a=s]').onclick=function(){call('inv/sell',{id:x.id}).then(function(r){toast('Продано +'+r.sold+' ★');rInv()})};
-  d.querySelector('[data-a=w]').onclick=function(){wdSheet(x.id)};g.appendChild(d)});
+  d.querySelector('[data-a=w]').onclick=function(){wdSheet(x.id)};if(DEMO)d.querySelector('[data-a=w]').style.display='none';g.appendChild(d)});
  $('sa').style.display=ME.inv.length?'':'none';
  api('wd/list').then(function(r){if(!r.list)return;$('wdl').innerHTML=r.list.length?r.list.map(function(q){var st=WDST[q.status]||['',''];return '<div class="it2"><span>'+esc(q.item)+' · ★'+q.value+'<br><small style="color:var(--muted)">'+new Date(q.t).toLocaleDateString('ru-RU')+(q.note?' · '+esc(q.note):'')+'</small></span><b class="'+st[1]+'">'+st[0]+'</b></div>'}).join(''):'<p class="note">Заявок на вывод пока нет.</p>'})}
 function wdSheet(id){call('wd/info',{id:id}).then(function(i){
@@ -973,7 +1004,7 @@ function rLead(){call('leaders').then(function(r){var h='';r.rows.forEach(functi
  tick();cdT=setInterval(tick,1000)}).catch(function(){})}
 
 /* ===== РЕФЕРАЛЫ, ПОДДЕРЖКА, ПОПОЛНЕНИЕ ===== */
-function rRef(){call('ref').then(function(r){var link=CFG.settings.botUsername?'https://t.me/'+CFG.settings.botUsername+'?startapp=ref_'+ME.id:'';
+function rRef(){if(DEMO){$('rf').innerHTML='<div class="blk"><p class="note" style="text-align:left">Рефералы доступны на реальном счёте.</p></div>';return}call('ref').then(function(r){var link=CFG.settings.botUsername?'https://t.me/'+CFG.settings.botUsername+'?startapp=ref_'+ME.id:'';
  $('rf').innerHTML='<div class="blk"><div class="bt2">Приглашай друзей и получай '+Math.round(r.percent*100)+'% от их пополнений</div>'+(link?'<div class="kv"><span>'+esc(link)+'</span><button id="rfc">Копировать</button></div><button class="btn big" id="rfs">Поделиться</button>':'<p class="note">Ссылка появится, когда владелец укажет имя бота в админке.</p>')+'</div><div class="row" style="gap:10px">'+stat('Приглашено',r.count)+stat('Заработано','★ '+r.earned)+'</div>';
  if(link){$('rfc').onclick=function(){copy(link)};$('rfs').onclick=function(){openTG('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent('Заходи в LunoCase'))}}}).catch(function(){})}
 var FAQ=[['Как пополнить баланс?','Профиль → Пополнить баланс. Можно оплатить Telegram Stars или перевести TON с комментарием. Баланс обновится автоматически.'],['Игры честные?','Результаты считает сервер, а не телефон. Рандом основан на HMAC-SHA256 с сидом, хэш которого виден заранее.'],['Как вывести подарок?','Подарки лежат в Инвентаре. Продать за звёзды можно сразу, а вывод подарков подключается отдельно.'],['Платёж не пришёл','Подожди пару минут: для TON нужно подтверждение сети. Если баланс не изменился, напиши в поддержку и укажи свой ID.']];
@@ -982,7 +1013,7 @@ function rSup(){var u=CFG.settings.supportUsername,h='';FAQ.forEach(function(f){
  $('sp').querySelectorAll('.faq button').forEach(function(b){b.onclick=function(){b.parentNode.classList.toggle('on')}});
  $('spc').onclick=function(){u?openTG('https://t.me/'+u):toast('Владелец ещё не указал контакт поддержки')};$('spi').onclick=function(){copy(ME.id)}}
 function pollBal(n){n=n||0;api('me').then(function(r){var b0=ME.balance;sync(r);if(r.balance!==b0)toast('Баланс пополнен');else if(n<12)setTimeout(function(){pollBal(n+1)},1500)})}
-function rDep(){call('deposit/info').then(function(i){var h='<div class="tabs2"><button data-t="stars" class="'+(depTab==='stars'?'on':'')+'">Telegram Stars</button><button data-t="ton" class="'+(depTab==='ton'?'on':'')+'">TON</button></div>';
+function rDep(){if(DEMO){$('dp').innerHTML='<div class="blk"><div class="bt2">Демо-режим</div><p class="note" style="text-align:left">В демо-режиме звёзды виртуальные, пополнять нечего. Кнопка «+» вверху возвращает демо-баланс до начального значения. Чтобы играть по-настоящему, переключись на реальный счёт.</p><button class="btn big" id="dmsw">Перейти на реальный счёт</button></div>';$('dmsw').onclick=function(){setMode(false);go('home')};return}call('deposit/info').then(function(i){var h='<div class="tabs2"><button data-t="stars" class="'+(depTab==='stars'?'on':'')+'">Telegram Stars</button><button data-t="ton" class="'+(depTab==='ton'?'on':'')+'">TON</button></div>';
  if(depTab==='stars')h+='<div class="blk"><div class="bt2">Сумма в ★ (минимум '+i.minDeposit+')</div><input class="in" id="dsa" type="number" inputmode="numeric" value="100" style="width:100%"><div class="chips" id="dsc"><button>50</button><button>100</button><button>250</button><button>500</button><button>1000</button></div><button class="btn big" id="dsp">Оплатить Stars</button><p class="note">Оплата проходит внутри Telegram. Баланс пополняется 1 к 1.</p></div>';
  else if(!i.tonAddress)h+='<div class="blk"><p class="note">Пополнение TON пока не настроено владельцем.</p></div>';
  else h+='<div class="blk"><div class="bt2">Курс: 1 TON = '+i.tonToStars+' ★</div><input class="in" id="dta" type="number" step="0.1" value="1" style="width:100%"><p class="note" id="dtc"></p><div class="kv"><span>'+esc(i.tonAddress)+'</span><button data-c="'+esc(i.tonAddress)+'">Копировать</button></div><div class="kv"><span>Комментарий: <b>'+esc(i.comment)+'</b></span><button data-c="'+esc(i.comment)+'">Копировать</button></div><button class="btn big" id="dtw">Открыть кошелёк</button><p class="note">Обязательно укажи комментарий, иначе платёж не засчитается. Зачисление после подтверждения сети.</p></div>';
@@ -1018,7 +1049,7 @@ $('ugo').onclick=function(){if(upb||sel===null||tg===null)return;var target=tg;u
   setTimeout(function(){upb=0;sync(r);toast(r.win?'Апгрейд удался: '+itm(target).name:'Не повезло, подарок сгорел');sel=null;tg=null;upd()},4300)}).catch(function(){upb=0;$('ugo').disabled=false})};
 
 /* ===== запуск ===== */
-function start(){fill();hdr();applySkins();rCases();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
+function start(){fill();hdr();applySkins();rCases();modeUI();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
  
  $('tm').textContent=ONLINE?'':'Демо-режим: данные живут только в этой вкладке';livePoll();setInterval(livePoll,5000);upd()}
 var st2=$('stars');for(var si=0;si<70;si++){var d0=document.createElement('i');d0.className='s';var z=rnd()>.8?3:2;d0.style.cssText='left:'+rnd()*100+'%;top:'+rnd()*100+'%;animation-delay:'+rnd()*4+'s;width:'+z+'px;height:'+z+'px';st2.appendChild(d0)}

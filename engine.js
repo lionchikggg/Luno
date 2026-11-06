@@ -13,7 +13,7 @@
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
-        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10,
+        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, bjOn: 1, bjPay: 1.2, bjH17: 1,
         edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05 }, wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
@@ -74,7 +74,7 @@
     var S = o.state; S.wd = S.wd || []; S.wdSeq = S.wdSeq || 0; S.daily = S.daily || {}; S.fees = S.fees || 0; S.sys = S.sys || {}; S.hist = S.hist || []; S.paid = S.paid || {}; S.deposited = S.deposited || 0; S.live = S.live || []; var now = o.now || Date.now, save = o.save || function () {}, roll = o.roll;
     var cfg = function () { return S.cfg; }, set = function (k) { return Number(S.cfg.settings[k]); };
     (function migrate() {
-      var DS = defaultConfig({}).settings, st = S.cfg.settings; Object.keys(DS).forEach(function (k) { if (st[k] === undefined) st[k] = DS[k]; });
+      var DS = defaultConfig({}).settings, st = S.cfg.settings; Object.keys(DS).forEach(function (k) { if (st[k] === undefined || (typeof DS[k] === 'number' && (st[k] === null || st[k] === '' || isNaN(+st[k])))) st[k] = DS[k]; });
       st.edges = st.edges || {}; Object.keys(DS.edges).forEach(function (g) { if (st.edges[g] === undefined) st.edges[g] = DS.edges[g]; });
       S.flags = S.flags || {}; if (!S.flags.m10) { S.flags.m10 = 1; var ed0 = S.cfg.settings.edges || {}; if (ed0.mines === 0.06) ed0.mines = 0.10; var sk1 = S.cfg.skins || {}; if (!sk1.sprite_rocket || /pepe\.webp$/.test(sk1.sprite_rocket)) sk1.sprite_rocket = '/art/minedog.webp'; }
       var sk0 = S.cfg.skins = S.cfg.skins || {}; if (sk0.mines_closed === undefined) sk0.mines_closed = '/art/minedog.webp'; ['mines_safe', 'mines_bomb', 'card_mines'].forEach(function (k) { if (sk0[k] === undefined) sk0[k] = ''; });
@@ -145,6 +145,90 @@
       if (u.balance < fee) reasons.push('Для комиссии за вывод (★' + fee + ') не хватает звёзд на балансе');
       return { ok: !reasons.length, reasons: reasons, fee: fee };
     }
+
+    // ---- Блэкджек: живые столы с реальными игроками, дилер играет по правилам на сервере ----
+    var BJ_ST = [10, 50, 100, 500, 1000, 5000, 10000], BJ_TN = ['Луна', 'Орбита', 'Сатурн'], BJ_BET = 9000, BJ_TURN = 15000, BJ_IDLE = 40000;
+    function bjAll(demo) {
+      var B = S.bj || (S.bj = {}), k = demo ? 'demo' : 'real';
+      if (!B[k]) { B[k] = {}; BJ_ST.forEach(function (st) { BJ_TN.forEach(function (n, i) { var id = (demo ? 'd' : 'r') + st + '_' + i; B[k][id] = { id: id, stake: st, name: n, seats: [null, null, null, null, null], phase: 'wait', dl: 0, dealer: [], hole: false, shoe: [], round: 0, turn: -1, th: 0 }; }); }); }
+      return B[k];
+    }
+    function bjTable(id) { var B = S.bj || {}; return (B.real && B.real[id]) || (B.demo && B.demo[id]) || null; }
+    var bjV = function (c) { var r = c[0]; return r === 'A' ? 11 : 'TJQK'.indexOf(r) >= 0 ? 10 : +r; };
+    function bjScore(cs) { var t = 0, a = 0; cs.forEach(function (c) { if (c === '??') return; t += bjV(c); if (c[0] === 'A') a++; }); while (t > 21 && a) { t -= 10; a--; } return { t: t, soft: a > 0 }; }
+    var bjNat = function (h) { return h.c.length === 2 && !h.split && bjScore(h.c).t === 21; };
+    function bjDraw(T) {
+      if (!T.shoe || T.shoe.length < 80) { // 6 колод, перемешиваются заново, когда остаётся четверть
+        var R = 'A23456789TJQK', sh = [], d, i, j, k; for (d = 0; d < 6; d++) for (i = 0; i < 13; i++) for (j = 0; j < 4; j++) sh.push(R[i] + 'shdc'[j]);
+        for (k = sh.length - 1; k > 0; k--) { var x = Math.floor(roll(S.sys) * (k + 1)), tmp = sh[k]; sh[k] = sh[x]; sh[x] = tmp; } T.shoe = sh;
+      }
+      return T.shoe.pop();
+    }
+    function bjSeatOf(T, uid) { for (var i = 0; i < 5; i++) if (T.seats[i] && T.seats[i].uid === uid) return i; return -1; }
+    function bjDeal(T, t) {
+      var act = T.seats.filter(function (s) { return s && s.bet > 0; });
+      T.seats.forEach(function (s) { if (s) s.hands = []; });
+      if (!act.length) { T.phase = 'wait'; T.dealer = []; return; }
+      T.round++; T.dealer = []; T.hole = true;
+      act.forEach(function (s) { s.hands = [{ c: [], bet: s.bet }]; });
+      for (var p = 0; p < 2; p++) { act.forEach(function (s) { s.hands[0].c.push(bjDraw(T)); }); T.dealer.push(bjDraw(T)); }
+      if (bjScore(T.dealer).t === 21) return bjSettle(T, t); // у дилера блэкджек: открывает сразу
+      act.forEach(function (s) { if (bjScore(s.hands[0].c).t === 21) s.hands[0].done = true; });
+      T.phase = 'play'; bjNext(T, t);
+    }
+    function bjNext(T, t) {
+      for (var i = 0; i < 5; i++) { var s = T.seats[i]; if (!s) continue; for (var j = 0; j < s.hands.length; j++) if (!s.hands[j].done) { T.turn = i; T.th = j; T.dl = t + BJ_TURN; return; } }
+      T.turn = -1; bjDealerPlay(T, t);
+    }
+    function bjDealerPlay(T, t) {
+      T.hole = false; var live = false;
+      T.seats.forEach(function (s) { if (s) s.hands.forEach(function (h) { if (bjScore(h.c).t <= 21 && !bjNat(h)) live = true; }); });
+      if (live) for (;;) { var d = bjScore(T.dealer); if (d.t > 17 || (d.t === 17 && !(d.soft && set('bjH17')))) break; T.dealer.push(bjDraw(T)); }
+      bjSettle(T, t);
+    }
+    function bjSettle(T, t) {
+      T.hole = false; var d = bjScore(T.dealer).t, dn = T.dealer.length === 2 && d === 21, bp = set('bjPay') || 1.2;
+      T.seats.forEach(function (s) {
+        if (!s) return; var u = S.users[s.uid];
+        s.hands.forEach(function (h) {
+          var v = bjScore(h.c).t, nat = bjNat(h), p = 0;
+          if (nat && dn) p = h.bet; else if (nat) p = h.bet + Math.floor(h.bet * bp); else if (dn || v > 21) p = 0; else if (d > 21 || v > d) p = h.bet * 2; else if (v === d) p = h.bet;
+          h.pay = p; h.res = p > h.bet ? 'w' : p === h.bet ? 'p' : 'l'; h.done = true;
+          if (u) { u.balance += p; book(u, 'blackjack', h.bet, p); u.stats.profit += p - h.bet; }
+        });
+        s.bet = 0;
+      });
+      T.phase = 'done'; T.turn = -1; T.dl = t + 3800 + 700 * Math.max(0, T.dealer.length - 2);
+    }
+    function bjAdvance(T, t) {
+      for (var n = 0; n < 8; n++) {
+        T.seats.forEach(function (s, i) {
+          if (s && (s.left || t - s.seen > BJ_IDLE) && !(s.bet > 0) && !(T.phase === 'play' && s.hands.length)) { var u = S.users[s.uid]; if (u && u.bjt === T.id) u.bjt = ''; T.seats[i] = null; }
+        });
+        var seated = T.seats.filter(Boolean);
+        if (T.phase === 'bet' && (t >= T.dl || seated.every(function (s) { return s.bet > 0; }))) { bjDeal(T, t); continue; }
+        if (T.phase === 'play' && t >= T.dl) { var cs = T.seats[T.turn], ch = cs && cs.hands[T.th]; if (ch) ch.done = true; bjNext(T, t); continue; }
+        if (T.phase === 'done' && t >= T.dl) { T.phase = 'wait'; T.dealer = []; T.seats.forEach(function (s) { if (s) s.hands = []; }); continue; }
+        break;
+      }
+    }
+    function bjTick() {
+      var t = now(), B = S.bj || {};
+      ['real', 'demo'].forEach(function (k) { var A = B[k]; if (A) Object.keys(A).forEach(function (id) { var T = A[id]; if (T.phase !== 'wait' || T.seats.some(Boolean)) bjAdvance(T, t); }); });
+    }
+    function bjLeaveU(u) {
+      var T = u.bjt && bjTable(u.bjt); u.bjt = ''; if (!T) return; var i = bjSeatOf(T, u.id); if (i < 0) return; var s = T.seats[i];
+      if (T.phase === 'play' && s.hands.length) { s.left = true; s.hands.forEach(function (h) { h.done = true; }); if (T.turn === i) bjNext(T, now()); return; }
+      if (s.bet > 0) { u.balance += s.bet; s.bet = 0; } // ставка ещё не сыграла: возвращаем
+      T.seats[i] = null;
+    }
+    function bjView(u, T) {
+      var t = now(), me = bjSeatOf(T, u.id); if (me >= 0) T.seats[me].seen = t;
+      return { bj: { id: T.id, name: T.name, stake: T.stake, phase: T.phase, dl: T.dl, now: t, round: T.round, turn: T.turn, th: T.th, me: me, pay: set('bjPay') || 1.2, h17: !!set('bjH17'),
+        dealer: T.hole && T.dealer.length > 1 ? [T.dealer[0], '??'] : T.dealer.slice(),
+        seats: T.seats.map(function (s) { return s ? { name: s.uid === u.id ? s.name : maskName(s.name), me: s.uid === u.id, bet: s.bet, hands: s.hands.map(function (h) { return { c: h.c.slice(), bet: h.bet, done: !!h.done, res: h.res || '', pay: h.pay || 0, split: !!h.split }; }) } : null; }) } };
+    }
+    function bjMine(u) { var T = u.bjt && bjTable(u.bjt), i = T ? bjSeatOf(T, u.id) : -1; if (i < 0) throw new Err('Сначала сядь за стол'); return { T: T, i: i, s: T.seats[i] }; }
     var H = {
       me: function (u, b) {
         if (b.ref && !u.refSet) { u.refSet = 1; var rf = S.users[String(b.ref)]; if (rf && rf.id !== u.id) { u.ref = rf.id; rf.refCount = (rf.refCount || 0) + 1; } }
@@ -205,6 +289,42 @@
         var r = u.round; if (!r || r.game !== 'mines' || !r.opened.length) throw new Err('Сначала открой клетку');
         var mult = mmult(r.opened.length, r.M); u.round = null; return { mult: mult, payout: pay(u, 'mines', r.bet, r.bet * mult), mines: r.mines };
       },
+      'bj/lobby': function (u) {
+        var B = bjAll(u.demo), p = u.demo ? 'd' : 'r';
+        return { on: !!set('bjOn'), at: u.bjt || '', stakes: BJ_ST.map(function (st) { return { stake: st, tables: BJ_TN.map(function (n, i) { var T = B[p + st + '_' + i]; return { id: T.id, name: T.name, players: T.seats.filter(Boolean).length }; }) }; }) };
+      },
+      'bj/sit': function (u, b) {
+        if (!set('bjOn')) throw new Err('Блэкджек временно закрыт');
+        var T = bjAll(u.demo)[String(b.id || '')]; if (!T) throw new Err('Стол не найден');
+        if (u.bjt && u.bjt !== T.id) bjLeaveU(u);
+        if (bjSeatOf(T, u.id) < 0) { var free = [2, 1, 3, 0, 4].filter(function (i) { return !T.seats[i]; }); if (!free.length) throw new Err('За этим столом нет свободных мест'); T.seats[free[0]] = { uid: u.id, name: u.name, seen: now(), bet: 0, hands: [] }; }
+        u.bjt = T.id; return bjView(u, T);
+      },
+      'bj/leave': function (u) { bjLeaveU(u); return { ok: true }; },
+      'bj/state': function (u) { var T = u.bjt && bjTable(u.bjt); if (!T || bjSeatOf(T, u.id) < 0) { u.bjt = ''; return { gone: true }; } return bjView(u, T); },
+      'bj/bet': function (u) {
+        if (!set('bjOn')) throw new Err('Блэкджек временно закрыт');
+        var m = bjMine(u), T = m.T, s = m.s; if (T.phase !== 'wait' && T.phase !== 'bet') throw new Err('Дождись следующей раздачи'); if (s.bet > 0) throw new Err('Ставка уже сделана');
+        if (u.balance < T.stake) throw new Err('Не хватает звёзд'); u.balance -= T.stake; s.bet = T.stake; s.seen = now();
+        if (T.phase === 'wait') { T.phase = 'bet'; T.dl = now() + BJ_BET; } bjAdvance(T, now()); return bjView(u, T);
+      },
+      'bj/act': function (u, b) {
+        var m = bjMine(u), T = m.T, s = m.s, t = now(); if (T.phase !== 'play' || T.turn !== m.i) throw new Err('Сейчас не твой ход');
+        var h = s.hands[T.th], a = String(b.a || ''), sc = bjScore(h.c); s.seen = t;
+        if (a === 'hit') { h.c.push(bjDraw(T)); if (bjScore(h.c).t >= 21) h.done = true; }
+        else if (a === 'stand') h.done = true;
+        else if (a === 'double') {
+          if (h.c.length !== 2 || h.split || sc.soft || sc.t < 9 || sc.t > 11) throw new Err('Удвоить можно на 9, 10 или 11 с первых двух карт'); if (u.balance < h.bet) throw new Err('Не хватает звёзд для удвоения');
+          u.balance -= h.bet; h.bet *= 2; h.dbl = true; h.c.push(bjDraw(T)); h.done = true;
+        } else if (a === 'split') {
+          if (s.hands.length !== 1 || h.c.length !== 2 || h.c[0][0] !== h.c[1][0]) throw new Err('Разделить можно две одинаковые карты, один раз'); if (u.balance < h.bet) throw new Err('Не хватает звёзд для разделения');
+          u.balance -= h.bet; var aces = h.c[0][0] === 'A';
+          s.hands = [{ c: [h.c[0], bjDraw(T)], bet: h.bet, split: true }, { c: [h.c[1], bjDraw(T)], bet: h.bet, split: true }];
+          s.hands.forEach(function (x) { if (aces || bjScore(x.c).t === 21) x.done = true; });
+        } else throw new Err('Неизвестное действие');
+        if (s.hands[T.th] && !s.hands[T.th].done) T.dl = t + BJ_TURN; else bjNext(T, t);
+        return bjView(u, T);
+      },
       upgrade: function (u, b) {
         var i = inv(u, +b.stake), t = cfg().items[b.target]; if (i < 0 || !t) throw new Err('Выбери подарки');
         var sv = cfg().items[u.inv[i].k].value; if (sv < set('minBet')) throw new Err('Для апгрейда нужен подарок стоимостью от ★' + set('minBet')); if (!(t.value > sv)) throw new Err('Цель должна быть дороже');
@@ -244,7 +364,7 @@
     var DEMO_NO = ['wd/info', 'wd/request', 'deposit/info', 'deposit/test', 'ref', 'seed/rotate', 'promo'];
     function handle(path, id, body, name, username, demo) {
       try {
-        advance(); var u = user(id, name, username, demo), f = H[path]; if (!f) throw new Err('Нет такого метода');
+        advance(); bjTick(); var u = user(id, name, username, demo), f = H[path]; if (!f) throw new Err('Нет такого метода');
         if (u.demo && DEMO_NO.indexOf(path) >= 0) throw new Err('В демо-режиме это недоступно. Переключись на реальный счёт');
         if (u.banned && ['me', 'live', 'crash/state', 'leaders', 'wd/list'].indexOf(path) < 0) throw new Err('Аккаунт заблокирован. Напиши в поддержку.');
         var r = f(u, body || {}) || {}; r.balance = u.balance; r.inv = u.inv; r.stats = u.stats; save(); return r;
@@ -252,7 +372,7 @@
     }
     function publicConfig() {
       var c = cfg(); return {
-        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
+        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), bjOn: set('bjOn'), bjPay: set('bjPay'), bjH17: set('bjH17'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
         cases: c.cases.filter(function (x) { return x.active; }).map(function (x) { return { id: x.id, name: x.name, img: x.img, hue: x.hue, price: x.price, free: x.free, items: x.items.map(function (y) { return { k: y.k, weight: y.weight }; }) }; }),
         slots: slotInfo()
       };
@@ -264,10 +384,16 @@
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      ['edge', 'minBet', 'maxBet', 'demoBalance', 'maxPayout', 'maxCaseRtp', 'startBalance', 'tonToStars', 'minDeposit', 'refPercent', 'wdFeePct', 'wdMinValue', 'wdWagerMult', 'crashMax', 'crashSpeed', 'minesMin', 'minesMaxMult'].forEach(function (k) { var v = +s[k]; if (!(v >= 0)) throw new Err('Неверная настройка: ' + k); out.settings[k] = v; });
+      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17' };
+      Object.keys(LBL).forEach(function (k) {
+        var raw = s[k], cur = set(k); if (!(cur >= 0)) cur = Number(DS0[k]); // поле не пришло или пустое: оставляем текущее значение
+        var v = (raw === undefined || raw === null || raw === '' || isNaN(+raw)) ? cur : +raw; if (!(v >= 0)) throw new Err('Неверная настройка: ' + LBL[k]); out.settings[k] = v;
+      });
+      out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
+      if (!(out.settings.bjPay >= 1 && out.settings.bjPay <= 1.5)) throw new Err('Выплата за блэкджек от 1 до 1.5 (6 к 5 = 1.2, 3 к 2 = 1.5)');
       ['botUsername', 'supportUsername'].forEach(function (k) { var v = String(s[k] || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{0,32}$/.test(v)) throw new Err('Имя в Telegram: латиница, цифры, _ (' + k + ')'); out.settings[k] = v; });
       out.settings.wdNote = String(s.wdNote || '').slice(0, 80); out.settings.edges = {};
-      ['crash', 'mines', 'plinko', 'coin', 'upgrade', 'slots'].forEach(function (g) { var v = +((s.edges || {})[g]); if (!(v >= 0 && v <= 0.25)) throw new Err('Преимущество казино по игре ' + g + ' должно быть от 0 до 0.25'); out.settings.edges[g] = v; });
+      ['crash', 'mines', 'plinko', 'coin', 'upgrade', 'slots'].forEach(function (g) { var rv = (s.edges || {})[g], v = (rv === undefined || rv === null || rv === '') ? edgeOf(g) : +rv; if (!(v >= 0 && v <= 0.25)) throw new Err('Преимущество казино по игре ' + g + ' должно быть от 0 до 0.25'); out.settings.edges[g] = v; });
       if (out.settings.minesMin < 1 || out.settings.minesMin > 20) throw new Err('Минимум мин от 1 до 20');
       if (out.settings.minesMaxMult < 1.1 || out.settings.minesMaxMult > 1000) throw new Err('Потолок выигрыша в минах от ×1.1 до ×1000');
       if (out.settings.crashMax < 2 || out.settings.crashMax > 100) throw new Err('Максимум ракеты должен быть от ×2 до ×100');
@@ -321,7 +447,7 @@
     }
     function userAdjust(id, delta) { var u = S.users[String(id)]; if (!u) throw new Err('Игрок не найден'); delta = Math.floor(+delta); if (!delta) throw new Err('Укажи сумму'); u.balance = Math.max(0, u.balance + delta); save(); return { balance: u.balance }; }
     function userBan(id, flag) { var u = S.users[String(id)]; if (!u) throw new Err('Игрок не найден'); u.banned = !!flag; save(); return { banned: u.banned }; }
-    function tick() { advance(); save(); }
+    function tick() { advance(); bjTick(); save(); }
     function seedHistory(n) { if (S.hist.length) return; for (var i = 0; i < n; i++) S.hist.push(Math.max(1, Math.min(set('crashMax') || 50, Math.floor(100 * (1 - edgeOf('crash')) / (1 - roll(S.sys))) / 100))); }
     return { tick: tick, seedHistory: seedHistory, wdList: wdList, wdResolve: wdResolve, usersList: usersList, userAdjust: userAdjust, userBan: userBan, credit: credit, creditOnce: creditOnce, setting: set, handle: handle, publicConfig: publicConfig, adminConfig: adminConfig, putConfig: putConfig, stats: stats, Err: Err };
   }

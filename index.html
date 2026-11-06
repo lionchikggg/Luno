@@ -402,6 +402,84 @@ html{scroll-behavior:smooth}
 #cd{inset:0 0 auto 0;height:44%;align-items:center}
 #rk .pil{width:76%!important;top:33%!important}
 #rk .pil{clip-path:inset(0 13% 30% 13%)}
+/* ===== Карточный зал и блэкджек ===== */
+.hall{grid-template-columns:minmax(0,1fr)!important}
+.game .bjart .pc span{color:inherit;margin:0;font-weight:800}.game .bjart .pcr{font-size:calc(var(--cw)*.3)}.game .bjart .pcs{font-size:calc(var(--cw)*.56)}
+.c7{background:radial-gradient(70% 120% at 85% 30%,rgba(96,140,255,.32),transparent),linear-gradient(135deg,#0a1a4a,#16348f 60%,#2a2a9e)}
+.bjart{position:absolute;right:22px;top:14px;width:120px;height:96px;pointer-events:none}
+.bjart .pc{position:absolute;--cw:52px}.bjart .pc:nth-child(1){left:8px;top:10px;transform:rotate(-14deg)}.bjart .pc:nth-child(2){left:52px;top:4px;transform:rotate(9deg)}
+.pc{width:var(--cw,50px);height:calc(var(--cw,50px)*1.4);perspective:600px;flex:none;position:relative}
+.pci{position:absolute;inset:0;transition:transform .45s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d}
+.pc.dn .pci{transform:rotateY(180deg)}
+.pcf,.pcb{position:absolute;inset:0;border-radius:calc(var(--cw,50px)*.13);backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 3px 8px rgba(0,0,0,.45)}
+.pcf{background:#fbf8f1;color:#1c1a33;font:800 calc(var(--cw,50px)*.3)/1 Manrope,sans-serif}
+.pc.rd .pcf{color:#d2364a}
+.pcr{position:absolute;left:9%;top:6%;text-align:center}.pcr i{display:block;font-style:normal;font-size:.86em}
+.pcs{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--cw,50px)*.56);padding-top:20%}
+.pcb{transform:rotateY(180deg);border:2px solid #fff;background:radial-gradient(circle,transparent 0 30%,rgba(255,255,255,.12) 31% 34%,transparent 35%),repeating-linear-gradient(45deg,#5b38cc 0 4px,#4a28b0 4px 8px);display:grid;place-items:center}
+.pcb::after{content:"";width:36%;aspect-ratio:1;border-radius:50%;box-shadow:inset calc(var(--cw,50px)*-.07) calc(var(--cw,50px)*.03) 0 0 #ffe9a8}
+.pc.deal{animation:pcdeal .45s cubic-bezier(.2,.8,.25,1) both}
+@keyframes pcdeal{from{transform:translate(var(--fx,40vw),var(--fy,-30vh)) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
+.pk{display:flex;justify-content:center;min-height:calc(var(--cw)*1.4);--cw:50px}
+.pk .pc+.pc{margin-left:calc(var(--cw)*-.48)}
+.pk.sm{--cw:26px}.pk.sm .pcs{display:none}.pk.sm .pcf{font-size:calc(var(--cw)*.42)}.pk.sm .pc+.pc{margin-left:calc(var(--cw)*-.52)}
+.pk.lg{--cw:60px}
+/* лобби */
+.bjst{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 12px;padding:2px 16px 4px;scrollbar-width:none}.bjst::-webkit-scrollbar{display:none}
+.bjst button{flex:none;display:flex;align-items:center;gap:6px;padding:10px 14px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-weight:800;white-space:nowrap}
+.bjst button i{width:16px;height:16px}
+.bjst button.on{background:linear-gradient(120deg,#ffe08a,#f4b02c);color:#3a2a00;border-color:#ffe08a}
+.bjr{display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:10px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(160deg,#10143f,#070920)}
+.bjx{flex:none;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font:800 12px Unbounded;color:#ffe9a8;background:radial-gradient(circle at 50% 35%,#1e3a9c,#0b1a52);border:3px solid #5a3fc0}
+.bjri{flex:1;min-width:0}.bjri b{display:block;font-size:15px}
+.tdot{display:flex;align-items:center;gap:4px;margin-top:5px;flex-wrap:wrap}.tdot i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--muted)}.tdot i.f{background:var(--violet);border-color:var(--violet)}
+.tdot span{color:var(--muted);font-size:12px;margin-left:6px}
+.bjr .btn{flex:none;padding:10px 18px;background:linear-gradient(120deg,#8b6bff,#5a3fc0);color:#fff}
+.bjr .btn:disabled{background:var(--card);color:var(--muted);opacity:1}
+.bjnote{color:var(--muted);font-size:13px;line-height:1.5;margin:14px 2px 0}
+.lnk{border:0;background:none;color:var(--gold);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:0}
+/* стол */
+.bjtop{display:flex;justify-content:space-between;align-items:center;margin:0 2px 10px;font-weight:700}
+.bjtop b{font:800 15px Unbounded}.bjtop span{color:var(--muted);font-size:13px}
+.felt{position:relative;padding:14px 8px 18px;border-radius:28px 28px 50% 50%/28px 28px 15% 15%;background:radial-gradient(120% 80% at 50% 18%,#1e3384,#0c1849);border:10px solid #4a2f8f;box-shadow:inset 0 0 0 2px rgba(255,255,255,.08),inset 0 0 60px rgba(0,0,0,.45),0 0 0 2px #2a1a5c,0 18px 40px -12px rgba(0,0,0,.7)}
+.shoe{position:absolute;right:12px;top:10px;width:34px;height:46px}.shoe .pc{--cw:30px;position:absolute;top:0;left:0}.shoe .pc+.pc{top:3px;left:3px}
+.shoe .pcb{transform:none}
+.bjd{text-align:center}.bjd .who{display:flex;justify-content:center;align-items:center;gap:8px;font-weight:800;font-size:13px;color:#c9cdf7;margin-bottom:6px}
+.bjd .pk{--fx:30vw;--fy:-2vh}
+.bjprint{display:block;width:100%;height:auto;margin:4px 0 0;pointer-events:none}.bjprint text{fill:#ffe9a8;opacity:.55;font-family:Unbounded,sans-serif;letter-spacing:.05em}
+.bjseats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;align-items:end;margin-top:2px;--fx:34vw;--fy:-20vh}
+.bjs{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:100px;padding:6px 2px;border-radius:14px;background:rgba(5,10,40,.55);border:1px solid rgba(255,255,255,.08);transition:box-shadow .2s}
+.bjs:nth-child(1),.bjs:nth-child(5){transform:translateY(-18px)}.bjs:nth-child(2),.bjs:nth-child(4){transform:translateY(-5px)}
+.bjs.free{justify-content:center;background:none;border:1.5px dashed rgba(255,255,255,.16);color:rgba(255,255,255,.35);font-size:11px}
+.bjs.me{border-color:#ffe9a8;background:rgba(40,30,90,.6)}
+.bjs.turn{box-shadow:0 0 0 2px #4be39a,0 0 18px rgba(75,227,154,.4)}
+.bjs .bjh{display:flex;flex-direction:column;gap:4px;flex:1;justify-content:flex-end}
+.bjs .nm{font-size:11px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#dfe2ff}
+.bchip{font:800 10px Manrope;padding:2px 7px;border-radius:999px;background:linear-gradient(120deg,#ffe08a,#f4b02c);color:#3a2a00}
+.bchip:empty{display:none}
+.bsc{display:inline-block;min-width:22px;padding:1px 7px;border-radius:999px;background:rgba(0,0,0,.45);font:700 11px Unbounded;color:#fff;text-align:center}
+.bsc:empty{display:none}.bsc.bust{background:var(--bad)}.bsc.bj{background:#ffe08a;color:#3a2a00}
+.bres{font:800 11px Unbounded;min-height:14px;opacity:0}.bres.on{animation:resin .35s both}
+.bres.w{color:var(--ok)}.bres.l{color:var(--bad)}.bres.p{color:var(--muted)}
+@keyframes resin{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+.bjtm{position:absolute;left:6px;right:6px;bottom:-3px;height:3px;border-radius:2px;background:#4be39a;transform-origin:left}
+.bjme{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:14px 0 4px;--fx:30vw;--fy:-40vh}
+.bmh{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 10px;border-radius:18px;border:1px solid transparent}
+.bmh.act{border-color:#4be39a;background:rgba(75,227,154,.07)}
+.bmh .mr{display:flex;gap:8px;align-items:center}.bmh .bsc{font-size:13px;padding:2px 9px}.bmh .bchip{font-size:12px;padding:3px 9px}.bmh .bres{font-size:14px}
+.bjmsg{text-align:center;min-height:44px;font-weight:700;margin:8px 0 4px;color:#dfe2ff}
+.bjmsg big{display:block;font:800 20px Unbounded}.bjmsg .w{color:var(--ok)}.bjmsg .l{color:var(--bad)}
+.bjctl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.bjctl .ab{padding:13px 4px 11px;border-radius:16px;border:1px solid var(--line);background:var(--card);font-weight:800;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bjctl .ab small{font-weight:600;color:var(--muted);font-size:11px}
+.bjctl .ab.hit{background:linear-gradient(120deg,#8b6bff,#5a3fc0);border-color:#8b6bff}.bjctl .ab.hit small{color:#e4dcff}
+.bjctl .ab:disabled{opacity:.35}
+.bjctl .btn.big{grid-column:1/-1}
+.bjrules{text-align:center;margin-top:12px}
+@media (max-width:360px){.pk.lg{--cw:52px}.pk.sm{--cw:22px}.bjs .nm{font-size:10px}}
+@media (min-width:900px){.pk.sm{--cw:34px}.pk.lg{--cw:72px}.bjs{min-height:130px}#bjt,#bj{max-width:640px;margin:0 auto}}
+@media (prefers-reduced-motion:reduce){.pc.deal{animation:none}.pci{transition:none}}
+.bjtm{transition:transform .7s linear}
 </style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
@@ -429,6 +507,8 @@ html{scroll-behavior:smooth}
   <button class="game wide c6" data-g="plinko"><div class="art" data-card="plinko"></div><span class="nw">NEW</span><strong>Plinko</strong><span class="sb2" id="plsub"></span></button>
   <button class="game wide c5" data-g="coin"><div class="art" data-card="coin"></div><span class="nw">NEW</span><strong>Монетка</strong><span class="sb2">выбери сторону</span></button>
  </div>
+ <div id="hallw"><h3>Карточный зал</h3>
+ <div class="grid hall"><button class="game wide c7" data-g="bj"><div class="bjart" aria-hidden="true"><div class="pc"><div class="pci"><div class="pcf"><span class="pcr">A<i>♠</i></span><span class="pcs">♠</span></div></div></div><div class="pc rd"><div class="pci"><div class="pcf"><span class="pcr">K<i>♥</i></span><span class="pcs">♥</span></div></div></div></div><span class="nw">NEW</span><strong>Блэкджек</strong><span class="sb2">живые столы против дилера</span></button></div></div>
  <p class="note" id="tm"></p>
 </section>
 
@@ -504,6 +584,26 @@ html{scroll-behavior:smooth}
   <button class="btn big" id="pgo">Бросить шар</button>
  </div>
 </section>
+<section class="view" id="bj">
+ <div class="bjst" id="bjst" role="group" aria-label="Ставка стола"></div>
+ <div id="bjtl"></div>
+ <p class="bjnote">За столом до 5 игроков, каждый играет против дилера. Если стол пустой, играешь один на один с дилером. <button class="lnk" data-bjrules>Правила</button></p>
+</section>
+<section class="view" id="bjt">
+ <div class="bjtop"><b id="bjtn"></b><span id="bjtp"></span></div>
+ <div class="felt">
+  <div class="shoe" aria-hidden="true"><div class="pc"><div class="pci"><div class="pcb"></div></div></div><div class="pc"><div class="pci"><div class="pcb"></div></div></div></div>
+  <div class="bjd"><div class="who">Дилер <span class="bsc" id="bjds"></span></div><div class="pk" id="k_d"></div></div>
+  <svg class="bjprint" viewBox="0 0 320 58" aria-hidden="true"><path id="bja1" d="M18,8 Q160,58 302,8" fill="none"/><path id="bja2" d="M48,24 Q160,66 272,24" fill="none"/>
+   <text font-size="11"><textPath href="#bja1" startOffset="50%" text-anchor="middle" id="bjp1">Блэкджек платит 6 к 5</textPath></text>
+   <text font-size="8"><textPath href="#bja2" startOffset="50%" text-anchor="middle" id="bjp2">Дилер берёт карту на мягких 17</textPath></text></svg>
+  <div class="bjseats" id="bjseats"></div>
+ </div>
+ <div class="bjme" id="bjme"></div>
+ <div class="bjmsg" id="bjmsg" role="status" aria-live="polite"></div>
+ <div class="bjctl" id="bjctl"></div>
+ <p class="bjrules"><button class="lnk" data-bjrules>Правила стола</button></p>
+</section>
 </main>
 <div class="md" id="md"><div class="mb" id="mbody"></div></div>
 <div class="sheet" id="sheet"><div class="box" id="sbox"></div></div>
@@ -529,7 +629,7 @@ html{scroll-behavior:smooth}
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
-        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10,
+        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, bjOn: 1, bjPay: 1.2, bjH17: 1,
         edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05 }, wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
@@ -590,7 +690,7 @@ html{scroll-behavior:smooth}
     var S = o.state; S.wd = S.wd || []; S.wdSeq = S.wdSeq || 0; S.daily = S.daily || {}; S.fees = S.fees || 0; S.sys = S.sys || {}; S.hist = S.hist || []; S.paid = S.paid || {}; S.deposited = S.deposited || 0; S.live = S.live || []; var now = o.now || Date.now, save = o.save || function () {}, roll = o.roll;
     var cfg = function () { return S.cfg; }, set = function (k) { return Number(S.cfg.settings[k]); };
     (function migrate() {
-      var DS = defaultConfig({}).settings, st = S.cfg.settings; Object.keys(DS).forEach(function (k) { if (st[k] === undefined) st[k] = DS[k]; });
+      var DS = defaultConfig({}).settings, st = S.cfg.settings; Object.keys(DS).forEach(function (k) { if (st[k] === undefined || (typeof DS[k] === 'number' && (st[k] === null || st[k] === '' || isNaN(+st[k])))) st[k] = DS[k]; });
       st.edges = st.edges || {}; Object.keys(DS.edges).forEach(function (g) { if (st.edges[g] === undefined) st.edges[g] = DS.edges[g]; });
       S.flags = S.flags || {}; if (!S.flags.m10) { S.flags.m10 = 1; var ed0 = S.cfg.settings.edges || {}; if (ed0.mines === 0.06) ed0.mines = 0.10; var sk1 = S.cfg.skins || {}; if (!sk1.sprite_rocket || /pepe\.webp$/.test(sk1.sprite_rocket)) sk1.sprite_rocket = '/art/minedog.webp'; }
       var sk0 = S.cfg.skins = S.cfg.skins || {}; if (sk0.mines_closed === undefined) sk0.mines_closed = '/art/minedog.webp'; ['mines_safe', 'mines_bomb', 'card_mines'].forEach(function (k) { if (sk0[k] === undefined) sk0[k] = ''; });
@@ -661,6 +761,90 @@ html{scroll-behavior:smooth}
       if (u.balance < fee) reasons.push('Для комиссии за вывод (★' + fee + ') не хватает звёзд на балансе');
       return { ok: !reasons.length, reasons: reasons, fee: fee };
     }
+
+    // ---- Блэкджек: живые столы с реальными игроками, дилер играет по правилам на сервере ----
+    var BJ_ST = [10, 50, 100, 500, 1000, 5000, 10000], BJ_TN = ['Луна', 'Орбита', 'Сатурн'], BJ_BET = 9000, BJ_TURN = 15000, BJ_IDLE = 40000;
+    function bjAll(demo) {
+      var B = S.bj || (S.bj = {}), k = demo ? 'demo' : 'real';
+      if (!B[k]) { B[k] = {}; BJ_ST.forEach(function (st) { BJ_TN.forEach(function (n, i) { var id = (demo ? 'd' : 'r') + st + '_' + i; B[k][id] = { id: id, stake: st, name: n, seats: [null, null, null, null, null], phase: 'wait', dl: 0, dealer: [], hole: false, shoe: [], round: 0, turn: -1, th: 0 }; }); }); }
+      return B[k];
+    }
+    function bjTable(id) { var B = S.bj || {}; return (B.real && B.real[id]) || (B.demo && B.demo[id]) || null; }
+    var bjV = function (c) { var r = c[0]; return r === 'A' ? 11 : 'TJQK'.indexOf(r) >= 0 ? 10 : +r; };
+    function bjScore(cs) { var t = 0, a = 0; cs.forEach(function (c) { if (c === '??') return; t += bjV(c); if (c[0] === 'A') a++; }); while (t > 21 && a) { t -= 10; a--; } return { t: t, soft: a > 0 }; }
+    var bjNat = function (h) { return h.c.length === 2 && !h.split && bjScore(h.c).t === 21; };
+    function bjDraw(T) {
+      if (!T.shoe || T.shoe.length < 80) { // 6 колод, перемешиваются заново, когда остаётся четверть
+        var R = 'A23456789TJQK', sh = [], d, i, j, k; for (d = 0; d < 6; d++) for (i = 0; i < 13; i++) for (j = 0; j < 4; j++) sh.push(R[i] + 'shdc'[j]);
+        for (k = sh.length - 1; k > 0; k--) { var x = Math.floor(roll(S.sys) * (k + 1)), tmp = sh[k]; sh[k] = sh[x]; sh[x] = tmp; } T.shoe = sh;
+      }
+      return T.shoe.pop();
+    }
+    function bjSeatOf(T, uid) { for (var i = 0; i < 5; i++) if (T.seats[i] && T.seats[i].uid === uid) return i; return -1; }
+    function bjDeal(T, t) {
+      var act = T.seats.filter(function (s) { return s && s.bet > 0; });
+      T.seats.forEach(function (s) { if (s) s.hands = []; });
+      if (!act.length) { T.phase = 'wait'; T.dealer = []; return; }
+      T.round++; T.dealer = []; T.hole = true;
+      act.forEach(function (s) { s.hands = [{ c: [], bet: s.bet }]; });
+      for (var p = 0; p < 2; p++) { act.forEach(function (s) { s.hands[0].c.push(bjDraw(T)); }); T.dealer.push(bjDraw(T)); }
+      if (bjScore(T.dealer).t === 21) return bjSettle(T, t); // у дилера блэкджек: открывает сразу
+      act.forEach(function (s) { if (bjScore(s.hands[0].c).t === 21) s.hands[0].done = true; });
+      T.phase = 'play'; bjNext(T, t);
+    }
+    function bjNext(T, t) {
+      for (var i = 0; i < 5; i++) { var s = T.seats[i]; if (!s) continue; for (var j = 0; j < s.hands.length; j++) if (!s.hands[j].done) { T.turn = i; T.th = j; T.dl = t + BJ_TURN; return; } }
+      T.turn = -1; bjDealerPlay(T, t);
+    }
+    function bjDealerPlay(T, t) {
+      T.hole = false; var live = false;
+      T.seats.forEach(function (s) { if (s) s.hands.forEach(function (h) { if (bjScore(h.c).t <= 21 && !bjNat(h)) live = true; }); });
+      if (live) for (;;) { var d = bjScore(T.dealer); if (d.t > 17 || (d.t === 17 && !(d.soft && set('bjH17')))) break; T.dealer.push(bjDraw(T)); }
+      bjSettle(T, t);
+    }
+    function bjSettle(T, t) {
+      T.hole = false; var d = bjScore(T.dealer).t, dn = T.dealer.length === 2 && d === 21, bp = set('bjPay') || 1.2;
+      T.seats.forEach(function (s) {
+        if (!s) return; var u = S.users[s.uid];
+        s.hands.forEach(function (h) {
+          var v = bjScore(h.c).t, nat = bjNat(h), p = 0;
+          if (nat && dn) p = h.bet; else if (nat) p = h.bet + Math.floor(h.bet * bp); else if (dn || v > 21) p = 0; else if (d > 21 || v > d) p = h.bet * 2; else if (v === d) p = h.bet;
+          h.pay = p; h.res = p > h.bet ? 'w' : p === h.bet ? 'p' : 'l'; h.done = true;
+          if (u) { u.balance += p; book(u, 'blackjack', h.bet, p); u.stats.profit += p - h.bet; }
+        });
+        s.bet = 0;
+      });
+      T.phase = 'done'; T.turn = -1; T.dl = t + 3800 + 700 * Math.max(0, T.dealer.length - 2);
+    }
+    function bjAdvance(T, t) {
+      for (var n = 0; n < 8; n++) {
+        T.seats.forEach(function (s, i) {
+          if (s && (s.left || t - s.seen > BJ_IDLE) && !(s.bet > 0) && !(T.phase === 'play' && s.hands.length)) { var u = S.users[s.uid]; if (u && u.bjt === T.id) u.bjt = ''; T.seats[i] = null; }
+        });
+        var seated = T.seats.filter(Boolean);
+        if (T.phase === 'bet' && (t >= T.dl || seated.every(function (s) { return s.bet > 0; }))) { bjDeal(T, t); continue; }
+        if (T.phase === 'play' && t >= T.dl) { var cs = T.seats[T.turn], ch = cs && cs.hands[T.th]; if (ch) ch.done = true; bjNext(T, t); continue; }
+        if (T.phase === 'done' && t >= T.dl) { T.phase = 'wait'; T.dealer = []; T.seats.forEach(function (s) { if (s) s.hands = []; }); continue; }
+        break;
+      }
+    }
+    function bjTick() {
+      var t = now(), B = S.bj || {};
+      ['real', 'demo'].forEach(function (k) { var A = B[k]; if (A) Object.keys(A).forEach(function (id) { var T = A[id]; if (T.phase !== 'wait' || T.seats.some(Boolean)) bjAdvance(T, t); }); });
+    }
+    function bjLeaveU(u) {
+      var T = u.bjt && bjTable(u.bjt); u.bjt = ''; if (!T) return; var i = bjSeatOf(T, u.id); if (i < 0) return; var s = T.seats[i];
+      if (T.phase === 'play' && s.hands.length) { s.left = true; s.hands.forEach(function (h) { h.done = true; }); if (T.turn === i) bjNext(T, now()); return; }
+      if (s.bet > 0) { u.balance += s.bet; s.bet = 0; } // ставка ещё не сыграла: возвращаем
+      T.seats[i] = null;
+    }
+    function bjView(u, T) {
+      var t = now(), me = bjSeatOf(T, u.id); if (me >= 0) T.seats[me].seen = t;
+      return { bj: { id: T.id, name: T.name, stake: T.stake, phase: T.phase, dl: T.dl, now: t, round: T.round, turn: T.turn, th: T.th, me: me, pay: set('bjPay') || 1.2, h17: !!set('bjH17'),
+        dealer: T.hole && T.dealer.length > 1 ? [T.dealer[0], '??'] : T.dealer.slice(),
+        seats: T.seats.map(function (s) { return s ? { name: s.uid === u.id ? s.name : maskName(s.name), me: s.uid === u.id, bet: s.bet, hands: s.hands.map(function (h) { return { c: h.c.slice(), bet: h.bet, done: !!h.done, res: h.res || '', pay: h.pay || 0, split: !!h.split }; }) } : null; }) } };
+    }
+    function bjMine(u) { var T = u.bjt && bjTable(u.bjt), i = T ? bjSeatOf(T, u.id) : -1; if (i < 0) throw new Err('Сначала сядь за стол'); return { T: T, i: i, s: T.seats[i] }; }
     var H = {
       me: function (u, b) {
         if (b.ref && !u.refSet) { u.refSet = 1; var rf = S.users[String(b.ref)]; if (rf && rf.id !== u.id) { u.ref = rf.id; rf.refCount = (rf.refCount || 0) + 1; } }
@@ -721,6 +905,42 @@ html{scroll-behavior:smooth}
         var r = u.round; if (!r || r.game !== 'mines' || !r.opened.length) throw new Err('Сначала открой клетку');
         var mult = mmult(r.opened.length, r.M); u.round = null; return { mult: mult, payout: pay(u, 'mines', r.bet, r.bet * mult), mines: r.mines };
       },
+      'bj/lobby': function (u) {
+        var B = bjAll(u.demo), p = u.demo ? 'd' : 'r';
+        return { on: !!set('bjOn'), at: u.bjt || '', stakes: BJ_ST.map(function (st) { return { stake: st, tables: BJ_TN.map(function (n, i) { var T = B[p + st + '_' + i]; return { id: T.id, name: T.name, players: T.seats.filter(Boolean).length }; }) }; }) };
+      },
+      'bj/sit': function (u, b) {
+        if (!set('bjOn')) throw new Err('Блэкджек временно закрыт');
+        var T = bjAll(u.demo)[String(b.id || '')]; if (!T) throw new Err('Стол не найден');
+        if (u.bjt && u.bjt !== T.id) bjLeaveU(u);
+        if (bjSeatOf(T, u.id) < 0) { var free = [2, 1, 3, 0, 4].filter(function (i) { return !T.seats[i]; }); if (!free.length) throw new Err('За этим столом нет свободных мест'); T.seats[free[0]] = { uid: u.id, name: u.name, seen: now(), bet: 0, hands: [] }; }
+        u.bjt = T.id; return bjView(u, T);
+      },
+      'bj/leave': function (u) { bjLeaveU(u); return { ok: true }; },
+      'bj/state': function (u) { var T = u.bjt && bjTable(u.bjt); if (!T || bjSeatOf(T, u.id) < 0) { u.bjt = ''; return { gone: true }; } return bjView(u, T); },
+      'bj/bet': function (u) {
+        if (!set('bjOn')) throw new Err('Блэкджек временно закрыт');
+        var m = bjMine(u), T = m.T, s = m.s; if (T.phase !== 'wait' && T.phase !== 'bet') throw new Err('Дождись следующей раздачи'); if (s.bet > 0) throw new Err('Ставка уже сделана');
+        if (u.balance < T.stake) throw new Err('Не хватает звёзд'); u.balance -= T.stake; s.bet = T.stake; s.seen = now();
+        if (T.phase === 'wait') { T.phase = 'bet'; T.dl = now() + BJ_BET; } bjAdvance(T, now()); return bjView(u, T);
+      },
+      'bj/act': function (u, b) {
+        var m = bjMine(u), T = m.T, s = m.s, t = now(); if (T.phase !== 'play' || T.turn !== m.i) throw new Err('Сейчас не твой ход');
+        var h = s.hands[T.th], a = String(b.a || ''), sc = bjScore(h.c); s.seen = t;
+        if (a === 'hit') { h.c.push(bjDraw(T)); if (bjScore(h.c).t >= 21) h.done = true; }
+        else if (a === 'stand') h.done = true;
+        else if (a === 'double') {
+          if (h.c.length !== 2 || h.split || sc.soft || sc.t < 9 || sc.t > 11) throw new Err('Удвоить можно на 9, 10 или 11 с первых двух карт'); if (u.balance < h.bet) throw new Err('Не хватает звёзд для удвоения');
+          u.balance -= h.bet; h.bet *= 2; h.dbl = true; h.c.push(bjDraw(T)); h.done = true;
+        } else if (a === 'split') {
+          if (s.hands.length !== 1 || h.c.length !== 2 || h.c[0][0] !== h.c[1][0]) throw new Err('Разделить можно две одинаковые карты, один раз'); if (u.balance < h.bet) throw new Err('Не хватает звёзд для разделения');
+          u.balance -= h.bet; var aces = h.c[0][0] === 'A';
+          s.hands = [{ c: [h.c[0], bjDraw(T)], bet: h.bet, split: true }, { c: [h.c[1], bjDraw(T)], bet: h.bet, split: true }];
+          s.hands.forEach(function (x) { if (aces || bjScore(x.c).t === 21) x.done = true; });
+        } else throw new Err('Неизвестное действие');
+        if (s.hands[T.th] && !s.hands[T.th].done) T.dl = t + BJ_TURN; else bjNext(T, t);
+        return bjView(u, T);
+      },
       upgrade: function (u, b) {
         var i = inv(u, +b.stake), t = cfg().items[b.target]; if (i < 0 || !t) throw new Err('Выбери подарки');
         var sv = cfg().items[u.inv[i].k].value; if (sv < set('minBet')) throw new Err('Для апгрейда нужен подарок стоимостью от ★' + set('minBet')); if (!(t.value > sv)) throw new Err('Цель должна быть дороже');
@@ -760,7 +980,7 @@ html{scroll-behavior:smooth}
     var DEMO_NO = ['wd/info', 'wd/request', 'deposit/info', 'deposit/test', 'ref', 'seed/rotate', 'promo'];
     function handle(path, id, body, name, username, demo) {
       try {
-        advance(); var u = user(id, name, username, demo), f = H[path]; if (!f) throw new Err('Нет такого метода');
+        advance(); bjTick(); var u = user(id, name, username, demo), f = H[path]; if (!f) throw new Err('Нет такого метода');
         if (u.demo && DEMO_NO.indexOf(path) >= 0) throw new Err('В демо-режиме это недоступно. Переключись на реальный счёт');
         if (u.banned && ['me', 'live', 'crash/state', 'leaders', 'wd/list'].indexOf(path) < 0) throw new Err('Аккаунт заблокирован. Напиши в поддержку.');
         var r = f(u, body || {}) || {}; r.balance = u.balance; r.inv = u.inv; r.stats = u.stats; save(); return r;
@@ -768,7 +988,7 @@ html{scroll-behavior:smooth}
     }
     function publicConfig() {
       var c = cfg(); return {
-        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
+        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), bjOn: set('bjOn'), bjPay: set('bjPay'), bjH17: set('bjH17'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
         cases: c.cases.filter(function (x) { return x.active; }).map(function (x) { return { id: x.id, name: x.name, img: x.img, hue: x.hue, price: x.price, free: x.free, items: x.items.map(function (y) { return { k: y.k, weight: y.weight }; }) }; }),
         slots: slotInfo()
       };
@@ -780,10 +1000,16 @@ html{scroll-behavior:smooth}
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      ['edge', 'minBet', 'maxBet', 'demoBalance', 'maxPayout', 'maxCaseRtp', 'startBalance', 'tonToStars', 'minDeposit', 'refPercent', 'wdFeePct', 'wdMinValue', 'wdWagerMult', 'crashMax', 'crashSpeed', 'minesMin', 'minesMaxMult'].forEach(function (k) { var v = +s[k]; if (!(v >= 0)) throw new Err('Неверная настройка: ' + k); out.settings[k] = v; });
+      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17' };
+      Object.keys(LBL).forEach(function (k) {
+        var raw = s[k], cur = set(k); if (!(cur >= 0)) cur = Number(DS0[k]); // поле не пришло или пустое: оставляем текущее значение
+        var v = (raw === undefined || raw === null || raw === '' || isNaN(+raw)) ? cur : +raw; if (!(v >= 0)) throw new Err('Неверная настройка: ' + LBL[k]); out.settings[k] = v;
+      });
+      out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
+      if (!(out.settings.bjPay >= 1 && out.settings.bjPay <= 1.5)) throw new Err('Выплата за блэкджек от 1 до 1.5 (6 к 5 = 1.2, 3 к 2 = 1.5)');
       ['botUsername', 'supportUsername'].forEach(function (k) { var v = String(s[k] || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{0,32}$/.test(v)) throw new Err('Имя в Telegram: латиница, цифры, _ (' + k + ')'); out.settings[k] = v; });
       out.settings.wdNote = String(s.wdNote || '').slice(0, 80); out.settings.edges = {};
-      ['crash', 'mines', 'plinko', 'coin', 'upgrade', 'slots'].forEach(function (g) { var v = +((s.edges || {})[g]); if (!(v >= 0 && v <= 0.25)) throw new Err('Преимущество казино по игре ' + g + ' должно быть от 0 до 0.25'); out.settings.edges[g] = v; });
+      ['crash', 'mines', 'plinko', 'coin', 'upgrade', 'slots'].forEach(function (g) { var rv = (s.edges || {})[g], v = (rv === undefined || rv === null || rv === '') ? edgeOf(g) : +rv; if (!(v >= 0 && v <= 0.25)) throw new Err('Преимущество казино по игре ' + g + ' должно быть от 0 до 0.25'); out.settings.edges[g] = v; });
       if (out.settings.minesMin < 1 || out.settings.minesMin > 20) throw new Err('Минимум мин от 1 до 20');
       if (out.settings.minesMaxMult < 1.1 || out.settings.minesMaxMult > 1000) throw new Err('Потолок выигрыша в минах от ×1.1 до ×1000');
       if (out.settings.crashMax < 2 || out.settings.crashMax > 100) throw new Err('Максимум ракеты должен быть от ×2 до ×100');
@@ -837,7 +1063,7 @@ html{scroll-behavior:smooth}
     }
     function userAdjust(id, delta) { var u = S.users[String(id)]; if (!u) throw new Err('Игрок не найден'); delta = Math.floor(+delta); if (!delta) throw new Err('Укажи сумму'); u.balance = Math.max(0, u.balance + delta); save(); return { balance: u.balance }; }
     function userBan(id, flag) { var u = S.users[String(id)]; if (!u) throw new Err('Игрок не найден'); u.banned = !!flag; save(); return { banned: u.banned }; }
-    function tick() { advance(); save(); }
+    function tick() { advance(); bjTick(); save(); }
     function seedHistory(n) { if (S.hist.length) return; for (var i = 0; i < n; i++) S.hist.push(Math.max(1, Math.min(set('crashMax') || 50, Math.floor(100 * (1 - edgeOf('crash')) / (1 - roll(S.sys))) / 100))); }
     return { tick: tick, seedHistory: seedHistory, wdList: wdList, wdResolve: wdResolve, usersList: usersList, userAdjust: userAdjust, userBan: userBan, credit: credit, creditOnce: creditOnce, setting: set, handle: handle, publicConfig: publicConfig, adminConfig: adminConfig, putConfig: putConfig, stats: stats, Err: Err };
   }
@@ -886,8 +1112,8 @@ I.spin=V('<path d="M32 10a22 22 0 0 1 21 15M32 54a22 22 0 0 1-21-15" stroke="#ff
 I.snd=V('<path d="M8 24h11l15-13v42L19 40H8z" fill="#fff"/><path d="M42 22c5 5 5 15 0 20M49 14c9 9 9 27 0 36" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>');
 function fill(r){(r||document).querySelectorAll('[data-i]').forEach(function(e){e.innerHTML=I[e.dataset.i]})}
 var $=function(i){return document.getElementById(i)},CFG,ME={id:'',balance:0,inv:[],stats:{opened:0,profit:0}},ONLINE=false,ENG=null,name='Игрок',uname='',photo='',cur='home';
-var TT={rocket:'Ракетка',mines:'Мины',coin:'Монетка',slots:'Спины',upgrade:'Апгрейд',plinko:'Plinko',inventory:'Инвентарь',referrals:'Рефералы',support:'Поддержка',deposit:'Пополнение',casev:'Кейс'};
-var PARENT={inventory:'profile',referrals:'profile',support:'profile',deposit:'profile',casev:'cases'};
+var TT={rocket:'Ракетка',mines:'Мины',coin:'Монетка',slots:'Спины',upgrade:'Апгрейд',plinko:'Plinko',inventory:'Инвентарь',referrals:'Рефералы',support:'Поддержка',deposit:'Пополнение',casev:'Кейс',bj:'Блэкджек',bjt:'Блэкджек'};
+var PARENT={inventory:'profile',referrals:'profile',support:'profile',deposit:'profile',casev:'cases',bjt:'bj'};
 var TGW=window.Telegram&&window.Telegram.WebApp,DEVQ=(location.search.match(/dev=(\d+)/)||[])[1]||'';
 function tgInit(){var v='';try{if(TGW&&TGW.initData)v=TGW.initData}catch(e){}
  if(!v){try{v=new URLSearchParams(location.hash.slice(1)).get('tgWebAppData')||''}catch(e){}} /* запасной способ: Telegram кладёт данные запуска в адрес */
@@ -928,13 +1154,13 @@ function hdr(){var g=TT[cur];$('hd').innerHTML=(g?'<div class="me"><button class
  $('plus').onclick=function(){if(DEMO)call('demo/refill').then(function(){toast('Демо-баланс пополнен')});else go('deposit')};if(g)$('bk').onclick=function(){go(PARENT[cur]||'home')};if(cur==='mines')$('snd').onclick=function(){SND=!SND;try{localStorage.setItem('luno_snd',SND?'1':'0')}catch(e){}this.classList.toggle('off',!SND);beep(660,.1)}}
 function modeUI(){document.querySelectorAll('#seg button').forEach(function(b){b.classList.toggle('on',(b.dataset.m==='demo')===DEMO)});$('dmb').hidden=!DEMO;document.body.classList.toggle('demo',DEMO)}
 var RS=null,mon=0,upb=0,sp=0,fl=0,opening=0,plb=0,cdT=null,depTab='stars',curCase=null;
-function guard(){if(cur==='rocket'&&RS&&RS.my&&!RS.my.done&&RS.phase!=='crashed')return 'У тебя активная ставка в ракете';if(upb||sp||fl||opening||plb)return 'Подожди окончания игры';return ''}
-function go(v){var g=guard();if(g)return toast(g);clearInterval(cdT);if(cur==='rocket'&&v!=='rocket')stopRocket();if(cur==='slots'&&v!=='slots'){sauto=0;$('sauto').classList.remove('on')}cur=v;
+function guard(){if(cur==='rocket'&&RS&&RS.my&&!RS.my.done&&RS.phase!=='crashed')return 'У тебя активная ставка в ракете';if(upb||sp||fl||opening||plb)return 'Подожди окончания игры';if(cur==='bjt'&&BJ&&BJ.phase==='play'&&BJ.me>=0&&BJ.seats[BJ.me]&&BJ.seats[BJ.me].hands.some(function(h){return !h.done}))return 'Доиграй раздачу, потом можно выйти';return ''}
+function go(v){var g=guard();if(g)return toast(g);clearInterval(cdT);if(cur==='rocket'&&v!=='rocket')stopRocket();if(cur==='slots'&&v!=='slots'){sauto=0;$('sauto').classList.remove('on')}if(cur==='bjt'&&v!=='bjt')bjStop();if(cur==='bj'&&v!=='bj')clearInterval(bjLT);cur=v;
  document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('on',x.id===v)});
- var nv=PARENT[v]||(TT[v]?'home':v);document.body.classList.toggle('ingame',['rocket','mines','coin','slots','plinko','upgrade'].indexOf(v)>=0);
+ var nv=v==='bjt'?'home':(PARENT[v]||(TT[v]?'home':v));document.body.classList.toggle('ingame',['rocket','mines','coin','slots','plinko','upgrade','bjt'].indexOf(v)>=0);
  document.querySelectorAll('nav button').forEach(function(b){if(b.dataset.v===nv)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
  hdr();scrollTo(0,0);
- ({cases:rCases,casev:rCaseV,mines:minesInit,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit})[v]&&({cases:rCases,casev:rCaseV,mines:minesInit,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit})[v]()}
+ ({cases:rCases,casev:rCaseV,mines:minesInit,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit,bj:bjLobby,bjt:bjStart})[v]&&({cases:rCases,casev:rCaseV,mines:minesInit,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit,bj:bjLobby,bjt:bjStart})[v]()}
 function betOf(g){var v=Math.floor(+$('b-'+g).value),mn=CFG.settings.minBet||1;if(!(v>=mn)){toast('Минимальная ставка ★'+mn);return 0}return v}
 function setMode(d){if(!!d===DEMO)return;var g=guard();if(g)return toast(g);DEMO=!!d;try{localStorage.setItem('luno_mode',d?'demo':'real')}catch(e){}
  api('me').then(function(r){if(r.error){DEMO=!d;return toast(r.error)}sync(r);hdr();modeUI();rCases();toast(d?'Демо-режим: виртуальные звёзды':'Реальный счёт')})}
@@ -1238,8 +1464,100 @@ $('ugo').onclick=function(){if(upb||sel===null||tg===null)return;var target=tg;u
   ang=Math.floor(ang/360)*360+1800+f*360;$('ptr').style.transform='rotate('+ang+'deg)';
   setTimeout(function(){upb=0;sync(r);toast(r.win?'Апгрейд удался: '+itm(target).name:'Не повезло, подарок сгорел');sel=null;tg=null;upd()},4300)}).catch(function(){upb=0;$('ugo').disabled=false})};
 
+
+/* ===== Блэкджек: живые столы, дилер на сервере ===== */
+var BJ=null,BJL=null,bjT=null,bjLT=null,bjOff=0,bjBusy=0,bjSeq=0,bjApplied=0,bjResAt=0,BJP={c:{},key:'',rr:-1,ctl:'',msg:''};
+var bjStake=10;try{bjStake=+localStorage.getItem('luno_bjst')||10}catch(e){}
+var SU={s:'♠',h:'♥',d:'♦',c:'♣'};
+function bjFace(c){var r=c[0]==='T'?'10':c[0],s=SU[c[1]];return '<span class="pcr">'+r+'<i>'+s+'</i></span><span class="pcs">'+s+'</span>'}
+function bjCard(c){var d=document.createElement('div'),dn=c==='??';d.className='pc'+(dn?' dn':(c[1]==='h'||c[1]==='d'?' rd':''));
+ d.innerHTML='<div class="pci"><div class="pcf">'+(dn?'':bjFace(c))+'</div><div class="pcb"></div></div>';d.setAttribute('aria-label',dn?'закрытая карта':(c[0]==='T'?'10':c[0])+SU[c[1]]);return d}
+function bjFlip(d,c){d.querySelector('.pcf').innerHTML=bjFace(c);d.classList.toggle('rd',c[1]==='h'||c[1]==='d');d.setAttribute('aria-label',(c[0]==='T'?'10':c[0])+SU[c[1]]);void d.offsetWidth;d.classList.remove('dn')}
+function bjScore(cs){var t=0,a=0;cs.forEach(function(c){if(c==='??')return;var r=c[0];t+=r==='A'?11:'TJQK'.indexOf(r)>=0?10:+r;if(r==='A')a++});while(t>21&&a){t-=10;a--}return{t:t,soft:a>0}}
+function bjScT(el,cs,split){if(!el)return;el.className='bsc';if(!cs.length){el.textContent='';return}var s=bjScore(cs);
+ if(s.t>21){el.textContent='Перебор';el.classList.add('bust')}else if(cs.length===2&&!split&&s.t===21&&cs.indexOf('??')<0){el.textContent='BJ';el.classList.add('bj')}else el.textContent=s.soft&&s.t<21?(s.t-10)+'/'+s.t:s.t}
+function bjRes(el,res,text,wait){if(!el||el.dataset.v===res+text)return;el.dataset.v=res+text;el.className='bres'+(res?' '+res:'');el.textContent=text;if(text){el.style.animationDelay=wait+'ms';void el.offsetWidth;el.classList.add('on')}}
+function stk(n){return n.toLocaleString('ru-RU')}
+
+/* лобби */
+function bjLobby(){$('bjtl').innerHTML='<p class="bjnote">Загружаю столы…</p>';bjLoad();clearInterval(bjLT);bjLT=setInterval(function(){if(cur!=='bj'){clearInterval(bjLT);return}bjLoad()},3000)}
+function bjLoad(){api('bj/lobby').then(function(r){if(cur!=='bj'||!r||r.error)return;BJL=r;bjLobbyUI()})}
+function bjLobbyUI(){var r=BJL;if(!r)return;
+ if(!r.on){$('bjst').innerHTML='';$('bjtl').innerHTML='<p class="bjnote">Блэкджек временно закрыт. Загляни позже.</p>';return}
+ if(!r.stakes.some(function(x){return x.stake===bjStake}))bjStake=r.stakes[0].stake;
+ $('bjst').innerHTML=r.stakes.map(function(x){var on=x.stake===bjStake;return '<button data-s="'+x.stake+'" aria-pressed="'+on+'"'+(on?' class="on"':'')+'><i data-i="star"></i>'+stk(x.stake)+'</button>'}).join('');fill($('bjst'));
+ $('bjst').querySelectorAll('button').forEach(function(b){b.onclick=function(){bjStake=+b.dataset.s;try{localStorage.setItem('luno_bjst',bjStake)}catch(e){}bjLobbyUI()}});
+ var g=r.stakes.filter(function(x){return x.stake===bjStake})[0],sh=bjStake>=1000?(bjStake/1000)+'K':bjStake;
+ $('bjtl').innerHTML=g.tables.map(function(t){var full=t.players>=5,dots='',i;for(i=0;i<5;i++)dots+='<i class="'+(i<t.players?'f':'')+'"></i>';
+  return '<div class="bjr"><div class="bjx">'+sh+'</div><div class="bjri"><b>'+esc(t.name)+'</b><div class="tdot">'+dots+'<span>'+(t.players?t.players+' из 5 мест занято':'свободно')+'</span></div></div><button class="btn" data-id="'+t.id+'"'+(full?' disabled':'')+'>'+(full?'Мест нет':'Сесть')+'</button></div>'}).join('')
+  +(ME.balance<bjStake?'<p class="bjnote">На балансе меньше ★'+stk(bjStake)+'. Сесть можно, а для ставки нужно пополнить баланс.</p>':'');
+ $('bjtl').querySelectorAll('button[data-id]').forEach(function(b){b.onclick=function(){b.disabled=true;call('bj/sit',{id:b.dataset.id}).then(function(r){BJ=r.bj;go('bjt')},function(){b.disabled=false})}})}
+
+/* стол */
+function bjStart(){BJP={c:{},key:'',rr:-1,ctl:'',msg:''};$('k_d').innerHTML='';$('bjseats').innerHTML='';$('bjme').innerHTML='';if(BJ)bjRender(BJ);clearInterval(bjT);bjT=setInterval(bjPoll,700);bjPoll()}
+function bjStop(){clearInterval(bjT);bjT=null;if(BJ){BJ=null;api('bj/leave').then(function(r){if(r&&!r.error)sync(r)})}}
+function bjPoll(){if(bjBusy||cur!=='bjt')return;var q=++bjSeq;api('bj/state').then(function(r){if(cur!=='bjt'||bjBusy||q<bjApplied)return;bjApplied=q;
+ if(r.error){if(r.auth)showGate(r.error);return}if(r.gone){BJ=null;toast('Место за столом освободилось: долго не было активности');go('bj');return}sync(r);bjRender(r.bj)})}
+function bjDo(p,body){if(bjBusy)return;bjBusy=1;var q=++bjSeq;$('bjctl').querySelectorAll('button').forEach(function(x){x.disabled=true});
+ call(p,body).then(function(r){bjBusy=0;if(q>=bjApplied){bjApplied=q;bjRender(r.bj)}},function(){bjBusy=0;BJP.ctl='';if(BJ)bjRender(BJ)})}
+function bjSeatsDOM(b){var h='';b.seats.forEach(function(s,i){if(!s){h+='<div class="bjs free">Свободно</div>';return}
+  h+='<div class="bjs'+(s.me?' me':'')+'" id="bs'+i+'"><div class="bjh">'+(s.hands.length?s.hands:[0]).map(function(x,j){return '<div class="pk sm" id="k_s'+i+'h'+j+'"></div>'}).join('')+'</div><span class="bsc" id="bsc'+i+'"></span><b class="nm">'+esc(s.me?'Ты':s.name)+'</b><em class="bchip" id="bch'+i+'"></em><span class="bres" id="brs'+i+'"></span></div>'});
+ $('bjseats').innerHTML=h;
+ var me=b.me>=0?b.seats[b.me]:null,hs=me?me.hands:[];
+ $('bjme').innerHTML=hs.map(function(x,j){return '<div class="bmh" id="bm'+j+'"><div class="pk lg" id="k_m'+j+'"></div><div class="mr"><span class="bsc" id="bmsc'+j+'"></span><em class="bchip" id="bmch'+j+'"></em></div><span class="bres" id="bmr'+j+'"></span></div>'}).join('');
+ Object.keys(BJP.c).forEach(function(k){if(k==='d')return;var el=$('k_'+k);if(!el){delete BJP.c[k];return}el.innerHTML='';BJP.c[k].forEach(function(c){el.appendChild(bjCard(c))})})}
+function bjPut(Q,F,k,el,cards,o){if(!el)return;var prev=BJP.c[k]||[],i,same=el.children.length===prev.length;
+ for(i=0;same&&i<Math.min(prev.length,cards.length);i++)if(prev[i]!==cards[i]&&prev[i]!=='??')same=false;
+ if(!same||cards.length<prev.length){el.innerHTML='';prev=[]}
+ for(i=0;i<cards.length;i++){if(i<prev.length){if(prev[i]==='??'&&cards[i]!=='??')F.push({d:el.children[i],c:cards[i]});continue}Q.push({el:el,c:cards[i],i:i,o:o})}
+ BJP.c[k]=cards.slice()}
+function bjActs(h,s){var on=!!h,sc=h?bjScore(h.c):null,canD=on&&h.c.length===2&&!h.split&&!sc.soft&&sc.t>=9&&sc.t<=11&&ME.balance>=h.bet,canS=on&&s.hands.length===1&&h.c.length===2&&h.c[0][0]===h.c[1][0]&&ME.balance>=h.bet;
+ return '<button class="ab hit" data-a="hit"'+(on?'':' disabled')+'>Ещё<small>карту</small></button><button class="ab" data-a="stand"'+(on?'':' disabled')+'>Хватит<small>стоп</small></button><button class="ab" data-a="double"'+(canD?'':' disabled')+'>Удвоить<small>×2</small></button><button class="ab" data-a="split"'+(canS?'':' disabled')+'>Разделить<small>на 2</small></button>'}
+function bjRender(b){if(!b)return;BJ=b;bjOff=b.now-Date.now();
+ $('bjtn').textContent=b.name;$('bjtp').textContent='ставка ★'+stk(b.stake);
+ $('bjp1').textContent='Блэкджек платит '+(b.pay>=1.5?'3 к 2':'6 к 5');$('bjp2').textContent=b.h17?'Дилер берёт карту на мягких 17':'Дилер стоит на всех 17';
+ var key=b.seats.map(function(s){return s?(s.name+'/'+s.hands.length+'/'+(s.me?1:0)):'-'}).join('|');if(key!==BJP.key){BJP.key=key;bjSeatsDOM(b)}
+ var Q=[],F=[],done=b.phase==='done';bjPut(Q,F,'d',$('k_d'),b.dealer,100);
+ b.seats.forEach(function(s,i){if(!s)return;if(!s.hands.length)bjPut(Q,F,'s'+i+'h0',$('k_s'+i+'h0'),[],0);
+  s.hands.forEach(function(x,j){bjPut(Q,F,'s'+i+'h'+j,$('k_s'+i+'h'+j),x.c,i*2+j);if(s.me)bjPut(Q,F,'m'+j,$('k_m'+j),x.c,i*2+j)})});
+ Q.sort(function(a,c){return a.i-c.i||a.o-c.o});var step=-1,last='',rev=F.length>0,maxD=rev?.5:0;
+ Q.forEach(function(q){var kk=q.i+':'+q.o;if(kk!==last){step++;last=kk}var dl=rev?.55+step*.6:step*.2,d=bjCard(q.c);d.style.animationDelay=dl+'s';d.classList.add('deal');q.el.appendChild(d);maxD=Math.max(maxD,dl+.45);setTimeout(function(){beep(520,.04,'triangle')},dl*1000)});
+ F.forEach(function(f){bjFlip(f.d,f.c)});
+ if(done&&BJP.rr!==b.round){BJP.rr=b.round;bjResAt=Date.now()+maxD*1000}
+ var now2=Date.now()+bjOff,left=Math.max(0,Math.ceil((b.dl-now2)/1000)),wait=done?Math.max(0,bjResAt-Date.now()):0,me=b.me>=0?b.seats[b.me]:null;
+ bjScT($('bjds'),done&&wait>0?b.dealer.slice(0,2):b.dealer,false);
+ b.seats.forEach(function(s,i){if(!s)return;var el=$('bs'+i);if(!el)return;var turn=b.phase==='play'&&b.turn===i;el.classList.toggle('turn',turn);
+  var sc=$('bsc'+i);if(s.hands.length===1)bjScT(sc,s.hands[0].c,s.hands[0].split);else{sc.className='bsc';sc.textContent=s.hands.length>1?'2 руки':''}
+  var bet=s.hands.length?s.hands.reduce(function(a,x){return a+x.bet},0):s.bet;$('bch'+i).textContent=bet?'★'+stk(bet):'';
+  var net=0;s.hands.forEach(function(x){net+=x.pay-x.bet});var rs=done&&s.hands.length?(net>0?'w':net<0?'l':'p'):'';
+  bjRes($('brs'+i),rs,rs?(net>0?'+'+stk(net):net<0?'−'+stk(-net):'±0'):'',wait);
+  var tm=el.querySelector('.bjtm');if(turn){if(!tm){tm=document.createElement('i');tm.className='bjtm';el.appendChild(tm)}tm.style.transform='scaleX('+Math.max(0,Math.min(1,(b.dl-now2)/15000))+')'}else if(tm)tm.remove()});
+ if(me)me.hands.forEach(function(x,j){var m=$('bm'+j);if(!m)return;m.classList.toggle('act',b.phase==='play'&&b.turn===b.me&&b.th===j&&me.hands.length>1);bjScT($('bmsc'+j),x.c,x.split);$('bmch'+j).textContent='★'+stk(x.bet);
+  bjRes($('bmr'+j),done?x.res:'',done?(x.res==='p'?'Ничья':(x.pay>x.bet?'+':'−')+'★'+stk(Math.abs(x.pay-x.bet))):'',wait)});
+ var msg='',ctl='',others=b.seats.filter(function(s){return s&&!s.me}).length,poor=ME.balance<b.stake,
+  betB='<button class="btn big" id="bjbet"'+(poor?' disabled':'')+'>'+(poor?'Не хватает ★ на ставку':'Поставить ★'+stk(b.stake))+'</button>';
+ if(b.phase==='wait'){msg=others?'Делай ставку. Раздача начнётся, когда поставят все, или через 9 секунд':'Делай ставку, и дилер сразу раздаст карты';ctl=betB}
+ else if(b.phase==='bet'){if(me&&me.bet>0){msg='Ставка принята. Раздача через '+left+' с';ctl='<button class="btn big" disabled>Ждём остальных игроков</button>'}else{msg='Раздача через '+left+' с, успей поставить';ctl=betB}}
+ else if(b.phase==='play'){if(b.turn===b.me&&me){var hh=me.hands[b.th];msg='Твой ход'+(me.hands.length>1?', рука '+(b.th+1)+' из 2':'')+'. Осталось '+left+' с';ctl=bjActs(hh,me)}
+  else{var ts=b.seats[b.turn];msg=me&&me.hands.length?'Ходит '+esc(ts?ts.name:'игрок')+'…':'Идёт раздача. Ты сыграешь в следующей';ctl=bjActs(null)}}
+ else if(done){if(wait>0)msg='Дилер открывает карты…';else if(me&&me.hands.length){var net=0,nat=false,d=bjScore(b.dealer).t;me.hands.forEach(function(x){net+=x.pay-x.bet;if(x.res==='w'&&x.c.length===2&&!x.split&&bjScore(x.c).t===21)nat=true});
+   var dt=b.dealer.length===2&&d===21?'У дилера блэкджек':d>21?'У дилера перебор':'У дилера '+d;
+   msg=net>0?'<big class="w">+★'+stk(net)+'</big>'+(nat?'Блэкджек!':dt):net<0?'<big class="l">−★'+stk(-net)+'</big>'+dt:'<big>Ничья</big>Ставка вернулась на баланс'}
+  else msg='Раунд окончен. '+(b.dealer.length?'У дилера '+bjScore(b.dealer).t:'');
+  ctl='<button class="btn big" disabled>Новая раздача через '+left+' с</button>'}
+ if(msg!==BJP.msg){BJP.msg=msg;$('bjmsg').innerHTML=msg}if(ctl!==BJP.ctl){BJP.ctl=ctl;$('bjctl').innerHTML=ctl}}
+$('bjctl').onclick=function(e){var t=e.target.closest('button');if(!t||t.disabled)return;if(t.id==='bjbet')bjDo('bj/bet');else if(t.dataset.a)bjDo('bj/act',{a:t.dataset.a})};
+function bjRules(){var p=((BJ&&BJ.pay)||CFG.settings.bjPay||1.2)>=1.5?'3 к 2':'6 к 5',h17=BJ?BJ.h17:CFG.settings.bjH17!==0;
+ $('sbox').innerHTML='<button class="xb" id="shx" aria-label="Закрыть">×</button><h2>Правила блэкджека</h2><p>Набери больше очков, чем дилер, но не больше 21. Карты от 2 до 10 считаются по номиналу, картинки по 10, туз 1 или 11.</p>'
+  +'<h3>Выплаты</h3><p>Блэкджек (туз и десятка с первых двух карт) платит '+p+'. Обычная победа платит 1 к 1. При ничьей ставка возвращается.</p>'
+  +'<h3>Дилер</h3><p>'+(h17?'Дилер берёт карту до 17 и на мягких 17 (когда в руке туз).':'Дилер берёт карту до 16 и останавливается на любых 17.')+' Если у дилера блэкджек, он открывает его сразу.</p>'
+  +'<h3>Твои ходы</h3><p>«Ещё»: взять карту. «Хватит»: остановиться. «Удвоить»: ставка ×2 и ровно одна карта, можно на 9, 10 или 11 с первых двух карт. «Разделить»: две одинаковые карты становятся двумя руками, один раз за раздачу. Разделённые тузы получают по одной карте.</p>'
+  +'<h3>Стол</h3><p>За столом до 5 игроков, каждый играет против дилера, а не друг против друга. На ставки 9 секунд, на ход 15 секунд. Если не успел, игра сама нажимает «Хватит».</p>';
+ $('sheet').classList.add('on');$('shx').onclick=function(){$('sheet').classList.remove('on')}}
+document.querySelectorAll('[data-bjrules]').forEach(function(b){b.onclick=bjRules});
+
 /* ===== запуск ===== */
-function start(){fill();hdr();applySkins();rCases();modeUI();buildMg();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
+function start(){fill();hdr();$('hallw').hidden=CFG.settings.bjOn===0;applySkins();rCases();modeUI();buildMg();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
  
  $('tm').textContent=ONLINE?'':'Демо-режим: данные живут только в этой вкладке';livePoll();setInterval(livePoll,5000);upd()}
 fetch('/api/config').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(c){CFG=c;ONLINE=true},function(){throw 0}).catch(function(){

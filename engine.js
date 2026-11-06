@@ -13,7 +13,7 @@
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
-        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, bjOn: 1, bjPay: 1.2, bjH17: 1, duOn: 1, duFee: 0.05,
+        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, bjOn: 1, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
         edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05 }, wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
@@ -37,7 +37,8 @@
   }
   // Колесо фортуны: все секторы одинакового размера, шанс каждого = 1 / число секторов. RTP = средний множитель.
   var WHEEL_MAX_RTP = 0.97;
-  function defaultWheel() { return { on: 1, secs: [0, 1.2, 0, 0.5, 2, 0, 0.5, 1.2, 0, 3, 0, 0.5, 1.2, 0, 2, 0.5, 0, 7, 0, 0.5, 1.2, 0, 2, 0, 0.5, 3, 0, 1.2, 0.5, 0] }; }
+  var WHEEL_OLD = [0,1.2,0,0.5,2,0,0.5,1.2,0,3,0,0.5,1.2,0,2,0.5,0,7,0,0.5,1.2,0,2,0,0.5,3,0,1.2,0.5,0];
+  function defaultWheel() { return { on: 1, secs: [0.5, 1.2, 0.8, 0, 1.5, 0.5, 1.2, 0.8, 0.5, 2, 0, 1.2, 0.5, 0.8, 1.5, 0, 1.2, 5, 0.8, 0, 1.2, 0.5, 1.5, 0, 0.8, 2, 0.5, 1.2, 0, 0.5] }; }
   function wheelRtp(secs) { var t = 0; secs.forEach(function (m) { t += +m || 0; }); return secs.length ? t / secs.length : 0; }
 
   // ---- Слоты: кластерные выплаты (6+ одинаковых подарков где угодно), каскады, фриспины, кристаллы ----
@@ -84,7 +85,7 @@
       S.flags = S.flags || {}; if (!S.flags.m10) { S.flags.m10 = 1; var ed0 = S.cfg.settings.edges || {}; if (ed0.mines === 0.06) ed0.mines = 0.10; var sk1 = S.cfg.skins || {}; if (!sk1.sprite_rocket || /pepe\.webp$/.test(sk1.sprite_rocket)) sk1.sprite_rocket = '/art/minedog.webp'; }
       var sk0 = S.cfg.skins = S.cfg.skins || {}; if (sk0.mines_closed === undefined) sk0.mines_closed = '/art/minedog.webp'; ['mines_safe', 'mines_bomb', 'card_mines'].forEach(function (k) { if (sk0[k] === undefined) sk0[k] = ''; });
       Object.keys(S.cfg.items).forEach(function (k) { var it = S.cfg.items[k]; if (it.wd === undefined) it.wd = !!it.img; if (it.up === undefined) it.up = true; });
-      if (!S.cfg.wheel || !Array.isArray(S.cfg.wheel.secs) || S.cfg.wheel.secs.length < 2) S.cfg.wheel = defaultWheel();
+      if (!S.cfg.wheel || !Array.isArray(S.cfg.wheel.secs) || S.cfg.wheel.secs.length < 2 || S.cfg.wheel.secs.join() === WHEEL_OLD.join()) S.cfg.wheel = { on: S.cfg.wheel && S.cfg.wheel.on === 0 ? 0 : 1, secs: defaultWheel().secs }; // старое колесо с 40% «−100%» заменяется новым
     })();
     var edgeOf = function (g) { var e = S.cfg.settings.edges && S.cfg.settings.edges[g]; return e !== undefined && !isNaN(+e) ? +e : set('edge'); };
     function weekStart() { var d = new Date(now()); d.setUTCHours(0, 0, 0, 0); return d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5; }
@@ -203,7 +204,7 @@
         if (!s) return; var u = S.users[s.uid];
         s.hands.forEach(function (h) {
           var v = bjScore(h.c).t, nat = bjNat(h), p = 0;
-          if (nat && dn) p = h.bet; else if (nat) p = h.bet + Math.floor(h.bet * bp); else if (dn || v > 21) p = 0; else if (d > 21 || v > d) p = h.bet * 2; else if (v === d) p = h.bet;
+          if (nat && dn) p = h.bet; else if (nat) p = h.bet + Math.floor(h.bet * bp); else if (dn || v > 21) p = 0; else if (d === 22 && set('bjP22')) p = h.bet; else if (d > 21 || v > d) p = h.bet * 2; else if (v === d) p = h.bet;
           h.pay = p; h.res = p > h.bet ? 'w' : p === h.bet ? 'p' : 'l'; h.done = true;
           if (u) { u.balance += p; book(u, 'blackjack', h.bet, p); u.stats.profit += p - h.bet; }
         });
@@ -235,7 +236,7 @@
     }
     function bjView(u, T) {
       var t = now(), me = bjSeatOf(T, u.id); if (me >= 0) T.seats[me].seen = t;
-      return { bj: { id: T.id, name: T.name, stake: T.stake, phase: T.phase, dl: T.dl, now: t, round: T.round, turn: T.turn, th: T.th, me: me, pay: set('bjPay') || 1.2, h17: !!set('bjH17'),
+      return { bj: { id: T.id, name: T.name, stake: T.stake, phase: T.phase, dl: T.dl, now: t, round: T.round, turn: T.turn, th: T.th, me: me, pay: set('bjPay') || 1.2, h17: !!set('bjH17'), p22: !!set('bjP22'),
         solo: !!T.priv, dealer: T.hole && T.dealer.length > 1 ? [T.dealer[0], '??'] : T.dealer.slice(),
         seats: T.seats.map(function (s) { return s ? { name: s.uid === u.id ? s.name : maskName(s.name), me: s.uid === u.id, bet: s.bet, hands: s.hands.map(function (h) { return { c: h.c.slice(), bet: h.bet, done: !!h.done, res: h.res || '', pay: h.pay || 0, split: !!h.split }; }) } : null; }) } };
     }
@@ -524,7 +525,7 @@
     }
     function publicConfig() {
       var c = cfg(); return {
-        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), bjOn: set('bjOn'), bjPay: set('bjPay'), bjH17: set('bjH17'), duOn: set('duOn'), duFee: set('duFee'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
+        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), bjOn: set('bjOn'), bjPay: set('bjPay'), bjH17: set('bjH17'), bjP22: set('bjP22'), duOn: set('duOn'), duFee: set('duFee'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
         cases: c.cases.filter(function (x) { return x.active; }).map(function (x) { return { id: x.id, name: x.name, img: x.img, hue: x.hue, price: x.price, free: x.free, items: x.items.map(function (y) { return { k: y.k, weight: y.weight }; }) }; }),
         slots: slotInfo(), wheel: { on: (c.wheel || {}).on ? 1 : 0, secs: ((c.wheel || defaultWheel()).secs).slice() }
       };
@@ -536,12 +537,12 @@
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.wheelMaxRtp = WHEEL_MAX_RTP; c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17', duOn: 'дурак включён', duFee: 'комиссия в дураке' };
+      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17', bjP22: 'перебор дилера на 22', duOn: 'дурак включён', duFee: 'комиссия в дураке' };
       Object.keys(LBL).forEach(function (k) {
         var raw = s[k], cur = set(k); if (!(cur >= 0)) cur = Number(DS0[k]); // поле не пришло или пустое: оставляем текущее значение
         var v = (raw === undefined || raw === null || raw === '' || isNaN(+raw)) ? cur : +raw; if (!(v >= 0)) throw new Err('Неверная настройка: ' + LBL[k]); out.settings[k] = v;
       });
-      out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.duOn = out.settings.duOn ? 1 : 0; if (out.settings.duFee > 0.2) throw new Err('Комиссия в дураке не больше 0.2 (20%)'); out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
+      out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.bjP22 = out.settings.bjP22 ? 1 : 0; out.settings.duOn = out.settings.duOn ? 1 : 0; if (out.settings.duFee > 0.2) throw new Err('Комиссия в дураке не больше 0.2 (20%)'); out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
       if (!(out.settings.bjPay >= 1 && out.settings.bjPay <= 1.5)) throw new Err('Выплата за блэкджек от 1 до 1.5 (6 к 5 = 1.2, 3 к 2 = 1.5)');
       ['botUsername', 'supportUsername'].forEach(function (k) { var v = String(s[k] || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{0,32}$/.test(v)) throw new Err('Имя в Telegram: латиница, цифры, _ (' + k + ')'); out.settings[k] = v; });
       out.settings.wdNote = String(s.wdNote || '').slice(0, 80); out.settings.edges = {};

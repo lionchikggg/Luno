@@ -492,7 +492,12 @@ html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){.pc.deal{animation:none}.pci{transition:none}}
 .bjtm{transition:transform .7s linear}
 /* ===== Дурак ===== */
-.c9{background:radial-gradient(70% 120% at 85% 30%,rgba(255,170,220,.22),transparent),linear-gradient(135deg,#2b2236,#5a4470 60%,#7d5a92)}
+.c9{background:radial-gradient(70% 120% at 85% 25%,rgba(255,209,102,.25),transparent),linear-gradient(135deg,#0b3530,#145a4b 60%,#23866a)}
+.hall2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hall2 .game{min-height:176px}
+.hall2 .bjart,.hall2 .duart{transform:scale(.7);transform-origin:top right;right:8px;top:8px}
+.hall2 .game strong{font-size:18px}.hall2 .game .sb2{font-size:12px;line-height:1.25}
+@media (min-width:900px){.hall2 .bjart,.hall2 .duart{transform:none;right:18px;top:12px}.hall2 .game{min-height:150px}}
 .duart{position:absolute;right:18px;top:12px;width:130px;height:100px;pointer-events:none}
 .duart .dc{position:absolute;--cw:48px}.duart .dc:nth-child(1){left:6px;top:16px;transform:rotate(-18deg)}.duart .dc:nth-child(2){left:38px;top:6px;transform:rotate(-3deg)}.duart .dc:nth-child(3){left:70px;top:10px;transform:rotate(13deg)}
 .dc{position:relative;flex:none;width:var(--cw,56px);height:calc(var(--cw,56px)*1.4)}
@@ -545,7 +550,7 @@ html{scroll-behavior:smooth}
 .ductl .btn{min-width:130px}.ductl .btn.take{background:linear-gradient(120deg,#ffb54a,#f08a24);color:#3a2000}.ductl .btn.bito{background:linear-gradient(120deg,#2fd68a,#17a867);color:#06301c}
 .ductl .lnk{align-self:center;color:var(--muted);font-size:13px}
 .duhand{display:flex;justify-content:center;align-items:flex-end;min-height:118px;padding:16px 4px 6px;--cw:62px}
-.duhand .dc{cursor:pointer}.duhand .dc .f{transform:translateY(var(--y,0)) rotate(var(--rt,0deg))}
+.duhand .dc{cursor:pointer}.duhand .dc .f,.dutbl .dc .f{font-size:calc(var(--cw)*.36)}.duhand .dc .m,.dutbl .dc .m{font-size:calc(var(--cw)*.6)}.duhand .dc .f{transform:translateY(var(--y,0)) rotate(var(--rt,0deg))}
 .duhand .dc.ok .f{transform:translateY(calc(var(--y,0px) - 10px)) rotate(var(--rt,0deg));box-shadow:0 0 0 2px #4be39a,0 8px 16px rgba(0,0,0,.5)}
 .duhand .dc.no .f{filter:brightness(.62) saturate(.7)}
 .duhand .dc.sel .f{transform:translateY(calc(var(--y,0px) - 24px)) rotate(0deg);box-shadow:0 0 0 3px #ffd166,0 10px 20px rgba(0,0,0,.55)}
@@ -612,8 +617,7 @@ html{scroll-behavior:smooth}
   <button class="game wide c5" data-g="coin"><div class="art" data-card="coin"></div><span class="nw">NEW</span><strong>Монетка</strong><span class="sb2">выбери сторону</span></button>
  </div>
  <div id="hallw"><h3>Карточный зал</h3>
- <div class="grid hall"><button class="game wide c7" data-g="bj"><div class="bjart" aria-hidden="true"><div class="pc"><div class="pci"><div class="pcf"><span class="pcr">A<i>♠</i></span><span class="pcs">♠</span></div></div></div><div class="pc rd"><div class="pci"><div class="pcf"><span class="pcr">K<i>♥</i></span><span class="pcs">♥</span></div></div></div></div><span class="nw">NEW</span><strong>Блэкджек</strong><span class="sb2">живые столы против дилера</span></button></div>
- <div class="grid hall" style="margin-top:12px"><button class="game wide c9" data-g="du" id="ducard"><div class="duart" aria-hidden="true"><div class="dc"><div class="f"><span class="r">6<i>♠</i></span><span class="m">♠</span></div></div><div class="dc rd"><div class="f"><span class="r">10<i>♦</i></span><span class="m">♦</span></div></div><div class="dc rd"><div class="f"><span class="r">A<i>♥</i></span><span class="m">♥</span></div></div></div><span class="nw">NEW</span><strong>Дурак</strong><span class="sb2">игроки друг против друга</span></button></div>
+ <div class="grid hall2"><button class="game c7" data-g="bj"><div class="bjart" aria-hidden="true"><div class="pc"><div class="pci"><div class="pcf"><span class="pcr">A<i>♠</i></span><span class="pcs">♠</span></div></div></div><div class="pc rd"><div class="pci"><div class="pcf"><span class="pcr">K<i>♥</i></span><span class="pcs">♥</span></div></div></div></div><span class="nw">NEW</span><strong>Блэкджек</strong><span class="sb2">столы против дилера</span></button><button class="game c9" data-g="du" id="ducard"><div class="duart" aria-hidden="true"><div class="dc"><div class="f"><span class="r">6<i>♠</i></span><span class="m">♠</span></div></div><div class="dc rd"><div class="f"><span class="r">10<i>♦</i></span><span class="m">♦</span></div></div><div class="dc rd"><div class="f"><span class="r">A<i>♥</i></span><span class="m">♥</span></div></div></div><span class="nw">NEW</span><strong>Дурак</strong><span class="sb2">игроки на ставку</span></button></div>
 </div>
  <p class="note" id="tm"></p>
 </section>
@@ -762,7 +766,7 @@ html{scroll-behavior:smooth}
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
-        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, bjOn: 1, bjPay: 1.2, bjH17: 1, duOn: 1, duFee: 0.05,
+        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, bjOn: 1, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
         edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05 }, wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
@@ -786,7 +790,8 @@ html{scroll-behavior:smooth}
   }
   // Колесо фортуны: все секторы одинакового размера, шанс каждого = 1 / число секторов. RTP = средний множитель.
   var WHEEL_MAX_RTP = 0.97;
-  function defaultWheel() { return { on: 1, secs: [0, 1.2, 0, 0.5, 2, 0, 0.5, 1.2, 0, 3, 0, 0.5, 1.2, 0, 2, 0.5, 0, 7, 0, 0.5, 1.2, 0, 2, 0, 0.5, 3, 0, 1.2, 0.5, 0] }; }
+  var WHEEL_OLD = [0,1.2,0,0.5,2,0,0.5,1.2,0,3,0,0.5,1.2,0,2,0.5,0,7,0,0.5,1.2,0,2,0,0.5,3,0,1.2,0.5,0];
+  function defaultWheel() { return { on: 1, secs: [0.5, 1.2, 0.8, 0, 1.5, 0.5, 1.2, 0.8, 0.5, 2, 0, 1.2, 0.5, 0.8, 1.5, 0, 1.2, 5, 0.8, 0, 1.2, 0.5, 1.5, 0, 0.8, 2, 0.5, 1.2, 0, 0.5] }; }
   function wheelRtp(secs) { var t = 0; secs.forEach(function (m) { t += +m || 0; }); return secs.length ? t / secs.length : 0; }
 
   // ---- Слоты: кластерные выплаты (6+ одинаковых подарков где угодно), каскады, фриспины, кристаллы ----
@@ -833,7 +838,7 @@ html{scroll-behavior:smooth}
       S.flags = S.flags || {}; if (!S.flags.m10) { S.flags.m10 = 1; var ed0 = S.cfg.settings.edges || {}; if (ed0.mines === 0.06) ed0.mines = 0.10; var sk1 = S.cfg.skins || {}; if (!sk1.sprite_rocket || /pepe\.webp$/.test(sk1.sprite_rocket)) sk1.sprite_rocket = '/art/minedog.webp'; }
       var sk0 = S.cfg.skins = S.cfg.skins || {}; if (sk0.mines_closed === undefined) sk0.mines_closed = '/art/minedog.webp'; ['mines_safe', 'mines_bomb', 'card_mines'].forEach(function (k) { if (sk0[k] === undefined) sk0[k] = ''; });
       Object.keys(S.cfg.items).forEach(function (k) { var it = S.cfg.items[k]; if (it.wd === undefined) it.wd = !!it.img; if (it.up === undefined) it.up = true; });
-      if (!S.cfg.wheel || !Array.isArray(S.cfg.wheel.secs) || S.cfg.wheel.secs.length < 2) S.cfg.wheel = defaultWheel();
+      if (!S.cfg.wheel || !Array.isArray(S.cfg.wheel.secs) || S.cfg.wheel.secs.length < 2 || S.cfg.wheel.secs.join() === WHEEL_OLD.join()) S.cfg.wheel = { on: S.cfg.wheel && S.cfg.wheel.on === 0 ? 0 : 1, secs: defaultWheel().secs }; // старое колесо с 40% «−100%» заменяется новым
     })();
     var edgeOf = function (g) { var e = S.cfg.settings.edges && S.cfg.settings.edges[g]; return e !== undefined && !isNaN(+e) ? +e : set('edge'); };
     function weekStart() { var d = new Date(now()); d.setUTCHours(0, 0, 0, 0); return d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5; }
@@ -952,7 +957,7 @@ html{scroll-behavior:smooth}
         if (!s) return; var u = S.users[s.uid];
         s.hands.forEach(function (h) {
           var v = bjScore(h.c).t, nat = bjNat(h), p = 0;
-          if (nat && dn) p = h.bet; else if (nat) p = h.bet + Math.floor(h.bet * bp); else if (dn || v > 21) p = 0; else if (d > 21 || v > d) p = h.bet * 2; else if (v === d) p = h.bet;
+          if (nat && dn) p = h.bet; else if (nat) p = h.bet + Math.floor(h.bet * bp); else if (dn || v > 21) p = 0; else if (d === 22 && set('bjP22')) p = h.bet; else if (d > 21 || v > d) p = h.bet * 2; else if (v === d) p = h.bet;
           h.pay = p; h.res = p > h.bet ? 'w' : p === h.bet ? 'p' : 'l'; h.done = true;
           if (u) { u.balance += p; book(u, 'blackjack', h.bet, p); u.stats.profit += p - h.bet; }
         });
@@ -984,7 +989,7 @@ html{scroll-behavior:smooth}
     }
     function bjView(u, T) {
       var t = now(), me = bjSeatOf(T, u.id); if (me >= 0) T.seats[me].seen = t;
-      return { bj: { id: T.id, name: T.name, stake: T.stake, phase: T.phase, dl: T.dl, now: t, round: T.round, turn: T.turn, th: T.th, me: me, pay: set('bjPay') || 1.2, h17: !!set('bjH17'),
+      return { bj: { id: T.id, name: T.name, stake: T.stake, phase: T.phase, dl: T.dl, now: t, round: T.round, turn: T.turn, th: T.th, me: me, pay: set('bjPay') || 1.2, h17: !!set('bjH17'), p22: !!set('bjP22'),
         solo: !!T.priv, dealer: T.hole && T.dealer.length > 1 ? [T.dealer[0], '??'] : T.dealer.slice(),
         seats: T.seats.map(function (s) { return s ? { name: s.uid === u.id ? s.name : maskName(s.name), me: s.uid === u.id, bet: s.bet, hands: s.hands.map(function (h) { return { c: h.c.slice(), bet: h.bet, done: !!h.done, res: h.res || '', pay: h.pay || 0, split: !!h.split }; }) } : null; }) } };
     }
@@ -1273,7 +1278,7 @@ html{scroll-behavior:smooth}
     }
     function publicConfig() {
       var c = cfg(); return {
-        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), bjOn: set('bjOn'), bjPay: set('bjPay'), bjH17: set('bjH17'), duOn: set('duOn'), duFee: set('duFee'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
+        items: c.items, skins: c.skins, settings: { edge: set('edge'), crashMax: set('crashMax'), minesMin: set('minesMin'), minesMaxMult: set('minesMaxMult'), edges: cfg().settings.edges, demoBalance: set('demoBalance'), bjOn: set('bjOn'), bjPay: set('bjPay'), bjH17: set('bjH17'), bjP22: set('bjP22'), duOn: set('duOn'), duFee: set('duFee'), minBet: set('minBet'), maxBet: set('maxBet'), minDeposit: set('minDeposit'), tonToStars: set('tonToStars'), wdFeePct: set('wdFeePct'), wdMinValue: set('wdMinValue'), wdNote: cfg().settings.wdNote || '', botUsername: cfg().settings.botUsername || '', supportUsername: cfg().settings.supportUsername || '' }, plinko: plinkoTable(),
         cases: c.cases.filter(function (x) { return x.active; }).map(function (x) { return { id: x.id, name: x.name, img: x.img, hue: x.hue, price: x.price, free: x.free, items: x.items.map(function (y) { return { k: y.k, weight: y.weight }; }) }; }),
         slots: slotInfo(), wheel: { on: (c.wheel || {}).on ? 1 : 0, secs: ((c.wheel || defaultWheel()).secs).slice() }
       };
@@ -1285,12 +1290,12 @@ html{scroll-behavior:smooth}
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.wheelMaxRtp = WHEEL_MAX_RTP; c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17', duOn: 'дурак включён', duFee: 'комиссия в дураке' };
+      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17', bjP22: 'перебор дилера на 22', duOn: 'дурак включён', duFee: 'комиссия в дураке' };
       Object.keys(LBL).forEach(function (k) {
         var raw = s[k], cur = set(k); if (!(cur >= 0)) cur = Number(DS0[k]); // поле не пришло или пустое: оставляем текущее значение
         var v = (raw === undefined || raw === null || raw === '' || isNaN(+raw)) ? cur : +raw; if (!(v >= 0)) throw new Err('Неверная настройка: ' + LBL[k]); out.settings[k] = v;
       });
-      out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.duOn = out.settings.duOn ? 1 : 0; if (out.settings.duFee > 0.2) throw new Err('Комиссия в дураке не больше 0.2 (20%)'); out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
+      out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.bjP22 = out.settings.bjP22 ? 1 : 0; out.settings.duOn = out.settings.duOn ? 1 : 0; if (out.settings.duFee > 0.2) throw new Err('Комиссия в дураке не больше 0.2 (20%)'); out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
       if (!(out.settings.bjPay >= 1 && out.settings.bjPay <= 1.5)) throw new Err('Выплата за блэкджек от 1 до 1.5 (6 к 5 = 1.2, 3 к 2 = 1.5)');
       ['botUsername', 'supportUsername'].forEach(function (k) { var v = String(s[k] || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{0,32}$/.test(v)) throw new Err('Имя в Telegram: латиница, цифры, _ (' + k + ')'); out.settings[k] = v; });
       out.settings.wdNote = String(s.wdNote || '').slice(0, 80); out.settings.edges = {};
@@ -1808,7 +1813,7 @@ function bjActs(h,s){var on=!!h,sc=h?bjScore(h.c):null,canD=on&&h.c.length===2&&
  return '<button class="ab hit" data-a="hit"'+(on?'':' disabled')+'>Ещё<small>карту</small></button><button class="ab" data-a="stand"'+(on?'':' disabled')+'>Хватит<small>стоп</small></button><button class="ab" data-a="double"'+(canD?'':' disabled')+'>Удвоить<small>×2</small></button><button class="ab" data-a="split"'+(canS?'':' disabled')+'>Разделить<small>на 2</small></button>'}
 function bjRender(b){if(!b)return;BJ=b;bjOff=b.now-Date.now();
  $('bjtn').textContent=b.name;$('bjtp').textContent='ставка ★'+stk(b.stake);
- $('bjp1').textContent='Блэкджек платит '+(b.pay>=1.5?'3 к 2':'6 к 5');$('bjp2').textContent=b.h17?'Дилер берёт карту на мягких 17':'Дилер стоит на всех 17';
+ $('bjp1').textContent='Блэкджек платит '+(b.pay>=1.5?'3 к 2':'6 к 5');$('bjp2').textContent=(b.h17?'Дилер берёт карту на мягких 17':'Дилер стоит на всех 17')+(b.p22?'. Перебор дилера на 22 — ничья':'');
  var key=b.seats.map(function(s){return s?(s.name+'/'+s.hands.length+'/'+(s.me?1:0)):'-'}).join('|');if(key!==BJP.key){BJP.key=key;bjSeatsDOM(b)}
  var Q=[],F=[],done=b.phase==='done';bjPut(Q,F,'d',$('k_d'),b.dealer,100);
  b.seats.forEach(function(s,i){if(!s)return;if(!s.hands.length)bjPut(Q,F,'s'+i+'h0',$('k_s'+i+'h0'),[],0);
@@ -1848,7 +1853,7 @@ $('bjctl').onclick=function(e){var t=e.target.closest('button');if(!t||t.disable
 function bjRules(){var p=((BJ&&BJ.pay)||CFG.settings.bjPay||1.2)>=1.5?'3 к 2':'6 к 5',h17=BJ?BJ.h17:CFG.settings.bjH17!==0;
  $('sbox').innerHTML='<button class="xb" id="shx" aria-label="Закрыть">×</button><h2>Правила блэкджека</h2><p>Набери больше очков, чем дилер, но не больше 21. Карты от 2 до 10 считаются по номиналу, картинки по 10, туз 1 или 11.</p>'
   +'<h3>Выплаты</h3><p>Блэкджек (туз и десятка с первых двух карт) платит '+p+'. Обычная победа платит 1 к 1. При ничьей ставка возвращается.</p>'
-  +'<h3>Дилер</h3><p>'+(h17?'Дилер берёт карту до 17 и на мягких 17 (когда в руке туз).':'Дилер берёт карту до 16 и останавливается на любых 17.')+' Если у дилера блэкджек, он открывает его сразу.</p>'
+  +'<h3>Дилер</h3><p>'+(h17?'Дилер берёт карту до 17 и на мягких 17 (когда в руке туз).':'Дилер берёт карту до 16 и останавливается на любых 17.')+' Если у дилера блэкджек, он открывает его сразу.'+(BJ&&BJ.p22?' Если дилер перебрал ровно 22, твоя рука (кроме блэкджека и перебора) играет вничью, ставка возвращается.':'')+'</p>'
   +'<h3>Твои ходы</h3><p>«Ещё»: взять карту. «Хватит»: остановиться. «Удвоить»: ставка ×2 и ровно одна карта, можно на 9, 10 или 11 с первых двух карт. «Разделить»: две одинаковые карты становятся двумя руками, один раз за раздачу. Разделённые тузы получают по одной карте.</p>'
   +'<h3>Стол</h3><p>За столом до 5 игроков, каждый играет против дилера, а не друг против друга. На ставки 9 секунд, на ход 15 секунд. Если не успел, игра сама нажимает «Хватит».</p>';
  $('sheet').classList.add('on');$('shx').onclick=function(){$('sheet').classList.remove('on')}}
@@ -1856,7 +1861,7 @@ document.querySelectorAll('[data-bjrules]').forEach(function(b){b.onclick=bjRule
 
 /* ===== Колесо фортуны ===== */
 var wsp=0,wAng=0,wHist=[];
-function wCol(m){return m<=0?'#7a1f35':m<1?'#a8434f':m===1?'#5d557c':m<1.5?'#7b5cff':m<2.5?'#26b07a':m<5?'#e2508f':'#f2b134'}
+function wCol(m){return m<=0?'#7a1f35':m<0.7?'#a8434f':m<1?'#b9705a':m===1?'#5d557c':m<1.5?'#7b5cff':m<2?'#26b07a':m<3?'#1f9fb0':m<5?'#e2508f':'#f2b134'}
 function wFmt(m){return '×'+(Math.round(m*100)/100)}
 function wLbl(m){m=+m||0;return m<1?'−'+Math.round((1-m)*100)+'%':wFmt(m)}
 function wSvg(secs,R,lbl){var n=secs.length,c=R+14,a=2*Math.PI/n,s='<svg viewBox="0 0 '+(2*c)+' '+(2*c)+'"><defs><radialGradient id="wsh"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs><circle cx="'+c+'" cy="'+c+'" r="'+(R+12)+'" fill="#1b1630" stroke="#f2b134" stroke-width="4"/>';
@@ -2005,7 +2010,7 @@ function duRules(){$('sbox').innerHTML='<button class="xb" id="shx" aria-label="
 document.querySelectorAll('[data-durules]').forEach(function(b){b.onclick=duRules});
 
 /* ===== запуск ===== */
-function start(){fill();hdr();$('hallw').hidden=CFG.settings.bjOn===0&&CFG.settings.duOn===0;document.querySelector('[data-g=bj]').parentNode.hidden=CFG.settings.bjOn===0;$('ducard').parentNode.hidden=CFG.settings.duOn===0;wCard();applySkins();rCases();modeUI();buildMg();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
+function start(){fill();hdr();$('hallw').hidden=CFG.settings.bjOn===0&&CFG.settings.duOn===0;document.querySelector('[data-g=bj]').hidden=CFG.settings.bjOn===0;$('ducard').hidden=CFG.settings.duOn===0;wCard();applySkins();rCases();modeUI();buildMg();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
  
  $('tm').textContent=ONLINE?'':'Демо-режим: данные живут только в этой вкладке';livePoll();setInterval(livePoll,5000);upd()}
 fetch('/api/config').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(c){CFG=c;ONLINE=true},function(){throw 0}).catch(function(){

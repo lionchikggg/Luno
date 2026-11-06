@@ -102,9 +102,9 @@ function vSkins(){var v=$('view');
   v.appendChild(h('h2',{},[g[0]]));v.appendChild(h('p',{class:'m'},[g[2]]));
   keys.forEach(function(s2){var k=s2[0],sel=h('select',{on:{change:function(){if(this.value){C.skins[k]=C.items[this.value].img;draw()}}}},[h('option',{value:''},['Взять из моих NFT…'])]);withImg.forEach(function(ik){sel.appendChild(h('option',{value:ik},[C.items[ik].name]))});
    v.appendChild(h('div',{class:'card'},[h('div',{class:'row'},[h('b',{},[s2[1]])]),h('div',{class:'row'},[img(function(){return C.skins[k]},function(u){C.skins[k]=u},draw),sel])]))})})}
-function wCol(m){return m<=0?'#7a1f35':m<1?'#a8434f':m===1?'#5d557c':m<1.5?'#7b5cff':m<2.5?'#26b07a':m<5?'#e2508f':'#f2b134'}
+function wCol(m){return m<=0?'#7a1f35':m<0.7?'#a8434f':m<1?'#b9705a':m===1?'#5d557c':m<1.5?'#7b5cff':m<2?'#26b07a':m<3?'#1f9fb0':m<5?'#e2508f':'#f2b134'}
 function wLbl(m){m=+m||0;return m<1?'−'+Math.round((1-m)*100)+'%':'×'+m}
-function vWheel(){var v=$('view'),W=C.wheel=C.wheel||{on:1,secs:[0,1.2,0,0.5,2,0,0.5,1.2,0,3,0,0.5,1.2,0,2,0.5,0,7,0,0.5,1.2,0,2,0,0.5,3,0,1.2,0.5,0]},MX=C.wheelMaxRtp||0.97;
+function vWheel(){var v=$('view'),W=C.wheel=C.wheel||{on:1,secs:[0.5,1.2,0.8,0,1.5,0.5,1.2,0.8,0.5,2,0,1.2,0.5,0.8,1.5,0,1.2,5,0.8,0,1.2,0.5,1.5,0,0.8,2,0.5,1.2,0,0.5]},MX=C.wheelMaxRtp||0.97;
  v.appendChild(h('div',{class:'help'},['Колесо состоит из одинаковых секторов, у каждого свой множитель. Шанс выпасть у всех секторов одинаковый: 1 из числа секторов. Средний множитель и есть RTP игрокам, остальное твоя прибыль. Сервер не даст сохранить колесо с RTP выше '+Math.round(MX*100)+'%, так что ты всегда в плюсе на дистанции. Множитель 0 игрок видит как «−100%» (ставка сгорела), 0.5 как «−50%» (вернулась половина), 1 возврат ставки, 2 выигрыш вдвое. Проигрышные секторы окрашены в красный. После изменений нажми «Сохранить всё».']));
  v.appendChild(h('div',{class:'card row'},[h('label',{style:'flex:1'},[h('input',{type:'checkbox',ck:W.on!==0,on:{change:function(){W.on=this.checked?1:0}}}),' Колесо фортуны включено (карточка в «Играх» на главной)'])]));
  var rt=h('div',{class:'rtp'}),pv=h('div',{style:'display:flex;justify-content:center;margin:10px 0'}),grp=h('div',{class:'m'}),list=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px'});
@@ -118,7 +118,7 @@ function vWheel(){var v=$('view'),W=C.wheel=C.wheel||{on:1,secs:[0,1.2,0,0.5,2,0
  v.appendChild(rt);v.appendChild(pv);v.appendChild(grp);
  v.appendChild(h('div',{class:'row'},[h('button',{class:'b g',on:{click:function(){if(W.secs.length>=60)return alert('Максимум 60 секторов');W.secs.push(0);rows();paint()}}},['+ сектор ×0']),
   h('button',{class:'b g',on:{click:function(){var a=W.secs.slice().sort(function(x,y){return y-x}),z=a.filter(function(x){return !(x>0)}),nz=a.filter(function(x){return x>0}),out=[];while(nz.length||z.length){if(nz.length)out.push(nz.shift());if(z.length)out.push(z.shift());if(z.length&&nz.length<z.length)out.push(z.shift())}W.secs=out;rows();paint()}}},['Расставить красиво']),
-  h('button',{class:'b g',on:{click:function(){if(!confirm('Вернуть стандартное колесо (30 секторов, RTP 95%)?'))return;W.secs=[0,1.2,0,0.5,2,0,0.5,1.2,0,3,0,0.5,1.2,0,2,0.5,0,7,0,0.5,1.2,0,2,0,0.5,3,0,1.2,0.5,0];rows();paint()}}},['Стандартное колесо'])]));
+  h('button',{class:'b g',on:{click:function(){if(!confirm('Вернуть стандартное колесо (30 секторов, RTP 94%)?'))return;W.secs=[0.5,1.2,0.8,0,1.5,0.5,1.2,0.8,0.5,2,0,1.2,0.5,0.8,1.5,0,1.2,5,0.8,0,1.2,0.5,1.5,0,0.8,2,0.5,1.2,0,0.5];rows();paint()}}},['Стандартное колесо'])]));
  v.appendChild(h('div',{class:'row'},['Подогнать множители под RTP',tg,'%',h('button',{class:'b',on:{click:function(){var n=W.secs.length,t=0;W.secs.forEach(function(m){t+=+m||0});if(!t)return alert('Добавь секторы с выигрышем');var f=(+tg.value/100)*n/t;
    W.secs=W.secs.map(function(m){return m>0?Math.max(0.1,Math.round(m*f*10)/10):0});rows();paint()}}},['Подогнать'])]));
  v.appendChild(h('p',{class:'m'},['Каждый сектор: множитель выигрыша. Порядок секторов тот же, что на колесе в приложении, по часовой стрелке от верхней стрелки.']));
@@ -144,11 +144,12 @@ function vSet(){var v=$('view'),S=C.settings;S.edges=S.edges||{};
  v.appendChild(num('Минимум мин на поле (от 1 до 20)',function(){return S.minesMin},function(x){S.minesMin=x}));
  v.appendChild(num('Потолок выигрыша в минах, ×',function(){return S.minesMaxMult},function(x){S.minesMaxMult=x}));
  v.appendChild(h('h2',{},['Блэкджек']));
- (function(){var inf=h('div',{class:'card m'});function pe(){var e=(+S.bjPay||1.2)>=1.5?0.7:2.0;if(+S.bjH17)e+=0.2;inf.textContent='Твоё преимущество при этих правилах около '+e.toFixed(1)+'% от ставок на дистанции. Игроки при этом выигрывают примерно 43% раздач и ещё около 8% уходят в ничью. Столы: 10, 50, 100, 500, 1000, 5000 и 10000 ★, по 3 стола на каждую ставку, до 5 игроков за столом. Если за столом никого, игрок играет один на один с дилером.'}
+ (function(){var inf=h('div',{class:'card m'});function pe(){var e=(+S.bjPay||1.2)>=1.5?0.7:2.0;if(+S.bjH17)e+=0.2;if(+S.bjP22)e+=6.5;inf.textContent='Твоё преимущество при этих правилах около '+e.toFixed(1)+'% от ставок на дистанции. Игроки при этом выигрывают примерно 43% раздач и ещё около 8% уходят в ничью. Столы: 10, 50, 100, 500, 1000, 5000 и 10000 ★, по 3 стола на каждую ставку, до 5 игроков за столом. Если за столом никого, игрок играет один на один с дилером.'}
   var sel=h('select',{on:{change:function(){S.bjPay=+this.value;pe()}}},[h('option',{value:'1.2'},['6 к 5 (больше прибыли)']),h('option',{value:'1.5'},['3 к 2 (щедрее к игрокам)'])]);sel.value=(+S.bjPay||1.2)>=1.5?'1.5':'1.2';
   v.appendChild(h('div',{class:'card row'},[h('label',{style:'flex:1'},[h('input',{type:'checkbox',ck:S.bjOn===undefined||+S.bjOn===1,on:{change:function(){S.bjOn=this.checked?1:0}}}),' Блэкджек включён (в «Карточном зале» на главной)'])]));
   v.appendChild(h('div',{class:'card row'},[h('span',{style:'flex:1'},['Сколько платит блэкджек']),sel]));
   v.appendChild(h('div',{class:'card row'},[h('label',{style:'flex:1'},[h('input',{type:'checkbox',ck:S.bjH17===undefined||+S.bjH17===1,on:{change:function(){S.bjH17=this.checked?1:0;pe()}}}),' Дилер берёт карту на мягких 17 (чуть больше прибыли)'])]));
+  v.appendChild(h('div',{class:'card row'},[h('label',{style:'flex:1'},[h('input',{type:'checkbox',ck:+S.bjP22===1,on:{change:function(){S.bjP22=this.checked?1:0;pe()}}}),' Перебор дилера ровно на 22 — ничья (сильно повышает прибыль, около +6.5%; игроки видят это правило на столе)'])]));
   pe();v.appendChild(inf)})();
  v.appendChild(h('h2',{},['Дурак']));
  v.appendChild(h('div',{class:'help'},['Игроки играют друг против друга, ты ничем не рискуешь. Каждый вносит ставку стола, проигравший (дурак) теряет свою, её делят победители. Твоя комиссия берётся только со ставки дурака: 0.05 значит 5%. Пример: стол ★100 на двоих, победитель получает +★95, тебе ★5. При ничьей ставки возвращаются без комиссии.']));

@@ -1,0 +1,29 @@
+# Автоматическая настройка для Render (Blueprint). Название должно быть уникальным на Render: поменяй luno-case на своё.
+services:
+  - type: web
+    name: luno-case
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: luno-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DATA
+        value: /data/data.json
+      - key: UPLOADS
+        value: /data/uploads
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: PUBLIC_URL
+        sync: false
+      - key: ADMIN_CHAT_ID
+        sync: false
+      - key: TON_ADDRESS
+        sync: false
+      - key: TON_API_KEY
+        sync: false

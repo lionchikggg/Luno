@@ -296,6 +296,7 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
 .fl2{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);z-index:6;font:800 30px Unbounded;color:#ffe08a;text-shadow:0 0 24px #ffb54a,0 2px 0 #7a4a00;pointer-events:none;animation:floatw 1.4s ease-out forwards;white-space:nowrap}
 @keyframes floatw{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-90%) scale(1)}}
 .bigw{font:800 38px Unbounded;color:var(--gold);margin:10px 0 4px;text-shadow:0 0 24px rgba(255,200,80,.5)}
+#gate{position:fixed;inset:0;z-index:100;background:#04051a;display:grid;place-items:center;text-align:center;padding:30px}#gate[hidden]{display:none}#gate h2{font-size:26px;margin-bottom:10px}#gate p{color:#ffd0da;font-weight:700;margin-bottom:10px}#gate small{color:var(--muted);line-height:1.5}
 </style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
@@ -304,7 +305,8 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
 <linearGradient id="gF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#ff9d2e"/><stop offset="1" stop-color="#ff4d6d"/></linearGradient>
 <linearGradient id="gE" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0f7ff"/><stop offset=".5" stop-color="#6fc3ff"/><stop offset="1" stop-color="#5a6bff"/></linearGradient>
 <radialGradient id="gO" cx=".35" cy=".3"><stop offset="0" stop-color="#e6dcff"/><stop offset=".5" stop-color="#8b6bff"/><stop offset="1" stop-color="#3a2a9a"/></radialGradient>
-<mask id="cm"><rect width="64" height="64" fill="#fff"/><circle cx="42" cy="22" r="21" fill="#000"/></mask><linearGradient id="gRb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a5bff"/><stop offset=".5" stop-color="#8dbcff"/><stop offset="1" stop-color="#4a2fd8"/></linearGradient><linearGradient id="gRf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6ecff"/><stop offset="1" stop-color="#3a4ee8"/></linearGradient></defs></svg><div id="stars" aria-hidden="true"></div><div class="toast" id="toast" role="status"></div>
+<mask id="cm"><rect width="64" height="64" fill="#fff"/><circle cx="42" cy="22" r="21" fill="#000"/></mask><linearGradient id="gRb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a5bff"/><stop offset=".5" stop-color="#8dbcff"/><stop offset="1" stop-color="#4a2fd8"/></linearGradient><linearGradient id="gRf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6ecff"/><stop offset="1" stop-color="#3a4ee8"/></linearGradient></defs></svg><div id="gate" hidden><div><h2>Luno</h2><p></p><small>Закрой окно полностью и открой игру кнопкой «Играть» в боте Telegram.</small><small class="dbg" style="display:block;margin-top:14px;opacity:.6"></small></div></div>
+<div id="stars" aria-hidden="true"></div><div class="toast" id="toast" role="status"></div>
 <main>
 <header id="hd"></header>
 
@@ -320,10 +322,10 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
    <button class="game c4" data-g="upgrade"><div class="art" data-card="upgrade"></div><strong>Апгрейд</strong><span class="sb2">прокачай подарок</span></button>
   <button class="game c5" data-g="coin"><div class="art" data-card="coin"></div><span class="nw">NEW</span><strong>Монетка</strong><span class="sb2">выбери сторону</span></button>
  </div>
+ <h3>Кейсы</h3><div class="grid" id="cl"></div>
  <p class="note" id="tm"></p>
 </section>
 
-<section class="view" id="cases"><h3>Кейсы</h3><div class="grid" id="cl"></div></section>
 <section class="view" id="casev"><div class="cvh"><div class="cvi" id="cvi"></div><p class="note" id="cvp" style="margin:6px 0 0"></p></div><h3>Что внутри и шансы выпадения</h3><div class="cvg" id="cvg"></div>
  <div class="dock"><button class="btn big" id="cvo"></button></div></section>
 <section class="view" id="leaders"><div class="lhd"><div class="lmoon" data-i="trophyC"></div><h2>Лидеры</h2><p class="note" style="margin:4px 0 0">Самые удачливые игроки недели</p><div class="cdn" id="cdn"></div></div><div id="ld"></div></section>
@@ -392,7 +394,6 @@ html,body{max-width:100%;overflow-x:hidden}main,section{min-width:0}
 <div class="sheet" id="sheet"><div class="box" id="sbox"></div></div>
 <nav aria-label="Разделы">
  <button data-v="home" aria-current="page"><i data-i="home"></i>Главная</button>
- <button data-v="cases"><i data-i="giftS"></i>Кейсы</button>
  <button data-v="leaders"><i data-i="trophy"></i>Лидеры</button>
  <button data-v="profile"><i data-i="user"></i>Профиль</button>
 </nav>
@@ -738,9 +739,15 @@ I.spin=V('<path d="M32 10a22 22 0 0 1 21 15M32 54a22 22 0 0 1-21-15" stroke="#ff
 function fill(r){(r||document).querySelectorAll('[data-i]').forEach(function(e){e.innerHTML=I[e.dataset.i]})}
 var $=function(i){return document.getElementById(i)},CFG,ME={id:'',balance:0,inv:[],stats:{opened:0,profit:0}},ONLINE=false,ENG=null,name='Игрок',uname='',photo='',cur='home';
 var TT={rocket:'Ракетка',coin:'Монетка',slots:'Спины',upgrade:'Апгрейд',plinko:'Plinko',inventory:'Инвентарь',referrals:'Рефералы',support:'Поддержка',deposit:'Пополнение',casev:'Кейс'};
-var PARENT={inventory:'profile',referrals:'profile',support:'profile',deposit:'profile',casev:'cases'};
-var TGW=window.Telegram&&window.Telegram.WebApp,INIT=TGW&&TGW.initData||'',DEVQ=(location.search.match(/dev=(\d+)/)||[])[1]||'';
-try{var tu=TGW&&TGW.initDataUnsafe&&TGW.initDataUnsafe.user;if(tu){name=tu.first_name||name;uname=tu.username||'';photo=tu.photo_url||''}if(TGW&&TGW.expand)TGW.expand()}catch(e){}
+var PARENT={inventory:'profile',referrals:'profile',support:'profile',deposit:'profile',casev:'home'};
+var TGW=window.Telegram&&window.Telegram.WebApp,DEVQ=(location.search.match(/dev=(\d+)/)||[])[1]||'';
+function tgInit(){var v='';try{if(TGW&&TGW.initData)v=TGW.initData}catch(e){}
+ if(!v){try{v=new URLSearchParams(location.hash.slice(1)).get('tgWebAppData')||''}catch(e){}} /* запасной способ: Telegram кладёт данные запуска в адрес */
+ try{if(v)sessionStorage.setItem('tgi',v);else v=sessionStorage.getItem('tgi')||''}catch(e){}return v}
+var INIT=tgInit();
+try{var tu=null;if(TGW&&TGW.initDataUnsafe&&TGW.initDataUnsafe.user)tu=TGW.initDataUnsafe.user;else if(INIT)tu=JSON.parse(new URLSearchParams(INIT).get('user')||'null');
+ if(tu){name=tu.first_name||name;uname=tu.username||'';photo=tu.photo_url||''}
+ if(TGW){if(TGW.ready)TGW.ready();if(TGW.expand)TGW.expand();try{TGW.setHeaderColor('#04051a');TGW.setBackgroundColor('#04051a')}catch(e){}}}catch(e){}
 function rnd(){var a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296} /* только для анимаций */
 function esc(t){return String(t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on')},2000)}
@@ -755,10 +762,11 @@ function copy(t){function fb(){var a=document.createElement('textarea');a.value=
 function openTG(u){if(TGW&&TGW.openTelegramLink&&/^https:\/\/t\.me\//.test(u))TGW.openTelegramLink(u);else window.open(u,'_blank')}
 var DEMO_UN=/nouser=1/.test(location.search)?'':(uname||'demo_user');
 function api(p,b){
- if(ONLINE)return fetch('/api/'+p,{method:'POST',headers:{'Content-Type':'application/json','x-init-data':INIT,'x-dev-user':DEVQ},body:JSON.stringify(b||{})}).then(function(r){return r.json()});
+ if(ONLINE)return fetch('/api/'+p,{method:'POST',headers:{'Content-Type':'application/json','x-init-data':INIT,'x-dev-user':DEVQ},body:JSON.stringify(b||{})}).then(function(r){return r.json().then(function(j){if(r.status===401)j.auth=true;return j})});
  return Promise.resolve(ENG.handle(p,'1',b||{},name,DEMO_UN))}
 function sync(r){if(r.balance!==undefined)ME.balance=r.balance;if(r.inv)ME.inv=r.inv;if(r.stats)ME.stats=r.stats;if($('bal'))$('bal').textContent=fmt(ME.balance)}
-function call(p,b,hold){return api(p,b).then(function(r){if(r.error){toast(r.error);throw r}if(!hold)sync(r);return r},function(e){if(e&&e.error)throw e;toast('Нет связи с сервером');throw e})}
+function showGate(msg){var g=$('gate');g.hidden=false;g.querySelector('p').textContent=msg||'Открой приложение из Telegram';g.querySelector('.dbg').textContent='Данные Telegram: скрипт '+(TGW?'есть':'нет')+', в адресе '+(/tgWebAppData/.test(location.hash)?'есть':'нет')+', получено '+(INIT?INIT.length:0)+' символов'}
+function call(p,b,hold){return api(p,b).then(function(r){if(r.error){if(r.auth){showGate(r.error);throw r}toast(r.error);throw r}if(!hold)sync(r);return r},function(e){if(e&&e.error)throw e;toast('Нет связи с сервером');throw e})}
 function hdr(){var g=TT[cur];$('hd').innerHTML=(g?'<div class="me"><button class="back" aria-label="Назад" id="bk">'+I.back+'</button><h2 style="font-size:17px">'+g+'</h2></div>':'<div class="me"><div class="av">'+esc(name[0]||'И')+'</div><span>'+esc(name)+'</span></div>')+'<div class="bal"><i>'+I.star+'</i><span id="bal">'+fmt(ME.balance)+'</span><button id="plus" aria-label="Пополнить">'+I.plus+'</button></div>';
  $('plus').onclick=function(){go('deposit')};if(g)$('bk').onclick=function(){go(PARENT[cur]||'home')}}
 var RS=null,mon=0,upb=0,sp=0,fl=0,opening=0,plb=0,cdT=null,depTab='stars',curCase=null;
@@ -768,7 +776,7 @@ function go(v){var g=guard();if(g)return toast(g);clearInterval(cdT);if(cur==='r
  var nv=PARENT[v]||(TT[v]?'home':v);
  document.querySelectorAll('nav button').forEach(function(b){if(b.dataset.v===nv)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
  hdr();scrollTo(0,0);
- ({cases:rCases,casev:rCaseV,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit})[v]&&({cases:rCases,casev:rCaseV,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit})[v]()}
+ ({home:rCases,casev:rCaseV,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit})[v]&&({home:rCases,casev:rCaseV,profile:rProf,leaders:rLead,upgrade:upd,inventory:rInv,referrals:rRef,support:rSup,deposit:rDep,rocket:startRocket,plinko:plBoard,slots:slInit})[v]()}
 function betOf(g){var v=Math.floor(+$('b-'+g).value),mn=CFG.settings.minBet||1;if(!(v>=mn)){toast('Минимальная ставка ★'+mn);return 0}return v}
 document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){go(b.dataset.v)}});
 document.querySelectorAll('.game').forEach(function(b){b.onclick=function(){go(b.dataset.g)}});
@@ -804,7 +812,7 @@ function applySkins(){applyTexts();
 function liveRender(list){var box=$('lv');box.innerHTML='';
  if(!list.length){for(var i=0;i<8;i++){var p=document.createElement('div');p.className='g ph';p.innerHTML=I.moon;box.appendChild(p)}return}
  list.forEach(function(k){var e=document.createElement('div');e.className='g';e.innerHTML=ik(k);box.appendChild(e)})}
-function livePoll(){api('live').then(function(r){if(r.live)liveRender(r.live)})}
+function livePoll(){api('live').then(function(r){if(r.auth)return showGate(r.error);if(r.live)liveRender(r.live)},function(){})}
 
 /* ===== РАКЕТКА: общий онлайн-раунд ===== */
 var PL=[{t:10,n:'Марс',c:'p-mars',s:64,x:'10%'},{t:20,n:'Юпитер',c:'p-jup',s:92,x:'66%'},{t:40,n:'Сатурн',c:'p-sat',s:76,x:'12%'},{t:70,n:'Нептун',c:'p-nep',s:70,x:'64%'},{t:100,n:'Луна',c:'p-moon',s:120,x:'52%'}];
@@ -819,7 +827,7 @@ function scene(m){var MX=(RS&&RS.mx)||CFG.settings.crashMax||50,lg=Math.log(Math
  PL.forEach(function(p){var y=50+(lg-Math.log(p.t))*190;if(m<2||y<-p.s-20||y>H+20){p.el.style.display='none'}else{p.el.style.display='block';p.el.style.transform='translateY('+y+'px)'}
   if(m>=p.t&&prevM<p.t){var e=$('ms');e.textContent=p.n+' ×'+p.t;e.className='';void e.offsetWidth;e.className='on'}});prevM=m}
 function rhist(list){$('rh').innerHTML=list.map(function(x){return '<span class="'+(x>=10?'big':'')+'">×'+x.toFixed(2)+'</span>'}).join('')}
-function pollRocket(){api('crash/state').then(function(r){if(r.error||cur!=='rocket')return;off=r.now-Date.now();var fresh=!RS||r.rid!==RS.rid;RS=r;sync(r);if(fresh)boomed=0;
+function pollRocket(){api('crash/state').then(function(r){if(r.error){if(r.auth)showGate(r.error);else $('rst').textContent='Нет связи с сервером, пробую снова…';return}if(cur!=='rocket')return;off=r.now-Date.now();var fresh=!RS||r.rid!==RS.rid;RS=r;sync(r);if(fresh)boomed=0;
  var hk=JSON.stringify(r.hist||[]);if(hk!==pollRocket.hk){pollRocket.hk=hk;rhist(r.hist||[])}},function(){})}
 function frame(){if(cur!=='rocket')return;requestAnimationFrame(frame);if(!RS)return;
  var t=Date.now()+off,ph=RS.phase,m=1,my=RS.my,b=$('rgo');if(ph==='bet'&&t>=RS.t0)ph='fly';
@@ -919,7 +927,7 @@ $('pgo').onclick=function(){if(plb)return;var b=betOf('plinko');if(!b)return;plb
 function rCases(){var g=$('cl');g.innerHTML='';CFG.cases.forEach(function(c){var b=document.createElement('button');b.className='cs';
  b.innerHTML='<div class="ch" style="'+(c.img?'':'filter:hue-rotate('+(+c.hue||0)+'deg)')+'">'+(c.img?imgH(c.img):I.chest)+'</div><strong>'+esc(c.name)+'</strong><div class="mini">'+c.items.slice(-4).map(function(x){return '<i>'+ik(x.k)+'</i>'}).join('')+'</div><span>'+(c.free?'по промокоду':'★ '+c.price)+'</span>';
  b.onclick=function(){curCase=c;TT.casev=c.name;go('casev')};g.appendChild(b)})}
-function rCaseV(){var c=curCase;if(!c)return go('cases');$('cvi').style.filter=c.img?'':'hue-rotate('+(+c.hue||0)+'deg) drop-shadow(0 12px 24px rgba(139,107,255,.45))';$('cvi').innerHTML=c.img?imgH(c.img):I.chest;
+function rCaseV(){var c=curCase;if(!c)return go('home');$('cvi').style.filter=c.img?'':'hue-rotate('+(+c.hue||0)+'deg) drop-shadow(0 12px 24px rgba(139,107,255,.45))';$('cvi').innerHTML=c.img?imgH(c.img):I.chest;
  $('cvp').textContent=c.free?'Открывается по промокоду из нашего канала':'Цена открытия ★ '+c.price;
  var tot=c.items.reduce(function(a,x){return a+x.weight},0),list=c.items.slice().sort(function(a,b){return itm(b.k).value-itm(a.k).value});
  $('cvg').innerHTML=list.map(function(x){var it=itm(x.k),p=x.weight/tot*100;return '<div class="ci" style="border-bottom-color:'+rar(it.value)+'"><i>'+ik(x.k)+'</i><b>'+esc(it.name)+'</b><span>★ '+it.value+'</span><em>'+(p>=10?p.toFixed(1):p>=1?p.toFixed(2):p.toFixed(3))+'%</em></div>'}).join('');
@@ -1010,12 +1018,12 @@ $('ugo').onclick=function(){if(upb||sel===null||tg===null)return;var target=tg;u
   setTimeout(function(){upb=0;sync(r);toast(r.win?'Апгрейд удался: '+itm(target).name:'Не повезло, подарок сгорел');sel=null;tg=null;upd()},4300)}).catch(function(){upb=0;$('ugo').disabled=false})};
 
 /* ===== запуск ===== */
-function start(){fill();hdr();applySkins();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
+function start(){fill();hdr();applySkins();rCases();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
  
  $('tm').textContent=ONLINE?'':'Демо-режим: данные живут только в этой вкладке';livePoll();setInterval(livePoll,5000);upd()}
 var st2=$('stars');for(var si=0;si<70;si++){var d0=document.createElement('i');d0.className='s';var z=rnd()>.8?3:2;d0.style.cssText='left:'+rnd()*100+'%;top:'+rnd()*100+'%;animation-delay:'+rnd()*4+'s;width:'+z+'px;height:'+z+'px';st2.appendChild(d0)}
 fetch('/api/config').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(c){CFG=c;ONLINE=true},function(){throw 0}).catch(function(){
  ONLINE=false;var d=new Uint32Array(1);ENG=Engine.create({state:Engine.newState(ART),roll:function(){crypto.getRandomValues(d);return d[0]/4294967296},allowTest:true});ENG.seedHistory(10);CFG=ENG.publicConfig()})
- .then(function(){return api('me')}).then(function(r){ME.id=r.id;ME.username=r.username||'';sync(r);start()});
+ .then(function(){return api('me')}).then(function(r){if(ONLINE&&r.error){showGate(r.error);return}ME.id=r.id;ME.username=r.username||'';sync(r);start()});
 
 </script></body></html>

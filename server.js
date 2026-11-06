@@ -99,7 +99,7 @@ http.createServer(async (req, res) => {
         const a = Math.floor(+b.amount), min = engine.setting('minDeposit');
         if (!BOT) return send(res, 400, { error: 'Оплата Stars работает только в боевом режиме' });
         if (!(a >= min && a <= 50000)) return send(res, 400, { error: 'Сумма от ' + min + ' до 50000 ★' });
-        const r = await tg('createInvoiceLink', { title: 'Пополнение LunoCase', description: a + ' ★ на игровой баланс', payload: 'dep:' + u.id + ':' + a, currency: 'XTR', prices: [{ label: a + ' ★', amount: a }] });
+        let r; try { r = await tg('createInvoiceLink', { title: 'Пополнение LunoCase', description: a + ' ★ на игровой баланс', payload: 'dep:' + u.id + ':' + a, currency: 'XTR', prices: [{ label: a + ' ★', amount: a }] }); } catch (e) { console.error('createInvoiceLink', e.message); return send(res, 502, { error: 'Не удалось связаться с Telegram. Проверь BOT_TOKEN на Render' }); }
         return r.ok ? send(res, 200, { link: r.result }) : send(res, 502, { error: 'Telegram: ' + r.description });
       }
       const r = engine.handle(p.slice(5), u.id, b, u.name, u.username); return send(res, r.error ? 400 : 200, r);
@@ -139,6 +139,9 @@ http.createServer(async (req, res) => {
     if (!isUp && !fs.existsSync(target)) { const bn = path.basename(f); if (/^(index|admin)\.html$|^[\w-]+\.webp$/.test(bn) && fs.existsSync(path.join(__dirname, bn))) target = path.join(__dirname, bn); }
     fs.readFile(target, (e, d) => {
       if (e) { res.writeHead(404); return res.end('Not found'); }
+      if (/\.html$/.test(target) && /index\.html$/.test(target)) { // скрипт Telegram нужен, чтобы приложение получило данные игрока от бота
+        const t = d.toString().replace(/<script src="https:\/\/telegram\.org[^>]*><\/script>/g, ''); d = Buffer.from(t.replace('<head>', '<head><script src="https://telegram.org/js/telegram-web-app.js"></script>'));
+      }
       res.writeHead(200, { 'Content-Type': MIME[path.extname(target)] || 'application/octet-stream', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': /^\/(art|uploads)\//.test(f) ? 'public, max-age=86400' : 'no-cache' }); res.end(d);
     });
   } catch (e) { console.error(e); send(res, 500, { error: 'Ошибка сервера' }); }

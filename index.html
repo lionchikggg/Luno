@@ -314,6 +314,10 @@ body.demo .bal{border-color:#ffb54a;background:linear-gradient(135deg,#3a2406,#1
 #ps.pick .it,#pt.pick .it{width:auto}
 /* кнопки в спинах без лишних значков */
 .cd{justify-content:center}
+
+/* своя картинка на карточке: не налезает на название, на узких карточках меньше */
+.art .sk{width:92px;height:84%;right:12px;top:8%}.game:not(.wide) .art .sk{width:64px;height:64px;right:10px;top:10px}
+.rin i{overflow:hidden}.rin i img{object-fit:contain}
 </style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
@@ -826,7 +830,7 @@ function rocketHTML(){var b=CFG.skins.rocket_body;if(b)return imgH(b)+'<div clas
  return '<svg viewBox="0 0 100 170" class="rsv"><path d="M30 94L5 142l7 6 28-14zM70 94l25 48-7 6-28-14z" fill="url(#gRf)"/><path d="M50 3C75 26 83 66 77 122Q75 140 65 148H35Q25 140 23 122C17 66 25 26 50 3z" fill="url(#gRb)"/><path d="M50 3C61 14 69 28 73 44H27C31 28 39 14 50 3z" fill="#eef1ff"/><circle cx="50" cy="26" r="6" fill="#ffd166"/><circle cx="53" cy="24" r="5" fill="#eef1ff"/><rect x="25" y="108" width="50" height="14" fill="#fff" opacity=".95"/><text x="50" y="119" text-anchor="middle" font-size="10" font-weight="800" fill="#2a2fa8" font-family="Unbounded,Arial,sans-serif" letter-spacing="2">LUNO</text><circle cx="50" cy="63" r="23" fill="#eef1ff"/><circle cx="50" cy="63" r="19" fill="#0b1030"/><path d="M37 148h26l4 11H33z" fill="#2a2f7a"/></svg><div class="pil"><div class="pfi">'+(pil?imgH(pil):I.frog)+'</div></div><div class="jet">'+JET+'</div>'}
 function nft(k,fb){var it=itm(k);return it.img?imgH(it.img):I[fb]}
 function artRocket(){return '<div class="mn2">'+I.moonBig+'</div><div class="rm">×1.00</div><div class="rk2">'+rocketHTML()+'</div>'}
-function artUpgrade(){return '<div class="rng"><div class="rin"><i>'+nft('arm','star')+'</i></div><div class="rptr"><b></b></div></div>'}
+function artUpgrade(sk){return '<div class="rng"><div class="rin"><i>'+(sk?imgH(sk):nft('arm','star'))+'</i></div><div class="rptr"><b></b></div></div>'}
 function artSpins(){var sc=CFG.skins.slot_sc;return '<i class="cr1">'+I.crystal+'</i><i class="cr0">'+I.crystal+'</i><div class="bb b1">'+nft('dog','cat')+'</div><div class="bb b2">'+(sc?imgH(sc):nft('pepe','frog'))+'</div><div class="bdg">×1000</div>'}
 function artPlinko(){var T=CFG.plinko||[],pk=[0,1,2,6,10,11,12],h='<svg class="pgs" viewBox="0 0 130 78">';
  for(var r=0;r<5;r++)for(var j=0;j<r+2;j++)h+='<circle cx="'+(65+(j-(r+1)/2)*17)+'" cy="'+(12+r*13)+'" r="2.6" fill="#c6ccf5"/>';
@@ -837,7 +841,7 @@ setInterval(function(){if(cur!=='home'||!CFG)return;var e=document.querySelector
  if(h.pause>0){h.pause--;return}h.t+=.09;var m=Math.exp(h.t*.55);if(m>=h.cap){h.pause=14;h.t=0;h.cap=4+rnd()*((CFG.settings.crashMax||50)-4)}e.textContent='×'+m.toFixed(2)},90);
 function applyTexts(){var E=CFG.settings.edges||{};$('rnote').textContent='RTP '+Math.round((1-(E.crash||0))*100)+'% · максимум ×'+(CFG.settings.crashMax||50)+' (Луна)';$('cgo').textContent='Бросить · ×'+(2*(1-(E.coin||0))).toFixed(2)}
 function applySkins(){applyTexts();
- document.querySelectorAll('.art[data-card]').forEach(function(e){var c=e.dataset.card,s2=CFG.skins['card_'+c];e.innerHTML=s2?'<div class="sk">'+imgH(s2)+'</div>':ARTF[c]()});
+ document.querySelectorAll('.art[data-card]').forEach(function(e){var c=e.dataset.card,s2=CFG.skins['card_'+c];e.innerHTML=c==='upgrade'?artUpgrade(s2):(s2?'<div class="sk">'+imgH(s2)+'</div>':ARTF[c]())});
  $('rk').innerHTML=rocketHTML();$('cn').innerHTML=sk('coin_a',I.coinM);$('mi').innerHTML=sk('upgrade_idle',I.frog);
  $('plsub').textContent='до ×'+Math.round(Math.max.apply(null,CFG.plinko||[0]))}
 function liveRender(list){var box=$('lv');box.innerHTML='';

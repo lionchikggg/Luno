@@ -508,7 +508,7 @@ html{scroll-behavior:smooth}
 @keyframes cphov{50%{transform:translateY(-6px)}}
 .cup.spin .lift{animation:cpspin .7s cubic-bezier(.3,.7,.4,1)}
 @keyframes cpspin{0%{transform:translateY(-70px)}45%{transform:translateY(4px) rotate(0)}60%{transform:rotate(-10deg)}75%{transform:rotate(8deg)}90%{transform:rotate(-4deg)}100%{transform:none}}
-.cpball{position:absolute;bottom:62px;width:30px;height:30px;margin-left:-15px;border-radius:50%;z-index:1;background:radial-gradient(circle at 35% 30%,#fff7d6,#ffd166 45%,#e09a1c 80%);box-shadow:0 0 18px rgba(255,209,102,.8),0 4px 6px rgba(0,0,0,.4);transition:left .3s,opacity .3s}
+.cpball{position:absolute;bottom:62px;width:30px;height:30px;margin-left:-15px;border-radius:50%;z-index:1;background:radial-gradient(circle at 35% 30%,#fff7d6,#ffd166 45%,#e09a1c 80%);box-shadow:0 0 18px rgba(255,209,102,.8),0 4px 6px rgba(0,0,0,.4);transition:opacity .3s}
 .cpball::after{content:"";position:absolute;left:9px;top:7px;width:12px;height:12px;border-radius:50%;box-shadow:inset -4px 2px 0 0 #b0680a;opacity:.55}
 .cpfog{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;background:radial-gradient(60% 50% at 50% 70%,rgba(200,190,255,.95),rgba(120,100,230,.85) 45%,rgba(40,30,110,.0) 80%);transition:opacity .25s}
 .cpfog.on{opacity:1}
@@ -2558,7 +2558,7 @@ function cpRandPair(){var a=Math.floor(Math.random()*3),b=(a+1+Math.floor(Math.r
 $('cpgo').onclick=function(){if(CP.st!=='idle'||CP.busy)return;var bet=betOf('cups');if(!bet)return;CP.busy=1;cpUpd();
  call('cups/start',{bet:bet}).then(async function(r){CP.busy=0;CP.st='mix';CP.mult=r.mult;cpUpd();
   document.querySelectorAll('#cpst .cup').forEach(function(c){c.classList.remove('pick','up')});
-  var s0=Math.floor(Math.random()*3),ball=$('cpball'),c0=cupAt(s0);ball.style.left=CPX[s0]+'%';
+  var s0=Math.floor(Math.random()*3),ball=$('cpball'),c0=cupAt(s0);ball.style.transition='none';ball.style.opacity=0;ball.style.left=CPX[s0]+'%';void ball.offsetWidth;ball.style.transition='';
   cpMsg('Следи за луной','',''); c0.classList.add('up');await cpWait(350);ball.style.opacity=1;await cpWait(650);
   c0.classList.remove('up');c0.classList.add('spin');soft('bell',1);await cpWait(450);ball.style.opacity=0;await cpWait(300);c0.classList.remove('spin');
   for(var i=0;i<5;i++){var p=cpRandPair();await cpSwap(p[0],p[1],300-i*20)}
@@ -2569,7 +2569,7 @@ $('cpgo').onclick=function(){if(CP.st!=='idle'||CP.busy)return;var bet=betOf('cu
   CP.st='pick';cpPickMode();cpMsg('Где луна?','выбери колпачок','');cpUpd()},function(){CP.busy=0;cpUpd()})};
 function cpPickMode(){document.querySelectorAll('#cpst .cup').forEach(function(c){c.classList.add('pick')});cpUpd()}
 function cpPick(c){if(CP.st!=='pick'||CP.busy)return;CP.busy=1;var slot=CP.slot[+c.dataset.c];document.querySelectorAll('#cpst .cup').forEach(function(x){x.classList.remove('pick')});
- call('cups/pick',{i:slot},true).then(async function(r){var ball=$('cpball');ball.style.left=CPX[r.pos]+'%';ball.style.opacity=1;c.classList.add('up');await cpWait(500);
+ call('cups/pick',{i:slot},true).then(async function(r){var ball=$('cpball');ball.style.transition='none';ball.style.opacity=0;ball.style.left=CPX[r.pos]+'%';void ball.offsetWidth;ball.style.transition='';ball.style.opacity=1;c.classList.add('up');await cpWait(500);
   if(r.win){cpMsg('Выигрыш ★'+fmt(r.payout),'луна твоя! чистыми +★'+fmt(r.payout-(Math.floor(+$('b-cups').value)||0)),'w');soft('big',1);fwin($('cpst'),'+'+fmt(r.payout)+' ★')}
   else{cupAt(r.pos).classList.add('up');cpMsg('Мимо','луна была здесь','l')}
   sync(r);CP.hist.unshift(r.win?1:0);CP.hist=CP.hist.slice(0,14);cpHist();await cpWait(1500);

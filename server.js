@@ -28,21 +28,23 @@ function rotate(u, cs) { ensureSeed(u); const old = u.seed, n = u.nonce; u.seed 
 const TON = process.env.TON_ADDRESS || '', PUBLIC = process.env.PUBLIC_URL || '', HOOK = crypto.createHash('sha256').update('hook' + BOT).digest('hex').slice(0, 32);
 const ADMIN_CHAT = process.env.ADMIN_CHAT_ID || '';
 const notify = text => { if (BOT && ADMIN_CHAT) tg('sendMessage', { chat_id: ADMIN_CHAT, text }).catch(() => {}); else console.log('[админу]', text); };
-const engine = Engine.create({ state, roll, now: Date.now, save: markDirty, fairInfo, rotate, tonAddress: TON, allowTest: DEV, notify });
+const engine = Engine.create({ state, roll, rand: () => crypto.randomBytes(6).readUIntBE(0, 6) / 281474976710656, now: Date.now, save: markDirty, fairInfo, rotate, tonAddress: TON, allowTest: DEV, notify });
 setInterval(() => { try { engine.tick(); } catch (e) { console.error('tick', e.message); } }, 1000).unref(); // ракета идёт круглосуточно, история копится сама
 // ---- платежи: Telegram Stars (счёт + вебхук бота) и TON (перевод с комментарием lunoID, проверка через toncenter) ----
 const tg = async (m, b) => (await fetch('https://api.telegram.org/bot' + BOT + '/' + m, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })).json();
 if (BOT && PUBLIC) tg('setWebhook', { url: PUBLIC.replace(/\/$/, '') + '/bot/' + HOOK, allowed_updates: ['pre_checkout_query', 'message'] }).then(r => console.log('Webhook бота:', r.ok ? 'ok' : r.description)).catch(e => console.error(e.message));
 else if (BOT) console.warn('PUBLIC_URL не задан: оплата Stars не будет зачисляться (нужен https-адрес сайта).');
+// Gram (бывший TON): адрес берётся из переменной TON_ADDRESS или из админки («Настройки» → «Пополнение»)
+const tonA = () => TON || engine.tonAddr();
 async function pollTon() {
-  if (!TON) return;
+  const A = tonA(); if (!A) return;
   try {
-    const r = await fetch('https://toncenter.com/api/v2/getTransactions?address=' + TON + '&limit=40' + (process.env.TON_API_KEY ? '&api_key=' + process.env.TON_API_KEY : '')), j = await r.json();
-    (j.result || []).forEach(tx => { const m = tx.in_msg; if (!m || !m.value || !m.message) return; const mm = /^luno(\d+)$/.exec(String(m.message).trim()); if (!mm) return;
+    const r = await fetch('https://toncenter.com/api/v2/getTransactions?address=' + encodeURIComponent(A) + '&limit=50' + (process.env.TON_API_KEY ? '&api_key=' + process.env.TON_API_KEY : '')), j = await r.json();
+    (j.result || []).forEach(tx => { const m = tx.in_msg; if (!m || !m.value || !m.message) return; const mm = /^luno(\d+)$/i.exec(String(m.message).trim()); if (!mm) return;
       const stars = Math.floor(Number(m.value) / 1e9 * engine.setting('tonToStars')); if (stars >= engine.setting('minDeposit')) engine.creditOnce('ton:' + tx.transaction_id.hash, mm[1], stars); });
   } catch (e) { console.error('TON:', e.message); }
 }
-if (TON) { setInterval(pollTon, 20000).unref(); pollTon(); }
+setInterval(pollTon, 20000).unref(); setTimeout(pollTon, 3000);
 
 // ---- авторизация Telegram ----
 function verify(init) {

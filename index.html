@@ -527,15 +527,21 @@ html{scroll-behavior:smooth}
 .bls .cl{position:absolute;height:26px;border-radius:20px;background:rgba(255,255,255,.18);filter:blur(1px);animation:cld linear infinite}
 .bls .cl::before,.bls .cl::after{content:"";position:absolute;border-radius:50%;background:inherit}.bls .cl::before{width:34px;height:34px;left:14px;top:-16px}.bls .cl::after{width:24px;height:24px;left:40px;top:-10px}
 @keyframes cld{from{transform:translateX(110vw)}to{transform:translateX(-160px)}}
-.blb{position:absolute;left:50%;bottom:6%;width:150px;margin-left:-75px;transform-origin:50% 100%;transition:transform .15s linear}
+.blb{position:absolute;left:50%;bottom:4%;width:150px;margin-left:-75px;display:flex;flex-direction:column;align-items:center}
+.blsv{width:150px;transform-origin:50% 100%;transition:transform .15s linear}
+.blbear{width:70px;margin-top:-4px;transform-origin:50% 0;animation:bsw 2.2s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(0,0,0,.35));pointer-events:none}
+@keyframes bsw{50%{transform:rotate(-7deg)}}
+.blb.pop .blbear{animation:bfall .9s cubic-bezier(.5,0,.9,.5) forwards}
+@keyframes bfall{to{transform:translateY(260px) rotate(120deg);opacity:0}}
+.blart .bb{position:absolute;left:50%;bottom:-14px;width:30px;margin-left:-15px}
 .blb svg{width:100%;display:block;overflow:visible}
 .blb .wob{transform-origin:50% 90%;animation:wob 1.6s ease-in-out infinite}
 @keyframes wob{50%{transform:rotate(3deg)}}
 .blm{position:absolute;left:0;right:0;top:20%;text-align:center;font:800 40px Unbounded;color:#fff;text-shadow:0 4px 16px rgba(0,0,0,.35);z-index:2;pointer-events:none}
 .blm small{display:block;font:700 14px Manrope;opacity:.85}
 .blb.fly{animation:blfly 1.4s cubic-bezier(.4,0,.2,1) forwards}
-@keyframes blfly{to{transform:translateY(-120%) scale(var(--sc,1)) rotate(-8deg);opacity:0}}
-.blb.pop svg{animation:blpop .25s forwards}
+@keyframes blfly{to{transform:translateY(-140%) rotate(-8deg);opacity:0}}
+.blb.pop .blsv svg{animation:blpop .25s forwards}
 @keyframes blpop{to{transform:scale(1.5);opacity:0}}
 .blbit{position:absolute;width:12px;height:8px;border-radius:3px;background:#ff5fa8;z-index:3;pointer-events:none}
 .blhold{display:block;width:96px;height:96px;margin:14px auto 8px;border-radius:50%;border:0;background:radial-gradient(circle at 40% 30%,#ff9cc6,#e2508f 70%);box-shadow:0 0 0 6px rgba(226,80,143,.25),0 10px 24px rgba(226,80,143,.45);color:#fff;font:800 12px Manrope;touch-action:none;-webkit-user-select:none;user-select:none;transition:transform .12s}
@@ -736,7 +742,7 @@ html{scroll-behavior:smooth}
   <button class="game c5" data-g="coin"><div class="art" data-card="coin"></div><strong>Монетка</strong><span class="sb2">выбери сторону</span></button>
   <button class="game wide c10" data-g="tower"><div class="twart" aria-hidden="true"><span></span><span class="tg1"></span><span></span><span class="tg1"></span><span></span><span></span><span></span><span></span><span class="tg1"></span><span class="tx1"></span><span class="tx1"></span><span class="tx1"></span></div><span class="nw">NEW</span><strong>Башня</strong><span class="sb2">поднимайся и умножай</span></button>
   <button class="game c12" data-g="roulette"><div class="rlart" id="rlart" aria-hidden="true"></div><strong>Рулетка</strong><span class="sb2">красное или чёрное</span></button>
-  <button class="game c13" data-g="balloon"><div class="blart" aria-hidden="true"><svg viewBox="0 0 100 150"><defs><radialGradient id="blgA" cx="35%" cy="30%"><stop offset="0" stop-color="#ffd0e6"/><stop offset=".45" stop-color="#ff6fb0"/><stop offset="1" stop-color="#c2307a"/></radialGradient></defs><path d="M50 4C24 4 8 26 8 50c0 28 22 48 38 54l-3 6h14l-3-6c16-6 38-26 38-54C92 26 76 4 50 4z" fill="url(#blgA)"/><ellipse cx="34" cy="30" rx="10" ry="16" fill="#fff" opacity=".35" transform="rotate(-20 34 30)"/><path d="M50 110c-6 10 6 18 0 28" stroke="#fff" stroke-opacity=".7" stroke-width="2" fill="none"/></svg></div><strong>Шарик</strong><span class="sb2">держи и не лопни</span></button>
+  <button class="game c13" data-g="balloon"><div class="blart" id="blart" aria-hidden="true"><svg viewBox="0 0 100 150"><defs><radialGradient id="blgA" cx="35%" cy="30%"><stop offset="0" stop-color="#ffd0e6"/><stop offset=".45" stop-color="#ff6fb0"/><stop offset="1" stop-color="#c2307a"/></radialGradient></defs><path d="M50 4C24 4 8 26 8 50c0 28 22 48 38 54l-3 6h14l-3-6c16-6 38-26 38-54C92 26 76 4 50 4z" fill="url(#blgA)"/><ellipse cx="34" cy="30" rx="10" ry="16" fill="#fff" opacity=".35" transform="rotate(-20 34 30)"/><path d="M50 110c-6 10 6 18 0 28" stroke="#fff" stroke-opacity=".7" stroke-width="2" fill="none"/></svg></div><strong>Шарик</strong><span class="sb2">держи и не лопни</span></button>
  </div>
  <div id="hallw"><h3>Карточный зал</h3>
  <div class="grid hall2"><button class="game c7" data-g="bj"><div class="bjart" aria-hidden="true"><div class="pc"><div class="pci"><div class="pcf"><span class="pcr">A<i>♠</i></span><span class="pcs">♠</span></div></div></div><div class="pc rd"><div class="pci"><div class="pcf"><span class="pcr">K<i>♥</i></span><span class="pcs">♥</span></div></div></div></div><span class="nw">NEW</span><strong>Блэкджек</strong><span class="sb2">столы против дилера</span></button><button class="game c9" data-g="du" id="ducard"><div class="duart" aria-hidden="true"><div class="dc"><div class="f"><span class="r">6<i>♠</i></span><span class="m">♠</span></div></div><div class="dc rd"><div class="f"><span class="r">10<i>♦</i></span><span class="m">♦</span></div></div><div class="dc rd"><div class="f"><span class="r">A<i>♥</i></span><span class="m">♥</span></div></div></div><span class="nw">NEW</span><strong>Дурак</strong><span class="sb2">игроки на ставку</span></button><button class="game c11 wide2" data-g="hilo"><div class="hlart" aria-hidden="true"><div class="dc"><div class="f"><span class="r">7<i>♣</i></span><span class="m">♣</span></div></div><div class="dc rd"><div class="f"><span class="r">Q<i>♥</i></span><span class="m">♥</span></div></div><b class="u">▲</b><b class="d">▼</b></div><span class="nw">NEW</span><strong>Hi-Lo</strong><span class="sb2">выше или ниже</span></button></div>
@@ -2453,8 +2459,9 @@ $('rlgo').onclick=function(){if(RL.spin)return;var keys=Object.keys(RL.bets);if(
 
 /* ===== Шарик ===== */
 var BL={on:0,busy:0,t0:0,off:0,k:.22,cap:50,raf:0,pt:0,rel:0,bet:0,hist:[]};
-function blSvg(){return '<div class="wob"><svg viewBox="0 0 100 150"><defs><radialGradient id="blg" cx="35%" cy="30%"><stop offset="0" stop-color="#ffd0e6"/><stop offset=".45" stop-color="#ff6fb0"/><stop offset="1" stop-color="#c2307a"/></radialGradient></defs><path d="M50 4C24 4 8 26 8 50c0 28 22 48 38 54l-3 6h14l-3-6c16-6 38-26 38-54C92 26 76 4 50 4z" fill="url(#blg)"/><ellipse cx="34" cy="30" rx="10" ry="16" fill="#fff" opacity=".35" transform="rotate(-20 34 30)"/><path d="M50 110c-6 10 6 18 0 28s4 12 0 12" stroke="#fff" stroke-opacity=".7" stroke-width="1.6" fill="none"/></svg></div>'}
-function blScale(m){var s=.55+Math.min(1.1,Math.log(Math.max(1,m))/Math.log(Math.max(2,BL.cap))*1.1);$('blb').style.transform='scale('+s.toFixed(3)+')';return s}
+function blBear(){var p=(CFG.skins&&CFG.skins.sprite_rocket)||'/art/minedog.webp';return '<img class="blbear" src="'+esc(p)+'" alt="">'}
+function blSvg(){return '<div class="wob"><div class="blsv"><svg viewBox="0 0 100 150"><defs><radialGradient id="blg" cx="35%" cy="30%"><stop offset="0" stop-color="#ffd0e6"/><stop offset=".45" stop-color="#ff6fb0"/><stop offset="1" stop-color="#c2307a"/></radialGradient></defs><path d="M50 4C24 4 8 26 8 50c0 28 22 48 38 54l-3 6h14l-3-6c16-6 38-26 38-54C92 26 76 4 50 4z" fill="url(#blg)"/><ellipse cx="34" cy="30" rx="10" ry="16" fill="#fff" opacity=".35" transform="rotate(-20 34 30)"/><path d="M50 110c-6 10 6 18 0 28s4 12 0 12" stroke="#fff" stroke-opacity=".7" stroke-width="1.6" fill="none"/></svg></div></div>'+blBear()}
+function blScale(m){var s=.55+Math.min(1.1,Math.log(Math.max(1,m))/Math.log(Math.max(2,BL.cap))*1.1),v=document.querySelector('#blb .blsv');if(v)v.style.transform='scale('+s.toFixed(3)+')';return s}
 function blHist(){$('blh').innerHTML=BL.hist.map(function(x){return '<span style="background:'+(x.w?'#17a867':'#7a2c52')+'">×'+x.m.toFixed(2)+'</span>'}).join('')}
 function blReset(){var b=$('blb');b.className='blb';b.innerHTML=blSvg();b.style.opacity='';blScale(1);$('blm').innerHTML='×1.00<small>держи кнопку</small>';$('blhold').disabled=false}
 function blInit(){var s=$('bls');if(!s.querySelector('.cl'))for(var i=0;i<4;i++){var c=document.createElement('div');c.className='cl';c.style.top=(8+i*20)+'%';c.style.width=(70+i*18)+'px';c.style.animationDuration=(26+i*9)+'s';c.style.animationDelay=(-i*7)+'s';s.appendChild(c)}
@@ -2465,7 +2472,7 @@ function blPop(cp){blStop();var b=$('blb'),r=b.getBoundingClientRect(),s=$('bls'
  for(var i=0;i<14;i++){var p=document.createElement('div');p.className='blbit';p.style.left=cx+'px';p.style.top=cy+'px';$('bls').appendChild(p);var a=Math.random()*Math.PI*2,d=60+Math.random()*90;
   p.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:'translate('+Math.cos(a)*d+'px,'+(Math.sin(a)*d+40)+'px) rotate('+(Math.random()*540)+'deg)',opacity:0}],{duration:700+Math.random()*300,easing:'cubic-bezier(.2,.8,.3,1)',fill:'forwards'}).onfinish=function(){this.effect.target.remove()}}
  $('blm').innerHTML='Лопнул<small>на ×'+(+cp).toFixed(2)+'</small>';BL.hist.unshift({m:+cp,w:0});BL.hist=BL.hist.slice(0,12);blHist();$('blhold').disabled=true;setTimeout(blReset,1500)}
-function blWin(m,pay){blStop();var b=$('blb');b.style.setProperty('--sc',b.style.transform.replace(/[^0-9.]/g,'')||1);b.classList.add('fly');$('blm').innerHTML='+★'+fmt(pay-BL.bet)+'<small>забрал на ×'+(+m).toFixed(2)+'</small>';
+function blWin(m,pay){blStop();var b=$('blb');b.classList.add('fly');$('blm').innerHTML='+★'+fmt(pay-BL.bet)+'<small>забрал на ×'+(+m).toFixed(2)+'</small>';
  BL.hist.unshift({m:+m,w:1});BL.hist=BL.hist.slice(0,12);blHist();if(pay>BL.bet)soft(m>=5?'big':'win',1);$('blhold').disabled=true;setTimeout(blReset,1500)}
 function blRelease(){if(BL.busy){BL.rel=1;return}if(!BL.on)return;blStop();BL.busy=1;call('balloon/cashout',{},true).then(function(r){BL.busy=0;sync(r);if(r.pop)blPop(r.cp);else blWin(r.mult,r.payout)},function(){BL.busy=0;blReset()})}
 (function(){var h=$('blhold');h.addEventListener('contextmenu',function(e){e.preventDefault()});
@@ -2475,7 +2482,7 @@ function blRelease(){if(BL.busy){BL.rel=1;return}if(!BL.on)return;blStop();BL.bu
  ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){h.addEventListener(ev,function(){blRelease()})})})();
 
 /* ===== запуск ===== */
-function start(){fill();hdr();$('hallw').hidden=CFG.settings.bjOn===0&&CFG.settings.duOn===0;document.querySelector('[data-g=bj]').hidden=CFG.settings.bjOn===0;$('ducard').hidden=CFG.settings.duOn===0;wCard();modesApply();chRender();if($('rlart'))$('rlart').innerHTML=rlWheel(rlOrder(),0);applySkins();rCases();modeUI();buildMg();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
+function start(){fill();hdr();$('hallw').hidden=CFG.settings.bjOn===0&&CFG.settings.duOn===0;document.querySelector('[data-g=bj]').hidden=CFG.settings.bjOn===0;$('ducard').hidden=CFG.settings.duOn===0;wCard();modesApply();chRender();if($('rlart'))$('rlart').innerHTML=rlWheel(rlOrder(),0);if($('blart'))$('blart').insertAdjacentHTML('beforeend','<img class="bb" src="'+esc((CFG.skins&&CFG.skins.sprite_rocket)||'/art/minedog.webp')+'" alt="">');applySkins();rCases();modeUI();buildMg();document.querySelectorAll('input[id^=b-]').forEach(function(e){var mn=CFG.settings.minBet||1;e.min=mn;if(+e.value<mn)e.value=mn});
  
  $('tm').textContent=ONLINE?'':'Демо-режим: данные живут только в этой вкладке';livePoll();setInterval(livePoll,5000);upd()}
 fetch('/api/config').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(c){CFG=c;ONLINE=true},function(){throw 0}).catch(function(){

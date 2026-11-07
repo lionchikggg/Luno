@@ -131,7 +131,7 @@ function num(lbl,get,set,step){return h('div',{class:'card row'},[h('span',{styl
 function str(lbl,get,set,ph){return h('div',{class:'card row'},[h('span',{style:'flex:1'},[lbl]),h('input',{v:get()||'',placeholder:ph||'',on:{input:function(){set(this.value)}}})])}
 function vSet(){var v=$('view'),S=C.settings;S.edges=S.edges||{};S.modes=S.modes||{};
  v.appendChild(h('h2',{},['Режимы: включить или выключить']));v.appendChild(h('p',{class:'m'},['Выключенный режим пропадает с главной, и в него нельзя сделать ставку. Начатые игры можно доиграть.']));
- (function(){var g=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px'});[['rocket','Ракетка'],['mines','Мины'],['upgrade','Апгрейд'],['slots','Спины'],['plinko','Plinko'],['wheel','Колесо фортуны'],['coin','Монетка'],['tower','Башня'],['bj','Блэкджек'],['du','Дурак'],['hilo','Hi-Lo'],['roulette','Рулетка'],['balloon','Шарик']].forEach(function(m){
+ (function(){var g=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px'});[['rocket','Ракетка'],['mines','Мины'],['upgrade','Апгрейд'],['slots','Спины'],['plinko','Plinko'],['wheel','Колесо фортуны'],['coin','Монетка'],['tower','Башня'],['bj','Блэкджек'],['du','Дурак'],['hilo','Hi-Lo'],['cups','Колпачки'],['balloon','Шарик']].forEach(function(m){
   g.appendChild(h('label',{class:'card row',style:'margin:0'},[h('input',{type:'checkbox',ck:S.modes[m[0]]!==0,on:{change:function(){S.modes[m[0]]=this.checked?1:0}}}),' '+m[1]]))});v.appendChild(g)})();
  v.appendChild(h('h2',{},['Твоя прибыль по играм (преимущество казино)']));v.appendChild(h('p',{class:'m'},['0.05 значит, что из каждых 100 ★ ставок в среднем остаётся 5 ★ тебе (RTP игрокам 95%). Чем выше, тем больше твоя прибыль, но игроки быстрее уходят. Разумно 3–10%.']));
  [['crash','Ракета'],['mines','Мины'],['plinko','Plinko'],['coin','Монетка'],['upgrade','Апгрейд'],['slots','Спины'],['tower','Башня (по умолчанию 0.08)'],['hilo','Hi-Lo (по умолчанию 0.07)'],['balloon','Шарик (по умолчанию 0.08)']].forEach(function(g){var rt=h('span',{class:'m'});function p(){rt.textContent=' RTP игрокам '+((1-(+S.edges[g[0]]||0))*100).toFixed(1)+'%'}p();
@@ -146,9 +146,8 @@ function vSet(){var v=$('view'),S=C.settings;S.edges=S.edges||{};S.modes=S.modes
  v.appendChild(h('div',{class:'help'},['Минимум мин: меньше мин значит больше шансов дойти далеко, поэтому по умолчанию 5. Потолок выигрыша: когда множитель достигает его, игра сама забирает выигрыш (по умолчанию ×10). Первая открытая клетка при ставке ★10 даёт около ★11. Процент прибыли по минам задаётся выше, в блоке «Твоя прибыль по играм».']));
  v.appendChild(num('Минимум мин на поле (от 1 до 20)',function(){return S.minesMin},function(x){S.minesMin=x}));
  v.appendChild(num('Потолок выигрыша в минах, ×',function(){return S.minesMaxMult},function(x){S.minesMaxMult=x}));
- v.appendChild(h('h2',{},['Рулетка и Шарик']));
- (function(){var sel=h('select',{on:{change:function(){S.rlZeros=+this.value}}},[h('option',{value:'1'},['Одно зеро (0) — игрокам 97.3%, тебе 2.7%']),h('option',{value:'2'},['0 и 00 — игрокам 94.7%, тебе 5.3%']),h('option',{value:'3'},['0, 00 и 000 — игрокам 92.3%, тебе 7.7%'])]);sel.value=String(S.rlZeros||3);
-  v.appendChild(h('div',{class:'card row'},[h('span',{style:'flex:1'},['Рулетка: сколько зеро на колесе. Выплаты стандартные, прибыль даёт зеро']),sel]))})();
+ v.appendChild(h('h2',{},['Колпачки и Шарик']));v.appendChild(num('Колпачки: выплата за угаданный колпачок (шанс 1 из 3). 2.7 = игрокам 90%, тебе 10%. Максимум 2.95',function(){return S.cupsMult||2.7},function(x){S.cupsMult=x}));
+ 
  v.appendChild(num('Шарик: потолок множителя (дальше шарик забирается автоматически)',function(){return S.blMax||50},function(x){S.blMax=x}));
  v.appendChild(h('h2',{},['Апгрейд']));v.appendChild(num('Минимальный шанс апгрейда (0.05 = 5%). Более дорогие цели игроку не показываются',function(){return S.upMinChance===undefined?0.05:S.upMinChance},function(x){S.upMinChance=x}));
  v.appendChild(h('h2',{},['Блэкджек']));

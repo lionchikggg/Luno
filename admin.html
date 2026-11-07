@@ -149,7 +149,8 @@ function vSet(){var v=$('view'),S=C.settings;S.edges=S.edges||{};S.modes=S.modes
  v.appendChild(h('h2',{},['Колпачки и Шарик']));v.appendChild(num('Колпачки: выплата за угаданный колпачок (шанс 1 из 3). 2.7 = игрокам 90%, тебе 10%. Максимум 2.95',function(){return S.cupsMult||2.7},function(x){S.cupsMult=x}));
  
  v.appendChild(num('Шарик: потолок множителя (дальше шарик забирается автоматически)',function(){return S.blMax||50},function(x){S.blMax=x}));
- v.appendChild(h('h2',{},['Апгрейд']));v.appendChild(num('Минимальный шанс апгрейда (0.05 = 5%). Более дорогие цели игроку не показываются',function(){return S.upMinChance===undefined?0.05:S.upMinChance},function(x){S.upMinChance=x}));
+ v.appendChild(h('h2',{},['Апгрейд']));v.appendChild(num('Минимальный множитель апгрейда: цель должна быть дороже подарка хотя бы во столько раз (1.5 = нельзя делать «безопасные» мелкие апгрейды ×1.05–1.4)',function(){return S.upMinMult||1.5},function(x){S.upMinMult=x}));
+ v.appendChild(num('Минимальный шанс апгрейда (0.05 = 5%). Более дорогие цели игроку не показываются',function(){return S.upMinChance===undefined?0.05:S.upMinChance},function(x){S.upMinChance=x}));
  v.appendChild(h('h2',{},['Блэкджек']));
  (function(){var inf=h('div',{class:'card m'});function pe(){var e=(+S.bjPay||1.2)>=1.5?0.7:2.0;if(+S.bjH17)e+=0.2;if(+S.bjP22)e+=6.5;inf.textContent='Твоё преимущество при этих правилах около '+e.toFixed(1)+'% от ставок на дистанции. Игроки при этом выигрывают примерно 43% раздач и ещё около 8% уходят в ничью. Столы: 10, 50, 100, 500, 1000, 5000 и 10000 ★, по 3 стола на каждую ставку, до 5 игроков за столом. Если за столом никого, игрок играет один на один с дилером.'}
   var sel=h('select',{on:{change:function(){S.bjPay=+this.value;pe()}}},[h('option',{value:'1.2'},['6 к 5 (больше прибыли)']),h('option',{value:'1.5'},['3 к 2 (щедрее к игрокам)'])]);sel.value=(+S.bjPay||1.2)>=1.5?'1.5':'1.2';

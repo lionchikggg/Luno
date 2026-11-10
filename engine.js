@@ -14,7 +14,7 @@
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
         crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, upMinChance: 0.05, upMinMult: 1.5, wdFeeFixed: 25, autoPay: 0, starsFeePct: 0, rlZeros: 3, blMax: 50, cupsMult: 2.7, bjOn: 1, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
-        edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05, tower: 0.08, hilo: 0.07, balloon: 0.08, slots3: 0.06 }, modes: { rocket: 1, mines: 1, upgrade: 1, slots: 1, plinko: 1, wheel: 1, coin: 1, tower: 1, bj: 1, du: 1, hilo: 1, roulette: 0, balloon: 1, cups: 1 }, tonAddress: '', giftDepositTo: '', giftDepositNote: 'Начисляем в течение 24 часов.', channelUrl: '', channelText: 'Наш канал', wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
+        edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05, tower: 0.08, hilo: 0.07, balloon: 0.08, slots3: 0.10 }, modes: { rocket: 1, mines: 1, upgrade: 1, slots: 1, plinko: 1, wheel: 1, coin: 1, tower: 1, bj: 1, du: 1, hilo: 1, roulette: 0, balloon: 1, cups: 1 }, tonAddress: '', giftDepositTo: '', giftDepositNote: 'Начисляем в течение 24 часов.', channelUrl: '', channelText: 'Наш канал', wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
         hat: { name: 'Шляпа мага', img: '', value: 30, wd: false, up: true }, ring: { name: 'Кольцо', img: '', value: 60, wd: false, up: true },
@@ -43,7 +43,7 @@
   function wheelRtp(secs) { var t = 0; secs.forEach(function (m) { t += +m || 0; }); return secs.length ? t / secs.length : 0; }
 
   function defaultSlots3(art) {
-    return { bets: [10, 25, 50, 100, 250], pair: 2, symbols: [
+    return { bets: [10, 25, 50, 100, 250, 500, 1000], pair: 0, symbols: [
       { id: 'clover', name: 'Клевер', img: '', icon: 'clover', mult: 5, count: 8 }, { id: 'gem', name: 'Кристалл', img: '', icon: 'gem', mult: 10, count: 7 },
       { id: 'hat', name: 'Шляпа мага', img: '', icon: 'hat', mult: 20, count: 5 }, { id: 'ring', name: 'Кольцо', img: '', icon: 'ring', mult: 40, count: 4 },
       { id: 'plum', name: 'Слива', img: art.slotplum || art.plum || '', icon: 'star', mult: 100, count: 3 }, { id: 'dog', name: 'Пёс в худи', img: art.dog || '', icon: 'star', mult: 200, count: 2 },
@@ -120,7 +120,9 @@
       var sk0 = S.cfg.skins = S.cfg.skins || {}; if (sk0.mines_closed === undefined) sk0.mines_closed = '/art/minedog.webp'; ['mines_safe', 'mines_bomb', 'card_mines'].forEach(function (k) { if (sk0[k] === undefined) sk0[k] = ''; });
       Object.keys(S.cfg.items).forEach(function (k) { var it = S.cfg.items[k]; if (it.wd === undefined) it.wd = !!it.img; if (it.up === undefined) it.up = true; });
       if (!S.cfg.slots3) S.cfg.slots3 = defaultSlots3({ slotplum: '/art/slotplum.webp', dog: '/art/dog.webp', pepe: '/art/pepe.webp' }); if (S.cfg.skins.card_slots3 === undefined) S.cfg.skins.card_slots3 = '';
-      (function () { var st9 = S.cfg.settings; if (st9.giftDepositTo === undefined) st9.giftDepositTo = ''; if (st9.giftDepositNote === undefined) st9.giftDepositNote = 'Начисляем в течение 24 часов.'; st9.edges = st9.edges || {}; if (st9.edges.slots3 === undefined) st9.edges.slots3 = 0.06; })();
+      (function () { var st9 = S.cfg.settings; if (st9.giftDepositTo === undefined) st9.giftDepositTo = ''; if (st9.giftDepositNote === undefined) st9.giftDepositNote = 'Начисляем в течение 24 часов.'; st9.edges = st9.edges || {}; if (st9.edges.slots3 === undefined) st9.edges.slots3 = 0.10; })();
+      (function () { S.flags = S.flags || {}; if (!S.flags.s3v3) { S.flags.s3v3 = 1; var c3b = S.cfg.slots3; if (c3b && JSON.stringify(c3b.bets) === JSON.stringify([10, 25, 50, 100, 250])) { var mnB = +S.cfg.settings.minBet || 10, mxB = +S.cfg.settings.maxBet || 1000, nb = [10, 25, 50, 100, 250, 500, 1000].filter(function (x) { return x >= mnB && x <= mxB; }); if (nb.length >= 2) c3b.bets = nb; } } })();
+      (function () { S.flags = S.flags || {}; if (!S.flags.s3v2) { S.flags.s3v2 = 1; var c3 = S.cfg.slots3, ed = S.cfg.settings.edges; if (c3 && +c3.pair === 2) c3.pair = 0; if (ed && +ed.slots3 === 0.06) ed.slots3 = 0.10; } })();
       var ST0 = S.cfg.settings; ST0.edges = ST0.edges || {}; if (ST0.edges.tower === undefined) ST0.edges.tower = 0.06; if (ST0.edges.hilo === undefined) ST0.edges.hilo = 0.05;
       ST0.modes = ST0.modes || {}; ['rocket', 'mines', 'upgrade', 'slots', 'plinko', 'wheel', 'coin', 'tower', 'bj', 'du', 'hilo'].forEach(function (k) { if (ST0.modes[k] === undefined) ST0.modes[k] = 1; });
       if (ST0.tonAddress === undefined) ST0.tonAddress = ''; if (ST0.channelUrl === undefined) ST0.channelUrl = ''; if (ST0.channelText === undefined) ST0.channelText = 'Наш канал';
@@ -155,7 +157,7 @@
     var mnext = function (k, M) { var cap = set('minesMaxMult') || 10; return (k >= 25 - M || mmult(k, M) >= cap) ? 0 : mmult(k + 1, M); };
     var s3c = { key: '', val: null };
     function s3info() { var c3 = cfg().slots3, ed = edgeOf('slots3'), key = JSON.stringify(c3) + '|' + ed; if (s3c.key !== key) s3c = { key: key, val: s3calc(c3, ed) }; return s3c.val; }
-    function s3pub() { var c3 = cfg().slots3, i = s3info(); return { symbols: c3.symbols.map(function (x, k) { return { name: x.name, img: x.img, icon: x.icon, mult: i.mults[k], count: x.count }; }), bets: c3.bets, pair: i.pair, strip: i.strip, hit: i.hit, rtp: 1 - edgeOf('slots3') }; }
+    function s3pub() { var c3 = cfg().slots3, i = s3info(); return { maxPay: set('maxPayout'), symbols: c3.symbols.map(function (x, k) { return { name: x.name, img: x.img, icon: x.icon, mult: i.mults[k], count: x.count }; }), bets: c3.bets, pair: i.pair, strip: i.strip, hit: i.hit, rtp: 1 - edgeOf('slots3') }; }
     var growth = function (ms, k) { return Math.exp((k || 0.00009) * ms); };
     var inv = function (u, id) { for (var i = 0; i < u.inv.length; i++) if (u.inv[i].id === id) return i; return -1; };
     var BET_MS = 8000, CRASH_MS = 3500, maskName = function (n) { n = String(n || 'И'); return n.length <= 2 ? n[0] + '*' : n[0] + '***' + n[n.length - 1]; };

@@ -813,6 +813,33 @@ body.s3bg::before{background:linear-gradient(180deg,#4b2112 0%,#25100a 42%,#0b06
 
 .nw{display:none!important}
 .c6 .s3box{right:18px}
+
+/* апгрейд: две карточки и окно выбора */
+.ugc{position:relative;display:flex;gap:14px;margin:0 0 14px}
+.ugcard{flex:1;min-width:0;text-align:left;border:1px solid rgba(255,255,255,.1);background:linear-gradient(160deg,#242a56,#181c3e);border-radius:24px;padding:14px;color:#fff;display:block;transition:transform .16s,border-color .2s}.ugcard:active{transform:scale(.97)}.ugcard.set{border-color:#8b6bff;box-shadow:0 0 0 1px #8b6bff inset}
+.ugcard small{display:block;color:#9aa3d6;font-weight:700;font-size:14px;margin-bottom:10px}
+.ugb{display:flex;align-items:center;gap:10px}.ugi{flex:none;width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);display:grid;place-items:center;font:300 32px Manrope;font-style:normal;overflow:hidden}.ugi img,.ugi svg{width:78%;height:78%;object-fit:contain}
+.ugb b{display:block;font:800 17px Manrope;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}.ugb span{display:block;color:#9aa3d6;font-weight:600;font-size:13px;line-height:1.25;margin-top:2px}.ugb>div{min-width:0}
+.ugar{position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:#2c3266;border:4px solid #0c0e26;display:grid;place-items:center;z-index:2}.ugar svg{width:18px;height:18px}
+.ugp{text-align:center;color:#4be39a;font-weight:800;min-height:20px;margin:8px 0 0}
+.sheet .pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-height:none;overflow:visible}
+.pick .it b{display:block;font:700 11px Manrope;line-height:1.15;margin:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+/* слоты: лунный фон */
+body.s3bg::before{background:radial-gradient(70% 40% at 86% 4%,rgba(255,244,200,.26),transparent 70%),radial-gradient(90% 50% at 8% 72%,rgba(80,70,190,.32),transparent 70%),linear-gradient(180deg,#151a48 0%,#0b0d2c 46%,#04050f 100%)}
+body.s3bg::after{content:"";position:fixed;right:-46px;top:-74px;width:170px;height:170px;border-radius:50%;pointer-events:none;z-index:-1;opacity:.32;background:radial-gradient(circle at 62% 30%,rgba(150,138,98,.5) 0 7%,transparent 8%),radial-gradient(circle at 34% 58%,rgba(150,138,98,.4) 0 10%,transparent 11%),radial-gradient(circle at 36% 34%,#fffdf0,#f3e8bf 40%,#d6c88f 70%,#b2a472);box-shadow:0 0 90px 24px rgba(255,238,180,.18)}
+.s3col{background:rgba(150,165,255,.10)}.s3col::before{background:linear-gradient(rgba(8,10,40,.55),transparent)}.s3col::after{background:linear-gradient(transparent,rgba(8,10,40,.55))}
+.s3bets,.s3btns button{background:rgba(150,165,255,.12)}.s3bets button.on{background:rgba(190,200,255,.26)}
+.s3about{color:#b9c2f5}.s3win small{color:#b7bfe6}.s3no{color:#9aa3d6!important}.s3wl{color:#ffe9a8}
+.s3pl{stroke:#ffe9a8;filter:drop-shadow(0 0 6px #ffe08a)}.s3c.win i{filter:drop-shadow(0 0 12px rgba(255,236,170,.9))}.s3mini u.on{background:#ffe08a}
+.btn.big.s3go{background:linear-gradient(120deg,#d4dbff,#8e9df0);color:#10143a;box-shadow:0 10px 30px rgba(140,155,255,.35)}
+
+/* кейс: как на примере, ровный ряд x1..x5 */
+.rl{height:160px;padding:9px 0}.rl.sm{height:122px;padding:8px 0}
+.rt{padding:8px 8px 14px}
+.ctl{display:grid;grid-template-columns:minmax(0,1fr) 50px;gap:10px;align-items:center}
+.qty{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;flex:none}.qty button{height:50px;width:auto;padding:0;min-width:0}
+.ib{width:50px;height:50px}
+.chd{flex-direction:column;justify-content:center;gap:6px;margin:0 0 12px;text-align:center}.chd .cvi{width:96px;height:96px}.chd small{display:block;color:var(--muted);font-weight:700}.chd small:empty{display:none}
 </style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
@@ -852,17 +879,17 @@ body.s3bg::before{background:linear-gradient(180deg,#4b2112 0%,#25100a 42%,#0b06
 
 <section class="view" id="cases"><h3>Кейсы</h3><div class="grid" id="cl"></div></section>
 <section class="view" id="casev">
- <div class="cpan"><div class="chd"><div class="cvi" id="cvi"></div><div><h2 id="cvn"></h2><small id="cvp"></small></div></div>
+ <div class="cpan"><div class="chd"><div class="cvi" id="cvi"></div><small id="cvp"></small></div>
   <div class="rls" id="rls"></div>
   <button class="btn big copen" id="cvo"></button>
-  <div class="ctl"><div class="qty" id="qty"><button data-n="1">x1</button><button data-n="2">x2</button><button data-n="3">x3</button><button data-n="4">x4</button><button data-n="5">x5</button></div><button class="ib" id="cfast" aria-label="Быстрое открытие"><i data-i="bolt"></i></button><button class="ib" id="cfair" aria-label="Честная игра"><i data-i="shield"></i></button><button class="ib" id="csnd" aria-label="Звук"><i data-i="snd"></i></button></div></div>
+  <div class="ctl"><div class="qty" id="qty"><button data-n="1">x1</button><button data-n="2">x2</button><button data-n="3">x3</button><button data-n="4">x4</button><button data-n="5">x5</button></div><button class="ib" id="cfast" aria-label="Быстрое открытие"><i data-i="bolt"></i></button></div></div>
  <h2 class="cth">Что может выпасть</h2><div class="cvg" id="cvg"></div>
 </section>
 <section class="view" id="s3">
  <div class="s3reels" id="s3r"><div class="s3col"></div><div class="s3col"></div><div class="s3col"></div><div class="s3line"></div><svg class="s3ov" id="s3ov"></svg></div>
  <div class="s3win" id="s3w"></div>
  <div class="s3bets" id="s3b"></div>
- <button class="s3about" id="s3ab">Об игре</button>
+ 
  <div class="s3btns"><button id="s3set"><i data-i="gear"></i>Настройки</button><button id="s3pz"><i data-i="prize"></i>Призы</button></div>
  <button class="btn big s3go" id="s3go"></button>
 </section>
@@ -920,12 +947,12 @@ body.s3bg::before{background:linear-gradient(180deg,#4b2112 0%,#25100a 42%,#0b06
  <div class="cards2"><button class="cd cbuy" id="sbuy"><b>Купить бонус</b><span id="sbuyp"></span></button><button class="cd cdc" id="sdc"><b>Повышенный шанс</b><span id="sdcp"></span></button></div>
 </section>
 <section class="view" id="upgrade">
- <div class="slots"><div id="us">Ставка</div><div class="ar" data-i="chev"></div><div id="ut">Цель</div></div>
+ <div class="ugc"><button class="ugcard" id="ugA"><small>Ваш подарок</small><div class="ugb"><i class="ugi" id="ugAi">+</i><div><b id="ugAt">Выбрать</b><span id="ugAs">подарок из инвентаря</span></div></div></button><div class="ugar" data-i="chev"></div><button class="ugcard" id="ugB"><small>Хочу получить</small><div class="ugb"><i class="ugi" id="ugBi">+</i><div><b id="ugBt">Выбрать</b><span id="ugBs">из всех подарков</span></div></div></button></div>
  <div class="wheel"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="none" stroke="#1b2166" stroke-width="14"/><circle id="arc" cx="100" cy="100" r="80" fill="none" stroke="#4be39a" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 503" transform="rotate(-90 100 100)"/></svg>
   <div class="ptr" id="ptr"><svg viewBox="0 0 200 200"><path d="M100 2l-9 18h18z" fill="#ffd166"/></svg></div>
   <div class="mid"><div><i id="mi"></i><b id="ch">0%</b></div></div></div>
  <button class="btn big" id="ugo" disabled>Выбери подарки</button>
- <h3>Ставка</h3><div class="pick" id="ps"></div><h3>Цель</h3><div class="pick" id="pt"></div>
+ <p class="ugp" id="ugp"></p><div id="ugh" hidden><div class="pick" id="ps"></div><div class="pick" id="pt"></div></div>
 </section>
 <section class="view" id="plinko">
  <div class="pb" id="pb"></div><div class="hist" id="plh"></div>
@@ -1833,7 +1860,7 @@ try{var tu=null;if(TGW&&TGW.initDataUnsafe&&TGW.initDataUnsafe.user)tu=TGW.initD
   try{['fullscreenChanged','safeAreaChanged','contentSafeAreaChanged','viewportChanged'].forEach(function(ev){TGW.onEvent(ev,applyInsets)})}catch(e){}
   applyInsets()}}catch(e){}
 var SND=true;try{SND=localStorage.getItem('luno_snd')!=='0'}catch(e){}
-var SNDV=['rocket','mines','slots','plinko','coin','upgrade','wheel','tower','hilo','bjt','dut','roulette','balloon','cups'];var AC=null;function beep(f,d,t){if(!SND)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(.07,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+var SNDV=['s3','rocket','mines','slots','plinko','coin','upgrade','wheel','tower','hilo','bjt','dut','roulette','balloon','cups'];var AC=null;function beep(f,d,t){if(!SND)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(.07,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
 function rnd(){var a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296} /* только для анимаций */
 function esc(t){return String(t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on')},2000)}
@@ -2088,14 +2115,15 @@ I.shield=V('<path d="M32 6l20 8v16c0 14-9 22-20 28C21 52 12 44 12 30V14z" fill="
 var S3={stops:[0,0,0],busy:0,bet:0,turbo:false,ready:0},S3LN=[[1,1,1],[0,0,0],[2,2,2],[0,1,2],[2,1,0]];
 try{S3.turbo=localStorage.getItem('luno_turbo')==='1'}catch(e){}
 function plural(n,a,b,c){var m=n%10,k=n%100;return m===1&&k!==11?a:(m>=2&&m<=4&&(k<10||k>=20))?b:c}
-function tone3(f,d,g,t){if(!SND)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),k=AC.createGain(),n=AC.currentTime;o.type=t||'sine';o.frequency.value=f;k.gain.setValueAtTime(.0001,n);k.gain.exponentialRampToValueAtTime(g||.045,n+.02);k.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(k);k.connect(AC.destination);o.start(n);o.stop(n+d+.02)}catch(e){}}
-function chime3(lv){var N=[[659,784],[659,784,988],[523,659,784,988,1319]][lv]||[659];N.forEach(function(f,i){setTimeout(function(){tone3(f,.34,lv>1?.05:.04)},i*100)})}
+function tone3(f,d,g,t){if(!SND)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();var o=AC.createOscillator(),k=AC.createGain(),n=AC.currentTime;o.type=t||'sine';o.frequency.value=f;k.gain.setValueAtTime(.0001,n);k.gain.exponentialRampToValueAtTime(g||.1,n+.02);k.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(k);k.connect(AC.destination);o.start(n);o.stop(n+d+.02)}catch(e){}}
+['pointerdown','touchstart','click'].forEach(function(ev){addEventListener(ev,function(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}},{passive:true})});
+function chime3(lv){var N=[[659,784],[659,784,988],[523,659,784,988,1319]][lv]||[659];N.forEach(function(f,i){setTimeout(function(){tone3(f,.42,lv>1?.14:.1)},i*100)})}
 function countUp(el,to,ms){var t0=performance.now();(function f(t){var k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);el.textContent='★ '+Math.round(to*e);if(k<1)requestAnimationFrame(f)})(t0)}
 function s3sym(i){var c=CFG.slots3.symbols[i]||{};return c.img?imgH(c.img):(I[c.icon]||I.star)}
 function s3rows(stop){var T=CFG.slots3.strip,L=T.length;return [T[(stop+L-1)%L],T[stop],T[(stop+1)%L]].map(function(i){return '<div class="s3c"><i>'+s3sym(i)+'</i></div>'}).join('')}
 function s3static(){document.querySelectorAll('#s3r .s3col').forEach(function(col,c){col.innerHTML=s3rows(S3.stops[c])})}
 function s3bets(){$('s3b').innerHTML=CFG.slots3.bets.map(function(b){return '<button data-b="'+b+'" class="'+(b===S3.bet?'on':'')+'"><i>'+I.star+'</i>'+b+'</button>'}).join('');
- $('s3b').querySelectorAll('button').forEach(function(x){x.onclick=function(){if(S3.busy)return;S3.bet=+x.dataset.b;s3bets();s3go();tone3(520,.08,.03)}})}
+ $('s3b').querySelectorAll('button').forEach(function(x){x.onclick=function(){if(S3.busy)return;S3.bet=+x.dataset.b;s3bets();s3go();tone3(520,.08,.06)}})}
 function s3go(){var b=$('s3go');b.innerHTML='Крутить за <i>'+I.star+'</i> '+S3.bet;b.disabled=!!S3.busy}
 function s3Init(){var c3=CFG.slots3;if(!S3.bet||c3.bets.indexOf(S3.bet)<0)S3.bet=c3.bets[0];
  if(!S3.ready){S3.ready=1;var L=c3.strip.length;S3.stops=[0,1,2].map(function(){return Math.floor(rnd()*L)})}
@@ -2107,7 +2135,7 @@ function s3anim(r){var T=CFG.slots3.strip,L=T.length,cols=document.querySelector
  cols.forEach(function(col,c){var h=col.clientHeight/3,prev=S3.stops[c],base=L*Math.ceil((14+c*7)/L),K=base+((r.stops[c]-prev+L)%L),cells='';
   for(var j=0;j<K+3;j++)cells+='<div class="s3c" style="height:'+h+'px"><i>'+s3sym(T[(prev-1+j+L*4)%L])+'</i></div>';
   col.innerHTML='<div class="s3s" style="height:'+(h*(K+3))+'px">'+cells+'</div>';
-  var st=col.firstChild,dur=(tb?600:1500)+c*(tb?150:430),fin=function(){col.innerHTML=s3rows(r.stops[c]);if(++done===3)s3end(r)};
+  var st=col.firstChild,dur=(tb?600:1500)+c*(tb?150:430),fin=function(){col.innerHTML=s3rows(r.stops[c]);tone3(250+c*55,.08,.06,'triangle');if(++done===3)s3end(r)};
   if(st.animate){var an=st.animate([{transform:'translate3d(0,0,0)'},{transform:'translate3d(0,'+(-K*h)+'px,0)'}],{duration:dur,easing:'cubic-bezier(.18,.78,.22,1.03)',fill:'forwards'});an.onfinish=fin}
   else{st.style.transition='transform '+dur+'ms cubic-bezier(.18,.78,.22,1)';st.getBoundingClientRect();st.style.transform='translate3d(0,'+(-K*h)+'px,0)';setTimeout(fin,dur+30)}})}
 function s3lines(wins){var box=$('s3r'),cs=box.querySelectorAll('.s3col'),br=box.getBoundingClientRect(),h='';
@@ -2118,40 +2146,37 @@ function s3end(r){S3.stops=r.stops;sync(r);var bet=r.bet,pay=r.payout,cs=documen
  if(pay>0){var lv=pay>=bet*20?2:pay>=bet*5?1:0;w.innerHTML='<div class="s3wl">'+(pay<bet?'Возврат':'Выигрыш')+'</div><b class="s3wa'+(pay>=bet*10?' big':'')+'" id="s3wn">★ 0</b><small>'+r.wins.length+' '+plural(r.wins.length,'линия','линии','линий')+' · ставка ★'+bet+'</small>';countUp($('s3wn'),pay,750);if(pay>=bet)chime3(lv)}
  else w.innerHTML='<small class="s3no">В этот раз без выигрыша</small>';
  setTimeout(function(){S3.busy=0;s3go()},S3.turbo?200:450)}
-function shW(html){$('sbox').innerHTML='<button class="xb" id="shx">✕</button>'+html;$('sheet').classList.add('on');$('shx').onclick=function(){$('sheet').classList.remove('on')}}
+function shW(html){if(typeof restorePick==='function')restorePick();$('sbox').innerHTML='<button class="xb" id="shx">✕</button>'+html;$('sheet').classList.add('on');$('shx').onclick=function(){$('sheet').classList.remove('on')}}
 $('s3pz').onclick=function(){var c3=CFG.slots3,h='<h2>Призы</h2><p class="note" style="text-align:left">Выигрывают 3 одинаковых символа на линии. Выплата равна ставке, умноженной на множитель.</p><div class="s3pt">';
  c3.symbols.slice().map(function(x,i){return {x:x,i:i}}).sort(function(a,b){return b.x.mult-a.x.mult}).forEach(function(o){h+='<div class="s3pr"><i>'+s3sym(o.i)+'</i><b>'+esc(o.x.name)+'</b><span>×'+o.x.mult+'</span></div>'});
  h+='</div>'+(c3.pair>0?'<p class="note" style="text-align:left">Два «'+esc(c3.symbols[0].name)+'» подряд слева на линии: ×'+c3.pair+'.</p>':'')+'<h3>Линии выплат</h3><div class="s3ln">';
  S3LN.forEach(function(ln){var g='';for(var r=0;r<3;r++)for(var c=0;c<3;c++)g+='<u class="'+(ln[c]===r?'on':'')+'"></u>';h+='<div class="s3mini">'+g+'</div>'});
- shW(h+'</div>')};
+ shW(h+'</div><p class="note" style="text-align:left">Теоретический возврат игрокам '+Math.round(c3.rtp*1000)/10+'%. Максимальная выплата за одно вращение ★'+c3.maxPay+'.</p>')};
 $('s3set').onclick=function(){shW('<h2>Настройки</h2><label class="s3tg"><span>Звук</span><input type="checkbox" id="s3snd"'+(SND?' checked':'')+'><i></i></label><label class="s3tg"><span>Быстрые вращения</span><input type="checkbox" id="s3tb"'+(S3.turbo?' checked':'')+'><i></i></label>');
  $('s3snd').onchange=function(){SND=this.checked;try{localStorage.setItem('luno_snd',SND?'1':'0')}catch(e){}if(SND)chime3(0)};$('s3tb').onchange=function(){S3.turbo=this.checked;try{localStorage.setItem('luno_turbo',S3.turbo?'1':'0')}catch(e){}}};
-$('s3ab').onclick=function(){var c3=CFG.slots3;shW('<h2>Об игре</h2><h3>Как работают слоты</h3><p>Результат каждого вращения определяет генератор случайных чисел (ГСЧ) на сервере. Он основан на HMAC-SHA256 с сидом, хэш которого виден заранее, поэтому результат нельзя подменить. Каждое вращение не зависит от предыдущих: «горячих» и «холодных» автоматов не бывает, а размер ставки не влияет на шансы.</p><h3>RTP</h3><p>Теоретический возврат игрокам на длинной дистанции в этой игре: <b>'+Math.round(c3.rtp*1000)/10+'%</b>. Это показатель на тысячи вращений, а не гарантия за короткую сессию. Шанс получить выплату за вращение около '+Math.round(c3.hit*100)+'%.</p><h3>Барабаны и линии</h3><p>3 барабана по 3 символа. Выплаты считаются по 5 линиям: три горизонтали и две диагонали. Чтобы получить выплату, одинаковые символы должны выпасть на одной линии. Выплаты со всех линий складываются.</p>')};
+
 
 var CQ={n:1,fast:false};try{CQ.fast=localStorage.getItem('luno_fast')==='1'}catch(e){}
 function pickW(c){var t=0;c.items.forEach(function(x){t+=x.weight});var r=rnd()*t;for(var i=0;i<c.items.length;i++){if(r<c.items[i].weight)return c.items[i].k;r-=c.items[i].weight}return c.items[0].k}
 function tileH(k,w){var it=itm(k);return '<div class="rt" style="width:'+w+'px;--rc:'+rar(it.value)+'"><i>'+ik(k)+'</i><b>'+esc(it.name)+'</b></div>'}
 function cvBtn(){var c=curCase,b=$('cvo');b.innerHTML=c.free?(DEMO?'Открыть бесплатно':'Открыть по промокоду'):'Открыть за '+(c.price*CQ.n)+' <i>'+I.star+'</i>'}
-function qtyUI(){var c=curCase;$('qty').style.display=c.free?'none':'flex';$('qty').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',+b.dataset.n===CQ.n)});$('cfast').classList.toggle('on',CQ.fast);$('csnd').classList.toggle('off',!SND)}
+function qtyUI(){var c=curCase;$('qty').style.display=c.free?'none':'grid';$('qty').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',+b.dataset.n===CQ.n)});$('cfast').classList.toggle('on',CQ.fast)}
 function idleReel(c){var keys=c.items.map(function(x){return x.k}),a=[],i;for(i=0;i<16;i++)a.push(keys[(i*3)%keys.length]);
- $('rls').innerHTML='<div class="rl"><div class="rmk"></div><div class="rtk idle">'+a.concat(a).map(function(k){return tileH(k,150)}).join('')+'</div></div>'}
+ $('rls').innerHTML='<div class="rl"><div class="rmk"></div><div class="rtk idle">'+a.concat(a).map(function(k){return tileH(k,140)}).join('')+'</div></div>'}
 function rCaseV(){var c=curCase;if(!c)return go('cases');opening=0;$('cvo').disabled=false;
- $('cvi').innerHTML=c.img?imgH(c.img):I.chest;$('cvi').style.filter=c.img?'':'hue-rotate('+(+c.hue||0)+'deg)';$('cvn').textContent=c.name;
+ $('cvi').innerHTML=c.img?imgH(c.img):I.chest;$('cvi').style.filter=c.img?'':'hue-rotate('+(+c.hue||0)+'deg)';
  $('cvp').textContent=c.free?(DEMO?'Бесплатный кейс в демо-режиме':'Открывается по промокоду из нашего канала'):'';
  if(c.free)CQ.n=1;qtyUI();idleReel(c);cvBtn();
  var tot=c.items.reduce(function(a,x){return a+x.weight},0),list=c.items.slice().sort(function(a,b){return itm(b.k).value-itm(a.k).value});
  $('cvg').innerHTML=list.map(function(x,i){var it=itm(x.k),p=x.weight/tot*100;return '<div class="ci" style="--rc:'+rar(it.value)+';animation-delay:'+Math.min(i*30,300)+'ms"><i>'+ik(x.k)+'</i><b>'+esc(it.name)+'</b><span><em class="st">'+I.star+'</em>'+it.value+'</span><small>'+(p>=10?p.toFixed(1):p>=1?p.toFixed(2):p.toFixed(3))+'%</small></div>'}).join('')}
 $('qty').querySelectorAll('button').forEach(function(b){b.onclick=function(){if(opening||!curCase||curCase.free)return;CQ.n=+b.dataset.n;qtyUI();cvBtn();tone3(560,.06,.03)}});
 $('cfast').onclick=function(){CQ.fast=!CQ.fast;try{localStorage.setItem('luno_fast',CQ.fast?'1':'0')}catch(e){}qtyUI();toast(CQ.fast?'Быстрое открытие включено':'Быстрое открытие выключено')};
-$('csnd').onclick=function(){SND=!SND;try{localStorage.setItem('luno_snd',SND?'1':'0')}catch(e){}qtyUI();if(SND)chime3(0)};
-$('cfair').onclick=function(){api('me').then(function(r){var f=r.fair||{};shW('<h2>Честная игра</h2><p>Результат каждого открытия считает сервер по формуле HMAC-SHA256(сид, клиентский сид:номер). Хэш сида показан заранее, поэтому подменить результат нельзя. Чтобы проверить прошлые открытия, смени сид: прошлый сид раскроется.</p><div class="kv"><span>Хэш сида: <b style="word-break:break-all">'+esc(f.seedHash||'')+'</b></span></div><div class="kv"><span>Клиентский сид: <b>'+esc(f.clientSeed||'')+'</b></span></div><div class="kv"><span>Номер броска: <b>'+esc(f.nonce)+'</b></span></div><button class="btn big" id="fsr" style="margin-top:12px">Сменить сид и показать прошлый</button><div id="fso"></div>');
-  $('fsr').onclick=function(){api('seed/rotate',{clientSeed:'luno'}).then(function(x){if(x.error)return toast(x.error);$('fso').innerHTML='<div class="kv"><span>Прошлый сид: <b style="word-break:break-all">'+esc(x.revealedSeed)+'</b></span></div><p class="note">Последний номер броска: '+x.lastNonce+'</p>'})}})};
 $('cvo').onclick=function(){startOpen()};
 function startOpen(){var c=curCase;if(opening||!c)return;if(c.free&&!DEMO){go('profile');setTimeout(function(){$('code').focus()},80);return toast('Введи промокод')}
  var n=c.free?1:CQ.n;if(!c.free&&ME.balance<c.price*n)return toast('Не хватает звёзд');
  opening=1;$('cvo').disabled=true;
  call('case/open',{id:c.id,count:n},true).then(function(r){var items=r.items||[r.item];if(CQ.fast)cvDone(c,r,items,true);else cvRoll(c,r,items)}).catch(function(){opening=0;$('cvo').disabled=false})}
-function cvRoll(c,r,items){var n=items.length,W=n===1?150:112,step=W+10,WI=34,reels=[];
+function cvRoll(c,r,items){var n=items.length,W=n===1?140:104,step=W+10,WI=34,reels=[];
  items.forEach(function(it){var arr=[];for(var j=0;j<44;j++)arr.push(j===WI?it.k:pickW(c));reels.push(arr)});
  $('rls').innerHTML=reels.map(function(arr){return '<div class="rl'+(n>1?' sm':'')+'"><div class="rmk"></div><div class="rtk">'+arr.map(function(k){return tileH(k,W)}).join('')+'</div></div>'}).join('');
  var left=n;$('rls').querySelectorAll('.rl').forEach(function(rl,i){var trk=rl.querySelector('.rtk'),rw=rl.clientWidth,off=WI*step+W/2-rw/2+(rnd()-.5)*W*.5,dur=(n===1?5200:4200)+i*380,
@@ -2245,20 +2270,30 @@ function rDep(){if(DEMO){$('dp').innerHTML='<div class="blk"><div class="bt2">Д
  if($('dtt'))$('dtt').onclick=function(){call('deposit/test',{amount:1000}).then(function(){toast('+1000 ★')})}}).catch(function(){})}
 
 /* ===== АПГРЕЙД: ставка берётся из инвентаря ===== */
-var sel=null,tg=null,ang=0,pr=0;
+var sel=null,tg=null,ang=0,pr=0,PKopen=null,PKq='';
+function restorePick(){var h=$('ugh');if(h)['ps','pt'].forEach(function(id){var e=$(id);if(e&&e.parentNode!==h)h.appendChild(e)});PKopen=null;PKq=''}
+function closePick(){restorePick();$('sheet').classList.remove('on')}
+function ugCards(sk2){var A=sk2!==null&&sk2!==undefined,B=tg!==null;
+ $('ugAi').innerHTML=A?ik(sk2):'+';$('ugAt').textContent=A?itm(sk2).name:'Выбрать';$('ugAs').textContent=A?'★ '+itm(sk2).value:'подарок из инвентаря';$('ugA').classList.toggle('set',A);
+ $('ugBi').innerHTML=B?ik(tg):'+';$('ugBt').textContent=B?itm(tg).name:'Выбрать';$('ugBs').textContent=B?'★ '+itm(tg).value:'из всех подарков';$('ugB').classList.toggle('set',B)}
+function openPick(which){if(upb)return;restorePick();
+ shW('<h2>'+(which==='ps'?'Ваш подарок':'Хочу получить')+'</h2><p class="note" style="text-align:left;margin:0 0 10px">'+(which==='ps'?'Выбери подарок из инвентаря, который хочешь поставить.':'Выбери подарок, который хочешь получить. Шанс считается по цене.')+'</p>'+(which==='pt'?'<input class="in" id="pks" placeholder="Поиск по названию" style="width:100%;margin-bottom:10px">':'')+'<div id="pkh"></div>');
+ $('pkh').appendChild($(which));PKopen=which;PKq='';$('shx').onclick=closePick;
+ if($('pks'))$('pks').oninput=function(){PKq=this.value.trim().toLowerCase();rows()}}
+$('ugA').onclick=function(){openPick('ps')};$('ugB').onclick=function(){openPick('pt')};
 function getInv(id){return ME.inv.filter(function(y){return y.id===id})[0]}
 function rows(){var ps=$('ps'),pt=$('pt');ps.innerHTML=pt.innerHTML='';
  if(!ME.inv.length)ps.innerHTML='<p class="note" style="margin:8px 0">Инвентарь пуст. Открой кейс, и подарок появится здесь.</p>';
- ME.inv.forEach(function(x){var it=itm(x.k),b=document.createElement('button');b.className='it'+(sel===x.id?' on':'');b.innerHTML='<i>'+ik(x.k)+'</i>★ '+it.value;b.onclick=function(){if(upb)return;sel=x.id;var lm=(CFG.settings.upMinChance||0)?it.value*(1-((CFG.settings.edges||{}).upgrade||0))/CFG.settings.upMinChance:Infinity;if(tg&&(itm(tg).value<=it.value||itm(tg).value>lm+1e-9||itm(tg).value<it.value*(CFG.settings.upMinMult||1)-1e-9))tg=null;upd()};ps.appendChild(b)});
+ ME.inv.forEach(function(x){var it=itm(x.k),b=document.createElement('button');b.className='it'+(sel===x.id?' on':'');b.innerHTML='<i>'+ik(x.k)+'</i><b>'+esc(it.name)+'</b>★ '+it.value;b.onclick=function(){if(upb)return;sel=x.id;var lm=(CFG.settings.upMinChance||0)?it.value*(1-((CFG.settings.edges||{}).upgrade||0))/CFG.settings.upMinChance:Infinity;if(tg&&(itm(tg).value<=it.value||itm(tg).value>lm+1e-9||itm(tg).value<it.value*(CFG.settings.upMinMult||1)-1e-9))tg=null;upd()};ps.appendChild(b)});
  var sv=sel!==null&&getInv(sel)?itm(getInv(sel).k).value:0;
  var ed=1-((CFG.settings.edges||{}).upgrade||0),mc=CFG.settings.upMinChance||0,lim=sv&&mc?sv*ed/mc:Infinity,hid=0,mm=CFG.settings.upMinMult||1,low=sv?sv*mm:0;
- Object.keys(CFG.items).filter(function(k){return CFG.items[k].up!==false}).filter(function(k){if(itm(k).value>lim+1e-9){hid++;return false}return true}).sort(function(a,b){return itm(a).value-itm(b).value}).forEach(function(k){var it=itm(k),b=document.createElement('button');b.className='it'+(tg===k?' on':'');b.disabled=it.value<=sv||it.value<low-1e-9;b.innerHTML='<i>'+ik(k)+'</i>★ '+it.value;b.onclick=function(){if(!upb){tg=k;upd()}};pt.appendChild(b)});
+ Object.keys(CFG.items).filter(function(k){return CFG.items[k].up!==false&&(!PKq||itm(k).name.toLowerCase().indexOf(PKq)>=0)}).filter(function(k){if(itm(k).value>lim+1e-9){hid++;return false}return true}).sort(function(a,b){return itm(a).value-itm(b).value}).forEach(function(k){var it=itm(k),b=document.createElement('button');b.className='it'+(tg===k?' on':'');b.disabled=it.value<=sv||it.value<low-1e-9;b.innerHTML='<i>'+ik(k)+'</i><b>'+esc(it.name)+'</b>★ '+it.value;b.onclick=function(){if(!upb){tg=k;upd()}};pt.appendChild(b)});
  if(sv&&mm>1){var n0=document.createElement('p');n0.className='note';n0.style.cssText='grid-column:1/-1;margin:6px 0';n0.textContent='Цель должна быть минимум в ×'+mm+' дороже подарка: от ★'+Math.ceil(low);pt.appendChild(n0)}
  if(hid){var nt=document.createElement('p');nt.className='note';nt.style.cssText='grid-column:1/-1;margin:6px 0';nt.textContent='Слишком дорогие цели скрыты: для этого подарка можно апгрейдить максимум до ★'+Math.floor(lim);pt.appendChild(nt)}}
 function upd(){if(sel!==null&&!getInv(sel))sel=null;rows();var ok=sel!==null&&tg!==null,sk2=sel!==null?getInv(sel).k:null;
- $('us').innerHTML=sk2?ik(sk2):'Ставка';$('ut').innerHTML=tg?ik(tg):'Цель';
+ ugCards(sk2);
  pr=ok?itm(sk2).value/itm(tg).value*(1-((CFG.settings.edges||{}).upgrade||0)):0;$('arc').setAttribute('stroke-dasharray',(pr*502.65)+' 503');$('ch').textContent=ok?'×'+(itm(tg).value/itm(sk2).value).toFixed(2):'';$('mi').innerHTML=ok?ik(tg):sk('upgrade_idle',I.frog);
- $('ugo').disabled=!ok;$('ugo').textContent=ok?'Апгрейд · ×'+(itm(tg).value/itm(sk2).value).toFixed(2):'Выбери подарки'}
+ $('ugo').disabled=!ok;$('ugo').textContent=ok?'Апгрейд · ×'+(itm(tg).value/itm(sk2).value).toFixed(2):'Выбери подарки';$('ugp').textContent=ok?'Шанс успеха '+(pr*100).toFixed(1)+'%':'';if(PKopen)closePick()}
 $('ugo').onclick=function(){if(upb||sel===null||tg===null)return;var target=tg;upb=1;$('ugo').disabled=true;
  call('upgrade',{stake:sel,target:target},true).then(function(r){var p=r.chance,f=r.win?p*(.06+.88*rnd()):p+(1-p)*(.06+.88*rnd());
   ang=Math.floor(ang/360)*360+1800+f*360;$('ptr').style.transform='rotate('+ang+'deg)';

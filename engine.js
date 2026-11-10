@@ -14,7 +14,7 @@
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
         crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, upMinChance: 0.05, upMinMult: 1.5, wdFeeFixed: 25, autoPay: 0, starsFeePct: 0, rlZeros: 3, blMax: 50, cupsMult: 2.7, bjOn: 1, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
-        edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05, tower: 0.08, hilo: 0.07, balloon: 0.08, slots3: 0.10 }, modes: { rocket: 1, mines: 1, upgrade: 1, slots: 1, plinko: 1, wheel: 1, coin: 1, tower: 1, bj: 1, du: 1, hilo: 1, roulette: 0, balloon: 1, cups: 1 }, tonAddress: '', giftDepositTo: '', giftDepositNote: 'Начисляем в течение 24 часов.', channelUrl: '', channelText: 'Наш канал', wdFeePct: 0.05, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
+        edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05, tower: 0.08, hilo: 0.07, balloon: 0.08, slots3: 0.10 }, modes: { rocket: 1, mines: 1, upgrade: 1, slots: 1, plinko: 1, wheel: 1, coin: 1, tower: 1, bj: 1, du: 1, hilo: 1, roulette: 0, balloon: 1, cups: 1 }, tonAddress: '', giftDepositTo: '', giftDepositNote: 'Начисляем в течение 24 часов.', channelUrl: '', channelText: 'Наш канал', wdFeePct: 0, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
         hat: { name: 'Шляпа мага', img: '', value: 30, wd: false, up: true }, ring: { name: 'Кольцо', img: '', value: 60, wd: false, up: true },
@@ -128,6 +128,7 @@
       if (ST0.tonAddress === undefined) ST0.tonAddress = ''; if (ST0.channelUrl === undefined) ST0.channelUrl = ''; if (ST0.channelText === undefined) ST0.channelText = 'Наш канал';
       if (ST0.edges.balloon === undefined) ST0.edges.balloon = 0.08; ['roulette', 'balloon'].forEach(function (k) { if (ST0.modes[k] === undefined) ST0.modes[k] = 1; }); if (ST0.rlZeros === undefined) ST0.rlZeros = 3; if (ST0.cupsMult === undefined) ST0.cupsMult = 2.7; if (ST0.upMinMult === undefined) ST0.upMinMult = 1.5; if (!S.flags.m14) { S.flags.m14 = 1; ST0.modes.roulette = 0; ST0.modes.cups = 1; } // рулетку заменили колпачками if (ST0.blMax === undefined) ST0.blMax = 50;
       if (!S.flags.m13) { S.flags.m13 = 1; if (ST0.wdFeeFixed === undefined) ST0.wdFeeFixed = 25; if (+ST0.wdFeePct === 0.05) ST0.wdFeePct = 0; if (ST0.autoPay === undefined) ST0.autoPay = 0; } // комиссия за вывод: фиксированные 25★
+      if (!S.flags.wd25) { S.flags.wd25 = 1; ST0.wdFeeFixed = 25; ST0.wdFeePct = 0; }
       if (!S.flags.m12) { S.flags.m12 = 1; if (+ST0.edges.tower === 0.06) ST0.edges.tower = 0.08; if (+ST0.edges.hilo === 0.05) ST0.edges.hilo = 0.07; } // Башня и Hi-Lo: больше прибыли
       if (!S.flags.m11) { S.flags.m11 = 1; var sk2 = S.cfg.skins = S.cfg.skins || {}; if (!sk2.sprite_rocket || !/\/uploads\//.test(sk2.sprite_rocket) || /pepe/i.test(sk2.sprite_rocket)) sk2.sprite_rocket = '/art/minedog.webp'; } // в ракете сидит тёмный мишка
       if (!S.cfg.wheel || !Array.isArray(S.cfg.wheel.secs) || S.cfg.wheel.secs.length < 2 || S.cfg.wheel.secs.join() === WHEEL_OLD.join()) S.cfg.wheel = { on: S.cfg.wheel && S.cfg.wheel.on === 0 ? 0 : 1, secs: defaultWheel().secs }; // старое колесо с 40% «−100%» заменяется новым
@@ -192,7 +193,7 @@
     }
     function comb(n, k) { var r = 1; for (var i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); }
     function wdCheck(u, it) {
-      var reasons = [], fee = Math.ceil(set('wdFeeFixed') || 0) + Math.ceil(it.value * set('wdFeePct')), need = Math.ceil((u.deposited || 0) * set('wdWagerMult')), have = Math.floor(u.wagered || 0);
+      var reasons = [], fee = Math.ceil(set('wdFeeFixed') || 0), need = Math.ceil((u.deposited || 0) * set('wdWagerMult')), have = Math.floor(u.wagered || 0);
       if (!it.wd) reasons.push('Этот предмет нельзя вывести, его можно продать за звёзды или использовать в апгрейде');
       if (it.value < set('wdMinValue')) reasons.push('Минимальная стоимость подарка для вывода ★' + set('wdMinValue'));
       if (!u.username) reasons.push('Для вывода нужен username в Telegram. Укажи его в Настройки → Имя пользователя и открой приложение заново');

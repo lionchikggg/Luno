@@ -10,7 +10,7 @@ if (!ADMIN) console.warn('ADMIN_TOKEN не задан: админка выклю
 try { fs.mkdirSync(path.dirname(DATA), { recursive: true }); } catch {}
 let state;
 try { state = JSON.parse(fs.readFileSync(DATA, 'utf8')); }
-catch { state = Engine.newState({ pepe: '/art/pepe.webp', plum: '/art/plum.webp', dog: '/art/dog.webp', arm: '/art/arm.webp', minedog: '/art/minedog.webp' }); }
+catch { state = Engine.newState({ pepe: '/art/pepe.webp', plum: '/art/plum.webp', dog: '/art/dog.webp', arm: '/art/arm.webp', minedog: '/art/minedog.webp', slotplum: '/art/slotplum.webp' }); }
 let dirty = false;
 const markDirty = () => { dirty = true; };
 setInterval(() => { if (!dirty) return; dirty = false; const tmp = DATA + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(state)); fs.renameSync(tmp, DATA); }, 1000).unref();
@@ -28,47 +28,21 @@ function rotate(u, cs) { ensureSeed(u); const old = u.seed, n = u.nonce; u.seed 
 const TON = process.env.TON_ADDRESS || '', PUBLIC = process.env.PUBLIC_URL || '', HOOK = crypto.createHash('sha256').update('hook' + BOT).digest('hex').slice(0, 32);
 const ADMIN_CHAT = process.env.ADMIN_CHAT_ID || '';
 const notify = text => { if (BOT && ADMIN_CHAT) tg('sendMessage', { chat_id: ADMIN_CHAT, text }).catch(() => {}); else console.log('[админу]', text); };
-const engine = Engine.create({ autoPay: (r, it) => autoPay(r, it), state, roll, rand: () => crypto.randomBytes(6).readUIntBE(0, 6) / 281474976710656, now: Date.now, save: markDirty, fairInfo, rotate, tonAddress: TON, allowTest: DEV, notify });
+const engine = Engine.create({ state, roll, now: Date.now, save: markDirty, fairInfo, rotate, tonAddress: TON, allowTest: DEV, notify });
 setInterval(() => { try { engine.tick(); } catch (e) { console.error('tick', e.message); } }, 1000).unref(); // ракета идёт круглосуточно, история копится сама
 // ---- платежи: Telegram Stars (счёт + вебхук бота) и TON (перевод с комментарием lunoID, проверка через toncenter) ----
 const tg = async (m, b) => (await fetch('https://api.telegram.org/bot' + BOT + '/' + m, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })).json();
-if (BOT && PUBLIC) tg('setWebhook', { url: PUBLIC.replace(/\/$/, '') + '/bot/' + HOOK, allowed_updates: ['pre_checkout_query', 'message', 'business_connection'] }).then(r => console.log('Webhook бота:', r.ok ? 'ok' : r.description)).catch(e => console.error(e.message));
+if (BOT && PUBLIC) tg('setWebhook', { url: PUBLIC.replace(/\/$/, '') + '/bot/' + HOOK, allowed_updates: ['pre_checkout_query', 'message'] }).then(r => console.log('Webhook бота:', r.ok ? 'ok' : r.description)).catch(e => console.error(e.message));
 else if (BOT) console.warn('PUBLIC_URL не задан: оплата Stars не будет зачисляться (нужен https-адрес сайта).');
-
-// ---- Автовыплата NFT: бот передаёт подарок с твоего аккаунта (Telegram Business) игроку ----
-const busyGifts = new Set();
-async function autoPay(r, it) {
-  const fail = why => notify('Заявка #' + r.id + ' (' + it.name + ' для @' + r.username + ') не выплачена автоматически: ' + why + '. Выдай вручную в админке');
-  try {
-    const B = engine.bizInfo(); if (!BOT || !B || !B.enabled) return fail('бизнес-аккаунт не подключён к боту');
-    const want = it.tg.toLowerCase(); let offset = '', found = null;
-    for (let page = 0; page < 20 && !found; page++) {
-      const j = await tg('getBusinessAccountGifts', { business_connection_id: B.id, exclude_unlimited: true, exclude_limited: true, limit: 100, offset });
-      if (!j.ok) return fail(j.description || 'Telegram не отдал список подарков');
-      const list = (j.result && j.result.gifts) || [], t = Math.floor(Date.now() / 1000);
-      found = list.find(g => g.type === 'unique' && g.gift && String(g.gift.base_name || '').toLowerCase() === want && g.can_be_transferred && !busyGifts.has(g.owned_gift_id) && (!g.next_transfer_date || g.next_transfer_date <= t));
-      offset = j.result && j.result.next_offset; if (!offset) break;
-    }
-    if (!found) return fail('на аккаунте нет свободного подарка из коллекции «' + it.tg + '»');
-    busyGifts.add(found.owned_gift_id);
-    const tr = await tg('transferGift', { business_connection_id: B.id, owned_gift_id: found.owned_gift_id, new_owner_chat_id: Number(r.uid), star_count: found.transfer_star_count || 0 });
-    busyGifts.delete(found.owned_gift_id);
-    if (!tr.ok) return fail(tr.description || 'Telegram отказал в передаче');
-    engine.wdResolve(r.id, 'done', 'автовыплата: ' + (found.gift.name || it.tg));
-    notify('Заявка #' + r.id + ' выплачена автоматически: ' + (found.gift.name || it.tg) + ' → @' + r.username);
-  } catch (e) { fail(e.message); }
-}
-// Gram (бывший TON): адрес берётся из переменной TON_ADDRESS или из админки («Настройки» → «Пополнение»)
-const tonA = () => TON || engine.tonAddr();
 async function pollTon() {
-  const A = tonA(); if (!A) return;
+  const ADDR = String(engine.rawSetting('tonAddress') || TON || ''); if (!ADDR) return;
   try {
-    const r = await fetch('https://toncenter.com/api/v2/getTransactions?address=' + encodeURIComponent(A) + '&limit=50' + (process.env.TON_API_KEY ? '&api_key=' + process.env.TON_API_KEY : '')), j = await r.json();
-    (j.result || []).forEach(tx => { const m = tx.in_msg; if (!m || !m.value || !m.message) return; const mm = /^luno(\d+)$/i.exec(String(m.message).trim()); if (!mm) return;
+    const r = await fetch('https://toncenter.com/api/v2/getTransactions?address=' + ADDR + '&limit=40' + (process.env.TON_API_KEY ? '&api_key=' + process.env.TON_API_KEY : '')), j = await r.json();
+    (j.result || []).forEach(tx => { const m = tx.in_msg; if (!m || !m.value || !m.message) return; const mm = /^luno(\d+)$/.exec(String(m.message).trim()); if (!mm) return;
       const stars = Math.floor(Number(m.value) / 1e9 * engine.setting('tonToStars')); if (stars >= engine.setting('minDeposit')) engine.creditOnce('ton:' + tx.transaction_id.hash, mm[1], stars); });
   } catch (e) { console.error('TON:', e.message); }
 }
-setInterval(pollTon, 20000).unref(); setTimeout(pollTon, 3000);
+setInterval(pollTon, 20000).unref(); pollTon();
 
 // ---- авторизация Telegram ----
 function verify(init) {
@@ -109,13 +83,13 @@ http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x'), p = url.pathname;
     if (BOT && p === '/bot/' + HOOK && req.method === 'POST') {
       let up = {}; try { up = JSON.parse((await body(req, 100000)).toString() || '{}'); } catch {} res.writeHead(200); res.end('ok');
-      if (up.business_connection) { engine.setBiz(up.business_connection); notify(up.business_connection.is_enabled ? 'Бизнес-аккаунт подключён к боту: автовыплата подарков может работать' : 'Бизнес-аккаунт отключён от бота: автовыплата не работает'); }
-      const q = up.pre_checkout_query; if (q) tg('answerPreCheckoutQuery', { pre_checkout_query_id: q.id, ok: q.currency === 'XTR' && /^dep:\d+:\d+(:\d+)?$/.test(q.invoice_payload || '') }).catch(() => {});
-      const sp = up.message && up.message.successful_payment, m = sp && /^dep:(\d+):(\d+)(?::(\d+))?$/.exec(sp.invoice_payload || '');
-      if (sp && m && sp.currency === 'XTR' && +(m[3] || m[2]) === sp.total_amount && String(up.message.from.id) === m[1]) engine.creditOnce('stars:' + sp.telegram_payment_charge_id, m[1], +m[2]);
+      const q = up.pre_checkout_query; if (q) tg('answerPreCheckoutQuery', { pre_checkout_query_id: q.id, ok: q.currency === 'XTR' && /^dep:\d+:\d+$/.test(q.invoice_payload || '') }).catch(() => {});
+      const sp = up.message && up.message.successful_payment, m = sp && /^dep:(\d+):(\d+)$/.exec(sp.invoice_payload || '');
+      if (sp && m && sp.currency === 'XTR' && +m[2] === sp.total_amount && String(up.message.from.id) === m[1]) engine.creditOnce('stars:' + sp.telegram_payment_charge_id, m[1], sp.total_amount);
       return;
     }
     if (p === '/health') { res.writeHead(200); return res.end('ok'); }
+    if (p === '/tonconnect-manifest.json') { const base = (PUBLIC || ('https://' + req.headers.host)).replace(/\/$/, ''); res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-cache' }); return res.end(JSON.stringify({ url: base, name: 'LunoCase', iconUrl: base + '/icon.png' })); }
     if (p === '/api/config' && req.method === 'GET') return send(res, 200, engine.publicConfig());
     if (p.startsWith('/api/') && req.method === 'POST') {
       const u = authUser(req); if (!u) return send(res, 401, { error: 'Открой приложение из Telegram' });
@@ -127,11 +101,12 @@ http.createServer(async (req, res) => {
         const a = Math.floor(+b.amount), min = engine.setting('minDeposit');
         if (!BOT) return send(res, 400, { error: 'Оплата Stars работает только в боевом режиме' });
         if (!(a >= min && a <= 50000)) return send(res, 400, { error: 'Сумма от ' + min + ' до 50000 ★' });
-        const fee = Math.min(0.3, Math.max(0, engine.setting('starsFeePct') || 0)), price = Math.ceil(a * (1 + fee)); // комиссия за пополнение звёздами
-        let r; try { r = await tg('createInvoiceLink', { title: 'Пополнение LunoCase', description: a + ' ★ на игровой баланс' + (price > a ? ' (включая комиссию ' + (price - a) + ' ⭐)' : ''), payload: 'dep:' + u.id + ':' + a + ':' + price, currency: 'XTR', prices: [{ label: a + ' ★' + (price > a ? ' + комиссия' : ''), amount: price }] }); } catch (e) { console.error('createInvoiceLink', e.message); return send(res, 502, { error: 'Не удалось связаться с Telegram. Проверь BOT_TOKEN на Render' }); }
+        let r; try { r = await tg('createInvoiceLink', { title: 'Пополнение LunoCase', description: a + ' ★ на игровой баланс', payload: 'dep:' + u.id + ':' + a, currency: 'XTR', prices: [{ label: a + ' ★', amount: a }] }); } catch (e) { console.error('createInvoiceLink', e.message); return send(res, 502, { error: 'Не удалось связаться с Telegram. Проверь BOT_TOKEN на Render' }); }
         return r.ok ? send(res, 200, { link: r.result }) : send(res, 502, { error: 'Telegram: ' + r.description });
       }
-      const r = engine.handle(p.slice(5), u.id, b, u.name, u.username, req.headers['x-demo'] === '1'); return send(res, r.error ? 400 : 200, r);
+      const r = engine.handle(p.slice(5), u.id, b, u.name, u.username, req.headers['x-demo'] === '1');
+      if (p === '/api/gdep/request' && r.ok && r.req) notify('Новая заявка на пополнение подарком #' + r.req.id + ': «' + r.req.name + '» от ' + u.name + (u.username ? ' @' + u.username : '') + ' (ID ' + u.id + '). Открой админку, вкладка «Пополнение подарками».');
+      return send(res, r.error ? 400 : 200, r);
     }
     if (p.startsWith('/admin/')) {
       if (!adminOk(req)) return send(res, 403, { error: 'Неверный токен' });
@@ -146,6 +121,13 @@ http.createServer(async (req, res) => {
         let b2 = {}; try { b2 = JSON.parse((await body(req, 5000)).toString() || '{}'); } catch {}
         try { const r = engine.wdResolve(b2.id, b2.action, b2.note); const q = r.req;
           if (BOT) tg('sendMessage', { chat_id: q.uid, text: b2.action === 'done' ? 'Подарок «' + q.item + '» отправлен на @' + q.username + '. Проверь входящие подарки в Telegram.' : 'Заявка на вывод «' + q.item + '» отклонена' + (q.note ? ': ' + q.note : '') + '. Подарок вернулся в инвентарь, комиссия возвращена.' }).catch(() => {});
+          return send(res, 200, { ok: true }); } catch (e) { if (e instanceof Engine.Err) return send(res, 400, { error: e.message }); throw e; }
+      }
+      if (p === '/admin/gdep' && req.method === 'GET') return send(res, 200, { list: engine.gdepList(url.searchParams.get('status') || '') });
+      if (p === '/admin/gdep' && req.method === 'POST') {
+        let b2 = {}; try { b2 = JSON.parse((await body(req, 5000)).toString() || '{}'); } catch {}
+        try { const r = engine.gdepResolve(b2.id, b2.action, b2.amount, b2.note); const q = r.req;
+          if (BOT) tg('sendMessage', { chat_id: q.uid, text: b2.action === 'done' ? 'Подарок «' + q.name + '» засчитан: на баланс начислено ' + q.credited + ' ★.' : 'Заявка на пополнение подарком «' + q.name + '» отклонена' + (q.note ? ': ' + q.note : '.') }).catch(() => {});
           return send(res, 200, { ok: true }); } catch (e) { if (e instanceof Engine.Err) return send(res, 400, { error: e.message }); throw e; }
       }
       if (p === '/admin/users' && req.method === 'GET') return send(res, 200, { list: engine.usersList(url.searchParams.get('q') || '') });
@@ -165,13 +147,14 @@ http.createServer(async (req, res) => {
     const isUp = f.startsWith('/uploads/'), root = isUp ? UP : PUB, full = path.normalize(path.join(root, isUp ? f.slice(9) : f)); if (!full.startsWith(root + path.sep)) { res.writeHead(403); return res.end(); }
     // запасной вариант: если при загрузке на GitHub папки public/art потерялись и файлы лежат в корне, берём их оттуда (только страницы и картинки)
     let target = full;
-    if (!isUp && !fs.existsSync(target)) { const bn = path.basename(f); if (/^(index|admin)\.html$|^[\w-]+\.webp$/.test(bn) && fs.existsSync(path.join(__dirname, bn))) target = path.join(__dirname, bn); }
+    if (!isUp && !fs.existsSync(target)) { const bn = path.basename(f); if (/^(index|admin)\.html$|^engine\.js$|^icon\.png$|^[\w-]+\.webp$/.test(bn) && fs.existsSync(path.join(__dirname, bn))) target = path.join(__dirname, bn); }
     fs.readFile(target, (e, d) => {
       if (e) { res.writeHead(404); return res.end('Not found'); }
       if (/\.html$/.test(target) && /index\.html$/.test(target)) { // скрипт Telegram нужен, чтобы приложение получило данные игрока от бота
-        const t = d.toString().replace(/<script src="https:\/\/telegram\.org[^>]*><\/script>/g, ''); d = Buffer.from(t.replace('<head>', '<head><script src="https://telegram.org/js/telegram-web-app.js"></script>'));
+        const t = d.toString().replace(/<script src="https:\/\/telegram\.org[^>]*><\/script>/g, ''); d = Buffer.from(t.replace('<head>', '<head><script src="https://telegram.org/js/telegram-web-app.js"></script><script async src="https://cdn.jsdelivr.net/npm/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>'));
       }
-      res.writeHead(200, { 'Content-Type': MIME[path.extname(target)] || 'application/octet-stream', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': /^\/(art|uploads)\//.test(f) ? 'public, max-age=86400' : 'no-cache' }); res.end(d);
+      const hd = { 'Content-Type': MIME[path.extname(target)] || 'application/octet-stream', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': /^\/(art|uploads)\//.test(f) ? 'public, max-age=86400' : 'no-cache' }; if (/icon\.png$/.test(target)) hd['Access-Control-Allow-Origin'] = '*';
+      res.writeHead(200, hd); res.end(d);
     });
   } catch (e) { console.error(e); send(res, 500, { error: 'Ошибка сервера' }); }
 }).listen(PORT, () => console.log('LunoCase: http://localhost:' + PORT));

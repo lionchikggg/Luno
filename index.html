@@ -968,6 +968,13 @@ body[data-mode=hilo]::after,body[data-mode=bj]::after,body[data-mode=wheel]::aft
 
 /* на этих экранах луны нет */
 body[data-mode=home]::after,body[data-mode=slots]::after,body[data-mode=cases]::after,body[data-mode=casev]::after,body[data-mode=profile]::after,body[data-mode=inventory]::after,body[data-mode=referrals]::after,body[data-mode=deposit]::after,body[data-mode=support]::after{display:none!important}
+
+/* Спины: плавная прокрутка и заметная обводка выигравших */
+.rstrip{will-change:transform;backface-visibility:hidden}.rstrip.mv{filter:none}
+#slots .sb .sc.win{background:radial-gradient(circle at 50% 30%,rgba(255,240,190,.42),rgba(70,52,10,.55) 72%);box-shadow:0 0 0 3px #ffd166,0 0 24px rgba(255,209,102,.85),inset 0 0 16px rgba(255,236,170,.35);z-index:3;animation:wing .55s ease-in-out infinite}
+#slots .sb.gold .sc.win{box-shadow:0 0 0 3px #fff,0 0 24px rgba(255,255,255,.9),inset 0 0 16px rgba(255,255,255,.3)}
+#slots .sb.hl .sc:not(.win){opacity:.4;transition:opacity .25s}
+#slots .sb .sc{transition:opacity .25s}
 </style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
@@ -2171,16 +2178,16 @@ function drawBoard(b,prev,win){var sb=$('sb');sb.querySelectorAll('.sc').forEach
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
 function SL(ms){return sleep(ms*SPD[spdI])}
 function rollReels(fin){return new Promise(function(res){
- var sb=$('sb'),cells=Array.prototype.slice.call(sb.querySelectorAll('.sc')),f=SPD[spdI],ch=cells[0].offsetHeight,cw=cells[0].offsetWidth,gap=6,step=ch+gap,N=11,done=0;rollReels.sc=0;sb.classList.add('spin');
+ var sb=$('sb'),cells=Array.prototype.slice.call(sb.querySelectorAll('.sc')),f=SPD[spdI],ch=cells[0].offsetHeight,cw=cells[0].offsetWidth,gap=6,step=ch+gap,N=24,done=0;rollReels.sc=0;sb.classList.add('spin');
  for(var col=0;col<5;col++)(function(col){
   var cc=[0,1,2,3,4].map(function(r){return cells[r*5+col]});cc.forEach(function(c){c.style.visibility='hidden';c.classList.remove('win','out','drop','land')});
   var host=document.createElement('div');host.className='rcol';host.style.cssText='left:'+cells[col].offsetLeft+'px;top:'+cells[0].offsetTop+'px;width:'+cw+'px;height:'+(5*ch+4*gap)+'px';
-  var items=[];for(var r=0;r<5;r++)items.push(fin[r*5+col]);for(var j=0;j<N;j++)items.push(Math.floor(Math.random()*9));
-  var strip=document.createElement('div');strip.className='rstrip mv';strip.innerHTML=items.map(function(v){return '<div class="sc">'+symH(v)+'</div>'}).join('');host.appendChild(strip);sb.appendChild(host);
-  strip.style.transform='translateY('+(-N*step)+'px)';strip.getBoundingClientRect();
-  var dur=(800+col*190)*f;strip.style.transition='transform '+dur+'ms cubic-bezier(.1,.7,.2,1.06)';strip.style.transform='translateY(0)';
-  setTimeout(function(){strip.classList.remove('mv')},dur*.7);
-  setTimeout(function(){host.remove();var nsc=0;cc.forEach(function(c,r){c.style.visibility='';c.innerHTML=symH(fin[r*5+col]);void c.offsetWidth;c.classList.add('land');if(fin[r*5+col]===9)nsc++});if(nsc){rollReels.sc=(rollReels.sc||0)+nsc;soft('bell',rollReels.sc)}if(++done===5){sb.classList.remove('spin');setTimeout(res,200*f)}},dur+40)})(col)})}
+  var items=[];for(var r=0;r<5;r++)items.push(fin[r*5+col]);var last=items[4];for(var j=0;j<N;j++){var v;do{v=Math.floor(Math.random()*9)}while(v===last);items.push(v);last=v}
+  var strip=document.createElement('div');strip.className='rstrip';strip.innerHTML=items.map(function(v){return '<div class="sc">'+symH(v)+'</div>'}).join('');host.appendChild(strip);sb.appendChild(host);
+  var dur=(1150+col*260)*f,delay=col*80*f,from='translate3d(0,'+(-N*step)+'px,0)',to='translate3d(0,0,0)';
+  var fin2=function(){host.remove();var nsc=0;cc.forEach(function(c,r){c.style.visibility='';c.innerHTML=symH(fin[r*5+col]);void c.offsetWidth;c.classList.add('land');if(fin[r*5+col]===9)nsc++});if(nsc){rollReels.sc=(rollReels.sc||0)+nsc;soft('bell',rollReels.sc)}if(++done===5){sb.classList.remove('spin');setTimeout(res,220*f)}};
+  if(strip.animate){var an=strip.animate([{transform:from},{transform:to}],{duration:dur,delay:delay,easing:'cubic-bezier(.4,.1,.2,1)',fill:'both'});an.onfinish=fin2}
+  else{strip.style.transform=from;strip.getBoundingClientRect();strip.style.transition='transform '+dur+'ms cubic-bezier(.4,.1,.2,1) '+delay+'ms';strip.style.transform=to;setTimeout(fin2,dur+delay+40)}})(col)})}
 function floatWin(txt){var e=document.createElement('div');e.className='fl2';e.textContent=txt;$('sb').appendChild(e);setTimeout(function(){e.remove()},1500)}
 function bonusSummary(r){return new Promise(function(res){var fs=r.spins.filter(function(x){return x.gold}).length,net=r.payout-r.cost,md=$('md');
  $('mbody').innerHTML='<div class="cfm"><small style="color:var(--muted);font-weight:700">Бонус завершён</small><div class="bigw">★ '+r.payout+'</div><p class="note" style="margin:6px 0 2px">Множитель ×'+fmt(r.total)+' от ставки · фриспинов: '+fs+'</p><p class="note" style="margin:0 0 14px">'+(net>=0?'Чистая прибыль +':'Итог ')+net+' ★ (с учётом стоимости)</p><button class="btn big" id="bsy">Забрать</button></div>';
@@ -2195,8 +2202,8 @@ async function playSlots(r,bet){var sb=$('sb'),run=0,fsN=r.spins.filter(function
   if(s2.gold){fi++;$('wbonus').hidden=false;$('sfs').textContent='Фриспин '+fi+' из '+fsN}else $('sfs').textContent='Обычная игра';
   $('sw').textContent='★ 0';
   for(var j=0;j<s2.stages.length;j++){var st=s2.stages[j];
-   if(j===0){await rollReels(st.b);var cl=sb.querySelectorAll('.sc');st.c.forEach(function(k){cl[k].classList.add('win')})}else drawBoard(st.b,prev,st.c);
-   if(st.c.length){soft(st.w>=5?'big':'win',j);sum+=st.w;$('sw').textContent='★ '+fmt(sum*bet);await SL(700);sb.querySelectorAll('.sc.win').forEach(function(e){e.classList.remove('win');e.classList.add('out')});await SL(360)}
+   if(j===0){await rollReels(st.b);var cl=sb.querySelectorAll('.sc');st.c.forEach(function(k){cl[k].classList.add('win')})}else drawBoard(st.b,prev,st.c);if(st.c.length)sb.classList.add('hl');
+   if(st.c.length){soft(st.w>=5?'big':'win',j);sum+=st.w;$('sw').textContent='★ '+fmt(sum*bet);await SL(950);sb.classList.remove('hl');sb.querySelectorAll('.sc.win').forEach(function(e){e.classList.remove('win');e.classList.add('out')});await SL(360)}
    prev=st.b}
   if(s2.mult>1&&s2.win>0){soft('shim');var bn=document.createElement('div');bn.className='mbanner';bn.textContent='×'+s2.mult;sb.appendChild(bn);$('sw').textContent='★ '+fmt(s2.win*bet);await SL(900);bn.remove()}
   run+=s2.win;if(bonus&&s2.gold)$('swt').textContent='★ '+fmt(run*bet);

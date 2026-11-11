@@ -43,7 +43,7 @@
   function wheelRtp(secs) { var t = 0; secs.forEach(function (m) { t += +m || 0; }); return secs.length ? t / secs.length : 0; }
 
   function defaultSlots3(art) {
-    return { bets: [10, 25, 50, 100, 250, 500, 1000], pair: 0, symbols: [
+    return { bets: [10, 25, 50, 100, 250, 500, 1000], pair: 2, symbols: [
       { id: 'clover', name: 'Клевер', img: '', icon: 'clover', mult: 5, count: 8 }, { id: 'gem', name: 'Кристалл', img: '', icon: 'gem', mult: 10, count: 7 },
       { id: 'hat', name: 'Шляпа мага', img: '', icon: 'hat', mult: 20, count: 5 }, { id: 'ring', name: 'Кольцо', img: '', icon: 'ring', mult: 40, count: 4 },
       { id: 'plum', name: 'Слива', img: art.slotplum || art.plum || '', icon: 'star', mult: 100, count: 3 }, { id: 'dog', name: 'Пёс в худи', img: art.dog || '', icon: 'star', mult: 200, count: 2 },
@@ -123,6 +123,7 @@
       (function () { var st9 = S.cfg.settings; if (st9.giftDepositTo === undefined) st9.giftDepositTo = ''; if (st9.giftDepositNote === undefined) st9.giftDepositNote = 'Начисляем в течение 24 часов.'; st9.edges = st9.edges || {}; if (st9.edges.slots3 === undefined) st9.edges.slots3 = 0.10; })();
       (function () { S.flags = S.flags || {}; if (!S.flags.s3v3) { S.flags.s3v3 = 1; var c3b = S.cfg.slots3; if (c3b && JSON.stringify(c3b.bets) === JSON.stringify([10, 25, 50, 100, 250])) { var mnB = +S.cfg.settings.minBet || 10, mxB = +S.cfg.settings.maxBet || 1000, nb = [10, 25, 50, 100, 250, 500, 1000].filter(function (x) { return x >= mnB && x <= mxB; }); if (nb.length >= 2) c3b.bets = nb; } } })();
       (function () { S.flags = S.flags || {}; if (!S.flags.s3v2) { S.flags.s3v2 = 1; var c3 = S.cfg.slots3, ed = S.cfg.settings.edges; if (c3 && +c3.pair === 2) c3.pair = 0; if (ed && +ed.slots3 === 0.06) ed.slots3 = 0.10; } })();
+      (function () { S.flags = S.flags || {}; if (!S.flags.s3v4) { S.flags.s3v4 = 1; var c3d = S.cfg.slots3; if (c3d && +c3d.pair === 0) c3d.pair = 2; } })();
       var ST0 = S.cfg.settings; ST0.edges = ST0.edges || {}; if (ST0.edges.tower === undefined) ST0.edges.tower = 0.06; if (ST0.edges.hilo === undefined) ST0.edges.hilo = 0.05;
       ST0.modes = ST0.modes || {}; ['rocket', 'mines', 'upgrade', 'slots', 'plinko', 'wheel', 'coin', 'tower', 'bj', 'du', 'hilo'].forEach(function (k) { if (ST0.modes[k] === undefined) ST0.modes[k] = 1; });
       if (ST0.tonAddress === undefined) ST0.tonAddress = ''; if (ST0.channelUrl === undefined) ST0.channelUrl = ''; if (ST0.channelText === undefined) ST0.channelText = 'Наш канал';
@@ -437,7 +438,7 @@
       'slots/spin': function (u, b) {
         var bet = Math.floor(+b.bet), buy = !!b.buy, dc = !!b.dc && !buy; if (!(bet >= set('minBet')) || bet > set('maxBet')) throw new Err('Ставка от ★' + set('minBet') + ' до ★' + set('maxBet'));
         var cost = Math.ceil(bet * (buy ? SLOT.buyX : dc ? 1.25 : 1)); if (u.balance < cost) throw new Err('Не хватает звёзд'); u.balance -= cost;
-        var g = slotGame(function () { return roll(u); }, { buy: buy, dc: dc }, (1 - edgeOf('slots')) / SLOT.rtp0), payout = pay(u, 'slots', cost, bet * g.total);
+        var g = slotGame(function () { return roll(u); }, { buy: buy, dc: dc }, (1 - edgeOf('slots')) / SLOT.rtp0), payout = pay(u, 'slots', cost, Math.round(bet * g.total));
         return { spins: g.spins, total: g.total, payout: payout, cost: cost };
       },
       'crash/state': function (u) {

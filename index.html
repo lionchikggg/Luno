@@ -965,6 +965,9 @@ body[data-mode=hilo]::after,body[data-mode=bj]::after,body[data-mode=wheel]::aft
 @media (min-width:900px){#upgrade .wheel{--ws:380px}}
 
 #twgo.cash{background:linear-gradient(120deg,#2fd68a,#17a867);color:#fff;box-shadow:0 10px 28px rgba(40,200,130,.3)}
+
+/* на этих экранах луны нет */
+body[data-mode=home]::after,body[data-mode=slots]::after,body[data-mode=cases]::after,body[data-mode=casev]::after,body[data-mode=profile]::after,body[data-mode=inventory]::after,body[data-mode=referrals]::after,body[data-mode=deposit]::after,body[data-mode=support]::after{display:none!important}
 </style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
@@ -1008,7 +1011,7 @@ body[data-mode=hilo]::after,body[data-mode=bj]::after,body[data-mode=wheel]::aft
   <div class="rls" id="rls"></div>
   <button class="btn big copen" id="cvo"></button>
   <div class="ctl"><div class="qty" id="qty"><button data-n="1">x1</button><button data-n="2">x2</button><button data-n="3">x3</button><button data-n="4">x4</button><button data-n="5">x5</button></div><button class="ib" id="cfast" aria-label="Быстрое открытие"><i data-i="bolt"></i></button></div></div>
- <h2 class="cth">Что может выпасть</h2><div class="cvg" id="cvg"></div>
+ <div class="cvg" id="cvg"></div>
 </section>
 <section class="view" id="s3">
  <div class="s3reels" id="s3r"><div class="s3col"></div><div class="s3col"></div><div class="s3col"></div><div class="s3line"></div><svg class="s3ov" id="s3ov"></svg></div>
@@ -2306,10 +2309,11 @@ function rCaseV(){var c=curCase;if(!c)return go('cases');opening=0;$('cvo').disa
 $('qty').querySelectorAll('button').forEach(function(b){b.onclick=function(){if(opening||!curCase||curCase.free)return;CQ.n=+b.dataset.n;qtyUI();cvBtn();tone3(560,.06,.03)}});
 $('cfast').onclick=function(){CQ.fast=!CQ.fast;try{localStorage.setItem('luno_fast',CQ.fast?'1':'0')}catch(e){}qtyUI();toast(CQ.fast?'Быстрое открытие включено':'Быстрое открытие выключено')};
 $('cvo').onclick=function(){startOpen()};
-function startOpen(){var c=curCase;if(opening||!c)return;if(c.free&&!DEMO){go('profile');setTimeout(function(){$('code').focus()},80);return toast('Введи промокод')}
+function startOpen(){var c=curCase;if(opening||!c)return;
  var n=c.free?1:CQ.n;if(!c.free&&ME.balance<c.price*n)return toast('Не хватает звёзд');
  opening=1;$('cvo').disabled=true;
- call('case/open',{id:c.id,count:n},true).then(function(r){var items=r.items||[r.item];if(CQ.fast)cvDone(c,r,items,true);else cvRoll(c,r,items)}).catch(function(){opening=0;$('cvo').disabled=false})}
+ call('case/open',{id:c.id,count:n},true)
+ .then(function(r){var items=r.items||[r.item];if(CQ.fast)cvDone(c,r,items,true);else cvRoll(c,r,items)}).catch(function(e){opening=0;$('cvo').disabled=false;if(e&&e.error==='Нужен промокод'){go('profile');setTimeout(function(){$('code').focus()},80)}})}
 function cvRoll(c,r,items){var n=items.length,W=n===1?140:104,step=W+10,WI=34,reels=[];
  items.forEach(function(it){var arr=[];for(var j=0;j<44;j++)arr.push(j===WI?it.k:pickW(c));reels.push(arr)});
  $('rls').innerHTML=reels.map(function(arr){return '<div class="rl'+(n>1?' sm':'')+'"><div class="rmk"></div><div class="rtk">'+arr.map(function(k){return tileH(k,W)}).join('')+'</div></div>'}).join('');
@@ -2367,13 +2371,19 @@ function rSup(){var u=CFG.settings.supportUsername,h='';FAQ.forEach(function(f){
  $('spc').onclick=function(){u?openTG('https://t.me/'+u):toast('Владелец ещё не указал контакт поддержки')};$('spi').onclick=function(){copy(ME.id)}}
 var TC=null,TC_UN=null;
 function tonComment(text){var t=new TextEncoder().encode(text),n=4+t.length;if(n>127)return '';var cell=[0,n*2,0,0,0,0].concat(Array.prototype.slice.call(t)),b=[0xb5,0xee,0x9c,0x72,1,1,1,1,0,cell.length,0].concat(cell),s='';b.forEach(function(x){s+=String.fromCharCode(x)});return btoa(s)}
-function tcGet(){if(TC)return TC;if(!window.TON_CONNECT_UI)return null;try{TC=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:location.origin+'/tonconnect-manifest.json',buttonRootId:'tcb',language:'ru',actionsConfiguration:CFG.settings.botUsername?{twaReturnUrl:'https://t.me/'+CFG.settings.botUsername}:undefined})}catch(e){TC=null}return TC}
+function tcReady(cb){if(window.TON_CONNECT_UI)return cb(true);var n=0,added=false;(function wait(){if(window.TON_CONNECT_UI)return cb(true);n++;if(n===12&&!added){added=true;var s=document.createElement('script');s.src='https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js';s.async=true;document.head.appendChild(s)}if(n>48)return cb(false);setTimeout(wait,250)})()}
+function tcGet(){if(TC)return TC;if(!window.TON_CONNECT_UI)return null;try{TC=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:location.origin+'/tonconnect-manifest.json',language:'ru',actionsConfiguration:CFG.settings.botUsername?{twaReturnUrl:'https://t.me/'+CFG.settings.botUsername}:undefined})}catch(e){TC=null}return TC}
+function tcShort(a){try{if(window.TON_CONNECT_UI&&window.TON_CONNECT_UI.toUserFriendlyAddress)a=window.TON_CONNECT_UI.toUserFriendlyAddress(a)}catch(e){}return a&&a.length>14?a.slice(0,6)+'…'+a.slice(-6):(a||'')}
 function pollBal(n,mx){n=n||0;mx=mx||12;api('me').then(function(r){var b0=ME.balance;sync(r);if(r.balance!==b0)toast('Баланс пополнен');else if(n<mx)setTimeout(function(){pollBal(n+1,mx)},mx>12?4000:1500)})}
-function tonConnectInit(i){var tc=tcGet(),pay=$('dtpay');if(!pay)return;
- if(!tc){$('tcb').innerHTML='<p class="note">Подключить кошелёк не получилось. Переведи вручную ниже.</p>';return}
- tc.uiOptions={buttonRootId:'tcb'};var upd=function(){pay.hidden=!tc.connected;if(tc.connected)pay.textContent='Оплатить через кошелёк'};if(TC_UN)try{TC_UN()}catch(e){}TC_UN=tc.onStatusChange(upd);upd();
- pay.onclick=function(){var ton=+$('dta').value;if(!(ton>0))return toast('Укажи сумму');if(Math.floor(ton*i.tonToStars)<i.minDeposit)return toast('Минимум '+i.minDeposit+' ★');var cm=tonComment(i.comment);if(!cm)return toast('Ошибка комментария');pay.disabled=true;
-  tc.sendTransaction({validUntil:Math.floor(Date.now()/1000)+600,messages:[{address:i.tonAddress,amount:String(Math.round(ton*1e9)),payload:cm}]}).then(function(){toast('Платёж отправлен, звёзды придут в течение минуты');pollBal(0,45)},function(){toast('Платёж отменён')}).then(function(){pay.disabled=false})}}
+function tonConnectInit(i){var box=$('tcb');if(!box)return;box.innerHTML='<p class="note">Загружаю подключение кошелька…</p>';if($('dtpay'))$('dtpay').hidden=true;
+ tcReady(function(ok){if(!$('tcb')||$('tcb')!==box)return;var tc=ok?tcGet():null;
+  if(!tc){box.innerHTML='<p class="note">Не удалось загрузить подключение кошелька. Проверь интернет.</p><button class="btn" id="tcretry" style="width:100%">Повторить</button>';$('tcretry').onclick=function(){TC=null;tonConnectInit(i)};return}
+  var paint=function(){var b=$('tcb'),pay=$('dtpay');if(!b)return;
+   if(tc.connected){b.innerHTML='<div class="kv"><span>Кошелёк: <b>'+esc(tcShort((tc.account&&tc.account.address)||''))+'</b></span><button id="tcoff">Отключить</button></div>';$('tcoff').onclick=function(){tc.disconnect()};if(pay){pay.hidden=false;pay.textContent='Оплатить через кошелёк'}}
+   else{b.innerHTML='<button class="btn big" id="tcon">Подключить кошелёк</button><p class="note">Wallet или Tonkeeper</p>';$('tcon').onclick=function(){tc.openModal()};if(pay)pay.hidden=true}};
+  if(TC_UN)try{TC_UN()}catch(e){}TC_UN=tc.onStatusChange(paint);paint();
+  var pay=$('dtpay');if(pay)pay.onclick=function(){var ton=+$('dta').value;if(!(ton>0))return toast('Укажи сумму');if(Math.floor(ton*i.tonToStars)<i.minDeposit)return toast('Минимум '+i.minDeposit+' ★');var cm=tonComment(i.comment);if(!cm)return toast('Ошибка комментария');pay.disabled=true;
+   tc.sendTransaction({validUntil:Math.floor(Date.now()/1000)+600,messages:[{address:i.tonAddress,amount:String(Math.round(ton*1e9)),payload:cm}]}).then(function(){toast('Платёж отправлен, звёзды придут в течение минуты');pollBal(0,45)},function(){toast('Платёж отменён')}).then(function(){pay.disabled=false})}})}
 function giftsInit(){call('gdep/info').then(function(g){var box=$('gd');
  if(!g.to){box.innerHTML='<div class="blk"><p class="note">Пополнение подарками пока не настроено владельцем.</p></div>';return}
  box.innerHTML='<div class="blk"><div class="bt2">Как пополнить подарком</div><ol class="gst"><li>Отправь подарок аккаунту <b>@'+esc(g.to)+'</b> (профиль в Telegram → «Подарить подарок»).</li><li>В сообщении к подарку напиши свой код <b>'+esc(g.code)+'</b>, чтобы мы тебя нашли.</li><li>Вернись сюда, укажи название подарка и нажми «Я отправил».</li><li>Звёзды будут начислены в течение 24 часов.</li></ol>'

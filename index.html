@@ -1146,7 +1146,7 @@ body[data-mode=home]::after,body[data-mode=slots]::after,body[data-mode=cases]::
 .rk2{width:104px!important;height:100px!important;right:10px!important;bottom:-2px!important;transform:none!important}
 
 /* ===== ракета-корабль: стоит на Луне, взлетает, бочка ===== */
-#rocket #rk.ship{width:123px;height:200px;transform-origin:50% 50%;filter:drop-shadow(0 8px 16px rgba(90,140,255,.32));z-index:4}
+#rocket #rk.ship{width:135px;height:206px;transform-origin:50% 50%;filter:drop-shadow(0 8px 16px rgba(90,140,255,.32));z-index:4}
 #rk .rkm{position:absolute;inset:0;transform-origin:56.220000000000006% 50%;z-index:2}
 #rk .rki{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none}
 #rk .rksn{position:absolute;inset:0;-webkit-mask:url(/art/rkship.webp) center/100% 100% no-repeat;mask:url(/art/rkship.webp) center/100% 100% no-repeat;background:linear-gradient(112deg,transparent 40%,rgba(255,255,255,.8) 50%,transparent 60%) no-repeat;background-size:280% 100%;background-position:130% 0;animation:rksn 4.8s ease-in-out infinite}
@@ -1178,6 +1178,11 @@ body[data-mode=home]::after,body[data-mode=slots]::after,body[data-mode=cases]::
 .sp4s{position:absolute;color:#fff;font-size:13px;text-shadow:0 0 10px #ffd6f5;animation:sp4t 2.6s ease-in-out infinite}
 .sp4s.s1{left:-6px;top:-12px}.sp4s.s2{right:-2px;bottom:-14px;font-size:10px;animation-delay:-1.2s}
 @keyframes sp4t{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1.15)}}
+
+.rk2{width:96px!important;height:96px!important;right:16px!important;bottom:2px!important;transform:none!important;filter:none!important}
+.rk2 .rkn{width:100%;height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 6px 12px rgba(70,120,255,.55))}
+
+.rm{right:128px!important}
 </style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
@@ -2258,10 +2263,10 @@ var JET='<svg viewBox="0 0 40 70"><path class="fl" d="M3 0Q20 84 37 0z" fill="ur
 var RBODY='M60 4C92 34 101 92 91 150Q87 171 74 177H46Q33 171 29 150C19 92 28 34 60 4Z';
 function ssm(x){x=x<0?0:x>1?1:x;return x*x*(3-2*x)}
 function ssr(x){x=x<0?0:x>1?1:x;return x*x*x*(x*(6*x-15)+10)}
-var SHIP={LT:2600,PRE:900,RD:1300,FR:2500,ax:0.5,tb:0.9887};
-var RKR={n:72,per:18,cols:6,rows:3,fw:272,fh:443,idx:0,k:-1,imgs:[],ready:0,lt:0};
+var SHIP={LT:2600,PRE:900,RD:1300,FR:2500,ax:0.5,tb:0.9865};
+var RKR={n:72,per:18,cols:6,rows:3,fw:292,fh:444,idx:0,k:-1,imgs:[],ready:0,lt:0};
 function rocketSvg(){RKR.k=-1;return '<canvas class="rkc"></canvas>'}
-(function(){var U=['/art/rkq1.webp','/art/rkq2.webp','/art/rkq3.webp','/art/rkq4.webp'],ld=0;
+(function(){var U=['/art/rkw1.webp','/art/rkw2.webp','/art/rkw3.webp','/art/rkw4.webp'],ld=0;
  U.forEach(function(u,q){var x=new Image();x.onload=function(){if((x.naturalWidth!==RKR.cols*RKR.fw||x.naturalHeight!==RKR.rows*RKR.fh)&&!x._r){x._r=1;x.src=u+'?r='+Date.now();return}RKR.imgs[q]=x;RKR.k=-1;if(++ld===U.length)RKR.ready=1};x.src=u;if(x.decode)x.decode().catch(function(){})});
  function draw(i){var s=Math.floor(i/RKR.per),l=i%RKR.per,im=RKR.imgs[s];if(!im)return;var sx=(l%RKR.cols)*RKR.fw,sy=Math.floor(l/RKR.cols)*RKR.fh,cs=document.querySelectorAll('.rkc'),z,c,x,w,h,d=Math.min(3,window.devicePixelRatio||1);
   for(z=0;z<cs.length;z++){c=cs[z];w=Math.round(c.clientWidth*d);h=Math.round(c.clientHeight*d);if(!w||!h)continue;if(c.width!==w||c.height!==h){c.width=w;c.height=h}x=c.getContext('2d');x.clearRect(0,0,w,h);x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(im,sx,sy,RKR.fw,RKR.fh,0,0,w,h)}}
@@ -2270,13 +2275,16 @@ function rocketSvg(){RKR.k=-1;return '<canvas class="rkc"></canvas>'}
 function shipPose(ts,t,ph,m){var W=RK.W,H=RK.H,rw=RK.rw,rh=RK.rh,sx=W/2-SHIP.ax*rw,sy=H*.85-SHIP.tb*rh+3,cy=RK.cy-rh/2,
  el=(ph==='crashed'||!RS)?1e9:t-RS.t0,s=el<0?0:Math.min(1,el/SHIP.LT),e=ssr(s),pre=el<0?Math.max(0,1+el/SHIP.PRE):1,cr=ssm((s-.72)/.28),
  vib=el<0?pre*pre*1.7:Math.max(0,1-s*3)*2.6,jx=(Math.random()-.5)*vib,jy=(Math.random()-.5)*vib,idle=el<0?Math.sin(ts/1100)*.8:0;
- return {x:sx+jx+Math.sin(ts/760)*3*cr,y:sy+(cy-sy)*e+jy+idle+Math.sin(ts/540)*4.5*cr,a:28*ssm((s-.3)/.7)+Math.sin(ts/950)*1.3*cr,s:1,e:e,s0:s,pre:pre,el:el}}
+ var wv=cr*(Math.sin(ts/760)*12+Math.sin(ts/330)*2.4),wa=cr*(Math.cos(ts/760)*4.6+Math.sin(ts/330)*1.2),sv=0,sa=0;
+ if(RK.swT0&&cr>0){var pp=(ts-RK.swT0)/1400;if(pp>=1)RK.swT0=0;else{sv=RK.swD*Math.sin(Math.PI*pp)*30;sa=RK.swD*Math.cos(Math.PI*pp)*8}}
+ return {x:sx+jx+Math.sin(ts/760)*3*cr+wv+sv,y:sy+(cy-sy)*e+jy+idle+Math.sin(ts/540)*4.5*cr,a:28*ssm((s-.3)/.7)+Math.sin(ts/950)*1.3*cr+wa+sa,s:1+.014*Math.sin(ts/700)*cr,e:e,s0:s,pre:pre,el:el}}
 function shipFx(ts,pos,ph,m){var k=$('rk'),pd=RK.pd=$('pad'),el=pos.el,s=pos.s0;
- if(ph==='bet'){if(RK.sph!=='bet'){RK.arr=RK.sph?ts:0;RK.nr=0;RK.roll=0}}RK.sph=ph;
+ if(ph==='bet'){if(RK.sph!=='bet'){RK.arr=RK.sph?ts:0;RK.nr=0;RK.roll=0;RK.swT0=0;RK.swn=0}}RK.sph=ph;
  if(pd){var pe=ssm((s-.04)/.85);pd.style.transform='translateX(-50%) translateY('+(pe*78).toFixed(1)+'%) scale('+(1-.16*pe).toFixed(3)+')';
   if(RK.arr){var q=Math.min(1,(ts-RK.arr)/700);pd.style.opacity=q;k.style.opacity=q;RK.op=q>=1?1:-2;if(q>=1)RK.arr=0}else if(pd.style.opacity!==''){pd.style.opacity=''}}
  var idx=0;
- if(ph==='fly'){if(!RK.nr)RK.nr=el<SHIP.FR?SHIP.FR:el+700+Math.random()*1200;
+ if(ph==='fly'){if(!RK.swn)RK.swn=el<SHIP.LT+800?SHIP.LT+800:el+800+Math.random()*1500;if(!RK.swT0&&!RK.roll&&el>=RK.swn){RK.swT0=ts;RK.swD=Math.random()<.5?1:-1;RK.swn=el+6500+Math.random()*5500}
+  if(!RK.nr)RK.nr=el<SHIP.FR?SHIP.FR:el+700+Math.random()*1200;
   if(!RK.roll&&el>=RK.nr){RK.roll=ts;RK.rdir=Math.random()<.5?1:-1}
   if(RK.roll){var p=(ts-RK.roll)/SHIP.RD;if(p>=1){RK.roll=0;RK.nr=el+6000+Math.random()*5500}else{var ee=(1-Math.cos(Math.PI*p))/2;idx=Math.floor(ee*RKR.n)%RKR.n;if(RK.rdir<0)idx=(RKR.n-idx)%RKR.n}}}
  else if(ph==='crashed')RK.roll=0;
@@ -2291,7 +2299,7 @@ function rocketHTML(){var b=CFG.skins.rocket_body;RK.sprite=0;RK.ship=!b;RK.svg=
  +'<path d="M33 82A27 21 0 0 0 87 82" fill="none" stroke="url(#gBs)" stroke-width="4.5" stroke-linecap="round"/><text x="60" y="148.5" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" font-family="Unbounded,Arial,sans-serif" letter-spacing="2.5">LUNO</text>'
  +'<path d="M46 177h28l5 14H41z" fill="#15298a" stroke="#a9d7ff" stroke-width="1.2"/></svg>'}
 function nft(k,fb){var it=itm(k);return it.img?imgH(it.img):I[fb]}
-function artRocket(){return '<div class="mn2">'+I.moonBig+'</div><div class="rm">×1.00</div><div class="rk2">'+rocketHTML()+'</div>'}
+function artRocket(){return '<div class="mn2">'+I.moonBig+'</div><div class="rm">×1.00</div><div class="rk2"><img class="rkn" src="/art/rknft.webp" alt="" draggable="false"></div>'}
 function artMines(){var d=CFG.skins.mines_closed,h='<div class="mgt">';for(var i=0;i<9;i++)h+=i===4?'<i class="st">'+I.star+'</i>':'<i>'+(d?imgH(d):I.moon)+'</i>';return h+'</div>'}
 function artUpgrade(sk){return '<div class="rng"><div class="rin"><i>'+(sk?imgH(sk):nft('arm','star'))+'</i></div><div class="rptr"><b></b></div></div>'}
 function artSpins(){var ids=[],all=[8,7,6,5,4,3,2,1,0],i,h='';all.forEach(function(v){if(ids.length<4&&CFG.skins['slot_s'+(v+1)])ids.push(v)});all.forEach(function(v){if(ids.length<4&&ids.indexOf(v)<0)ids.push(v)});

@@ -82,7 +82,7 @@ function verify(init) {
 }
 function authUser(req) {
   if (BOT) return verify(req.headers['x-init-data'] || '');
-  if (DEV) return { id: String(req.headers['x-dev-user'] || '1'), name: 'Dev ' + (req.headers['x-dev-user'] || '1'), username: req.headers['x-dev-un'] === undefined ? 'dev' + (req.headers['x-dev-user'] || '1') : String(req.headers['x-dev-un']) };
+  if (DEV) return { id: String(req.headers['x-dev-user'] || '1'), name: 'Dev ' + (req.headers['x-dev-user'] || '1'), username: req.headers['x-dev-un'] === undefined ? 'dev' + (req.headers['x-dev-user'] || '1') : String(req.headers['x-dev-un']), sp: String(req.headers['x-dev-sp'] || '') };
   return null;
 }
 

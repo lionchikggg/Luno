@@ -1191,6 +1191,21 @@ body[data-mode=home]::after,body[data-mode=slots]::after,body[data-mode=cases]::
 .rk2{width:80px!important;height:80px!important;right:18px!important;bottom:6px!important}
 .rm{right:112px!important}
 .sp4{width:60px;height:60px;margin-left:-8px}
+
+.free .gift img{width:100%;height:100%;object-fit:contain;display:block}
+.btn.lock{opacity:.62}
+.fcx{margin:12px 0 0;padding:12px;border:1px solid rgba(190,205,255,.22);border-radius:18px;background:rgba(10,12,26,.62)}
+.fcx[hidden]{display:none}
+.fcx .fct{font-weight:800;font-size:14px;margin:0 0 10px;color:#dfe4ff}
+.fco{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:rgba(255,255,255,.045);margin-bottom:8px}
+.fco:last-child{margin-bottom:0}
+.fco .fn{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#6f66e8;font-weight:800;font-size:13px;flex:none}
+.fco .fi{flex:1;min-width:0}.fco strong{display:block;font-size:14px;color:#fff}.fco small{color:#9aa3c8;font-size:12px}
+.fco form{display:flex;gap:8px;margin-top:8px}
+.fco input{flex:1;min-width:0;padding:9px 10px;border-radius:10px;border:1px solid rgba(190,205,255,.25);background:rgba(255,255,255,.05);color:#fff;font-size:14px;text-transform:uppercase}
+.fco .btn{padding:9px 12px;font-size:13px;white-space:nowrap;border-radius:12px;min-height:0;height:auto}
+.fcbar{height:6px;border-radius:4px;background:rgba(255,255,255,.1);margin-top:7px;overflow:hidden}
+.fcbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8f86ff,#6fd8ff);border-radius:4px;transition:width .4s}
 </style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
@@ -1208,7 +1223,7 @@ body[data-mode=home]::after,body[data-mode=slots]::after,body[data-mode=cases]::
  <div class="live"><b>Live</b><span id="lv" style="display:contents"></span></div>
  <div class="seg" id="seg"><button data-m="real">Реальный счёт</button><button data-m="demo">Демо-режим</button></div>
  <div class="dmb" id="dmb" hidden><b>Демо-режим</b><p>Виртуальные звёзды. Шансы в играх такие же, как в реальной игре. Вывод подарков и пополнение недоступны.</p><button class="btn" id="dmr">Пополнить демо-баланс</button></div>
- <button class="free bn" id="freeb"><div class="mn" data-i="moonBig"></div><div class="gift" data-i="chest"></div><h2>Бесплатный кейс</h2><p>введи промокод из нашего канала</p></button>
+ <button class="free bn" id="freeb"><div class="mn" data-i="moonBig"></div><div class="gift" data-i="chest"></div><h2>Бесплатный кейс</h2><p id="freep">промокод или 5 друзей</p></button>
  <h3>Игры</h3>
  <div class="grid">
   <button class="game wide c1" data-g="rocket"><div class="art" data-card="rocket"></div><strong>Ракетка</strong><span class="sb2">забери до краша</span></button>
@@ -1234,6 +1249,10 @@ body[data-mode=home]::after,body[data-mode=slots]::after,body[data-mode=cases]::
   <div class="rls" id="rls"></div>
   <button class="btn big copen" id="cvo"></button>
   <div class="ctl"><div class="qty" id="qty"><button data-n="1">x1</button><button data-n="2">x2</button><button data-n="3">x3</button><button data-n="4">x4</button><button data-n="5">x5</button></div><button class="ib" id="cfast" aria-label="Быстрое открытие"><i data-i="bolt"></i></button></div></div>
+ <div class="fcx" id="fcx" hidden><div class="fct">Как открыть бесплатный кейс</div>
+  <div class="fco"><span class="fn">1</span><div class="fi"><strong>Промокод</strong><small>из нашего канала</small><form id="fcpf"><input id="fccode" placeholder="Введи промокод" autocomplete="off" autocapitalize="characters"><button class="btn" type="submit">Активировать</button></form></div></div>
+  <div class="fco"><span class="fn">2</span><div class="fi"><strong>Пригласи друзей</strong><small id="fcrt">Приглашено 0/5</small><div class="fcbar"><i id="fcbi"></i></div></div><button class="btn" id="fcinv" type="button">Пригласить</button></div>
+ </div>
  <div class="cvg" id="cvg"></div>
 </section>
 <section class="view" id="s3">
@@ -2236,7 +2255,7 @@ var DEMO_UN=/nouser=1/.test(location.search)?'':(uname||'demo_user');
 function api(p,b){
  if(ONLINE)return fetch('/api/'+p,{method:'POST',headers:{'Content-Type':'application/json','x-init-data':INIT,'x-dev-user':DEVQ,'x-demo':DEMO?'1':''},body:JSON.stringify(b||{})}).then(function(r){return r.json().then(function(j){if(r.status===401)j.auth=true;return j})});
  return Promise.resolve(ENG.handle(p,'1',b||{},name,DEMO_UN,DEMO))}
-function sync(r){if(r.balance!==undefined)ME.balance=r.balance;if(r.inv)ME.inv=r.inv;if(r.stats)ME.stats=r.stats;if($('bal'))$('bal').textContent=fmt(ME.balance)}
+function sync(r){if(r.balance!==undefined)ME.balance=r.balance;if(r.inv)ME.inv=r.inv;if(r.stats)ME.stats=r.stats;if(r.refCount!==undefined)ME.refCount=r.refCount;if(r.refFree!==undefined)ME.refFree=r.refFree;if(r.refNeed)ME.refNeed=r.refNeed;if(r.tickets)ME.tickets=r.tickets;if($('bal'))$('bal').textContent=fmt(ME.balance);if(typeof freeBanner==='function')freeBanner()}
 function showGate(msg){var g=$('gate');g.hidden=false;g.querySelector('p').textContent=msg||'Открой приложение из Telegram';g.querySelector('.dbg').textContent='Данные Telegram: скрипт '+(TGW?'есть':'нет')+', в адресе '+(/tgWebAppData/.test(location.hash)?'есть':'нет')+', получено '+(INIT?INIT.length:0)+' символов'}
 function call(p,b,hold){return api(p,b).then(function(r){if(r.error){if(r.auth){showGate(r.error);throw r}toast(r.error);throw r}if(!hold)sync(r);return r},function(e){if(e&&e.error)throw e;toast('Нет связи с сервером');throw e})}
 function hdr(){var g=TT[cur];$('hd').innerHTML=(g?'<div class="me"><button class="back" aria-label="Назад" id="bk">'+I.back+'</button><h2 style="font-size:'+(cur==='mines'?'30px':'17px')+'">'+g+'</h2>'+(SNDV.indexOf(cur)>=0?'<button class="back snd'+(SND?'':' off')+'" id="snd" aria-label="Звук">'+I.snd+'</button>':'')+'</div>':'<div class="me"><div class="av">'+esc(name[0]||'И')+'</div><span>'+esc(name)+'</span></div>')+'<div class="bal">'+(DEMO?'<em class="dml">ДЕМО</em>':'')+'<i>'+I.star+'</i><span id="bal">'+fmt(ME.balance)+'</span><button id="plus" aria-label="Пополнить">'+I.plus+'</button></div>';
@@ -2264,7 +2283,7 @@ document.querySelectorAll('.stp button[data-for],.rb[data-for]').forEach(functio
  if(d>0){for(i=0;i<STEPS.length;i++)if(STEPS[i]>v)break;v=Math.min(mx,STEPS[i]||mx)}else{for(i=STEPS.length-1;i>=0;i--)if(STEPS[i]<v)break;v=Math.max(mn,STEPS[i]||mn)}
  inp.value=v;inp.dispatchEvent(new Event('input'))}});
 document.querySelectorAll('.chips button').forEach(function(b){var t=b.parentNode.dataset.t;b.addEventListener('click',function(){var e=$('b-'+t);e.dispatchEvent(new Event('input'))})});
-$('freeb').onclick=function(){go('profile');setTimeout(function(){$('code').focus()},80)};
+$('freeb').onclick=function(){var c=freeCase();if(!c)return go('profile');curCase=c;go('casev')};
 
 /* ===== оформление из настроек ===== */
 var JET='<svg viewBox="0 0 40 70"><path class="fl" d="M3 0Q20 84 37 0z" fill="url(#gF)"/><path class="fl fl2" d="M12 0Q20 52 28 0z" fill="#fff6c8"/></svg>';
@@ -2525,8 +2544,8 @@ $('pgo').onclick=function(){if(plb)return;var b=betOf('plinko');if(!b)return;plb
    k+=r.path[i];i++;ball.style.transform='translate('+(150+(k-i/2)*22)+'px,'+(i===R?16+R*19+14:16+(i-.5)*19)+'px)';setTimeout(step,150)})()}).catch(function(){plb=0;$('pgo').disabled=false})};
 
 /* ===== КЕЙСЫ ===== */
-function rCases(){var g=$('cl');if(!g)return;g.innerHTML='';CFG.cases.forEach(function(c){var b=document.createElement('button'),h=((260+(+c.hue||0))%360+360)%360;b.className='cx';
- b.innerHTML='<div class="ca" style="--h:'+h+'"><div class="cart" style="'+(c.img?'':'filter:hue-rotate('+(+c.hue||0)+'deg)')+'">'+(c.img?imgH(c.img):I.chest)+'</div></div><div class="cb"><strong>'+esc(c.name)+'</strong><span class="pp">'+(c.free?(DEMO?'Бесплатно':'Код'):'<i>'+I.star+'</i>'+c.price)+'</span></div>';
+function rCases(){freeBanner();var g=$('cl');if(!g)return;g.innerHTML='';CFG.cases.forEach(function(c){var b=document.createElement('button'),h=((260+(+c.hue||0))%360+360)%360;b.className='cx';
+ b.innerHTML='<div class="ca" style="--h:'+h+'"><div class="cart" style="'+(c.img?'':'filter:hue-rotate('+(+c.hue||0)+'deg)')+'">'+(c.img?imgH(c.img):I.chest)+'</div></div><div class="cb"><strong>'+esc(c.name)+'</strong><span class="pp">'+(c.free?'Бесплатно':'<i>'+I.star+'</i>'+c.price)+'</span></div>';
  b.onclick=function(){curCase=c;go('casev')};g.appendChild(b)})}
 I.users=V('<circle cx="24" cy="22" r="10" fill="currentColor"/><path d="M6 54c0-11 8-18 18-18s18 7 18 18z" fill="currentColor"/><circle cx="46" cy="24" r="8" fill="currentColor" opacity=".7"/><path d="M42 38c10-1 18 5 18 16H46c0-6-1-11-4-16z" fill="currentColor" opacity=".7"/>');
 I.wifi=V('<path d="M6 24c14-14 38-14 52 0M16 34c9-9 23-9 32 0M26 44c4-4 8-4 12 0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="54" r="3.6" fill="currentColor"/>');
@@ -2586,7 +2605,7 @@ $('s3set').onclick=function(){var row=function(id,t,on){return '<button class="s
 var CQ={n:1,fast:false};try{CQ.fast=localStorage.getItem('luno_fast')==='1'}catch(e){}
 function pickW(c){var t=0;c.items.forEach(function(x){t+=x.weight});var r=rnd()*t;for(var i=0;i<c.items.length;i++){if(r<c.items[i].weight)return c.items[i].k;r-=c.items[i].weight}return c.items[0].k}
 function tileH(k,w){var it=itm(k);return '<div class="rt" style="width:'+w+'px;--rc:'+rar(it.value)+'"><i>'+ik(k)+'</i><b>'+esc(it.name)+'</b></div>'}
-function cvBtn(){var c=curCase,b=$('cvo');b.innerHTML=c.free?(DEMO?'Открыть бесплатно':'Открыть по промокоду'):'Открыть за '+(c.price*CQ.n)+' <i>'+I.star+'</i>'}
+function cvBtn(){var c=curCase,b=$('cvo');if(c.free){var ok=hasFree();b.innerHTML=DEMO||ok?'Открыть бесплатно':'Нужен промокод или '+(ME.refNeed||5)+' друзей';b.classList.toggle('lock',!DEMO&&!ok)}else{b.classList.remove('lock');b.innerHTML='Открыть за '+(c.price*CQ.n)+' <i>'+I.star+'</i>'}}
 function qtyUI(){var c=curCase;$('qty').style.display=c.free?'none':'grid';$('qty').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',+b.dataset.n===CQ.n)});$('cfast').classList.toggle('on',CQ.fast)}
 function idleReel(c){var keys=c.items.map(function(x){return x.k}),a=[],i;for(i=0;i<16;i++)a.push(keys[(i*3)%keys.length]);
  $('rls').innerHTML='<div class="rl"><div class="rmk"></div><div class="rtk idle">'+a.concat(a).map(function(k){return tileH(k,140)}).join('')+'</div></div>';
@@ -2594,18 +2613,18 @@ function idleReel(c){var keys=c.items.map(function(x){return x.k}),a=[],i;for(i=
  trk.style.transform='translate3d('+(-off0)+'px,0,0)';trk.children[3].classList.add('hit');rl.classList.add('done')}
 function rCaseV(){var c=curCase;if(!c)return go('cases');opening=0;$('cvo').disabled=false;
  
- $('cvp').textContent=c.free?(DEMO?'Бесплатный кейс в демо-режиме':'Открывается по промокоду из нашего канала'):'';
- if(c.free)CQ.n=1;qtyUI();idleReel(c);cvBtn();
+ $('cvp').textContent=c.free?(DEMO?'Бесплатный кейс в демо-режиме':'Промокод или '+(ME.refNeed||5)+' приглашённых друзей'):'';
+ if(c.free)CQ.n=1;qtyUI();idleReel(c);cvBtn();fcUI();
  var tot=c.items.reduce(function(a,x){return a+x.weight},0),list=c.items.slice().sort(function(a,b){return itm(b.k).value-itm(a.k).value});
  $('cvg').innerHTML=list.map(function(x,i){var it=itm(x.k),p=x.weight/tot*100;return '<div class="ci" style="--rc:'+rar(it.value)+';animation-delay:'+Math.min(i*30,300)+'ms"><i>'+ik(x.k)+'</i><b>'+esc(it.name)+'</b><span><em class="st">'+I.star+'</em>'+it.value+'</span></div>'}).join('')}
 $('qty').querySelectorAll('button').forEach(function(b){b.onclick=function(){if(opening||!curCase||curCase.free)return;CQ.n=+b.dataset.n;qtyUI();cvBtn();tone3(560,.06,.03)}});
 $('cfast').onclick=function(){CQ.fast=!CQ.fast;try{localStorage.setItem('luno_fast',CQ.fast?'1':'0')}catch(e){}qtyUI();toast(CQ.fast?'Быстрое открытие включено':'Быстрое открытие выключено')};
 $('cvo').onclick=function(){startOpen()};
-function startOpen(){var c=curCase;if(opening||!c)return;
+function startOpen(){var c=curCase;if(opening||!c)return;if(c.free&&!DEMO&&!hasFree()){fcUI();var xx=$('fcx');if(xx&&!xx.hidden)xx.scrollIntoView({behavior:'smooth',block:'center'});return toast('Нужен промокод или '+(ME.refNeed||5)+' приглашённых друзей')}
  var n=c.free?1:CQ.n;if(!c.free&&ME.balance<c.price*n)return toast('Не хватает звёзд');
  opening=1;$('cvo').disabled=true;
  call('case/open',{id:c.id,count:n},true)
- .then(function(r){var items=r.items||[r.item];if(CQ.fast)cvDone(c,r,items,true);else cvRoll(c,r,items)}).catch(function(e){opening=0;$('cvo').disabled=false;if(e&&e.error==='Нужен промокод'){go('profile');setTimeout(function(){$('code').focus()},80)}})}
+ .then(function(r){fcSync(r);var items=r.items||[r.item];if(CQ.fast)cvDone(c,r,items,true);else cvRoll(c,r,items)}).catch(function(e){opening=0;$('cvo').disabled=false;if(e&&/Нужен промокод/.test(e.error||'')){cvBtn();fcUI()}})}
 function cvRoll(c,r,items){var n=items.length,W=n===1?140:104,step=W+10,WI=34,reels=[];
  items.forEach(function(it){var arr=[];for(var j=0;j<44;j++)arr.push(j===WI?it.k:pickW(c));reels.push(arr)});
  $('rls').innerHTML=reels.map(function(arr){return '<div class="rl'+(n>1?' sm':'')+'"><div class="rmk"></div><div class="rtk">'+arr.map(function(k){return tileH(k,W)}).join('')+'</div></div>'}).join('');
@@ -2620,6 +2639,18 @@ function cvResult(c,items,tot){var md=$('md'),h;
  else{h='<h2 style="text-align:center;margin-bottom:12px;font-size:18px">'+esc(c.name)+' · '+items.length+' шт.</h2><div class="rwg">'+items.map(function(x,i){var it=itm(x.k);return '<div class="rwc" style="--rc:'+rar(it.value)+';animation-delay:'+i*90+'ms"><i>'+ik(x.k)+'</i><b>'+esc(it.name)+'</b><span>★ '+it.value+'</span></div>'}).join('')+'</div><div class="row2"><button class="btn big" id="keep">Забрать всё</button><button class="btn" id="sell">Продать всё ★'+tot+'</button></div>'}
  $('mbody').innerHTML=h;md.classList.add('on');$('keep').onclick=function(){md.classList.remove('on')};
  $('sell').onclick=function(){this.disabled=true;var ids=items.map(function(x){return x.id});(items.length===1?call('inv/sell',{id:ids[0]}):call('inv/sellmany',{ids:ids})).then(function(x){toast('Продано +'+x.sold+' ★');md.classList.remove('on')}).catch(function(){})}}
+
+/* ===== бесплатный кейс: промокод ИЛИ 5 приглашённых друзей ===== */
+function freeCase(){return CFG&&CFG.cases?CFG.cases.filter(function(x){return x.free})[0]||null:null}
+function hasFree(){var c=freeCase();if(!c)return false;return !!(DEMO||(ME.tickets&&ME.tickets[c.id]>0)||ME.refFree>0)}
+function fcSync(r){if(!r)return;if(r.refCount!==undefined)ME.refCount=r.refCount;if(r.refFree!==undefined)ME.refFree=r.refFree;if(r.refNeed)ME.refNeed=r.refNeed;if(r.tickets)ME.tickets=r.tickets;freeBanner();if(cur==='casev'&&curCase&&curCase.free){cvBtn();fcUI()}}
+function freeBanner(){var b=$('freeb');if(!b||typeof CFG==='undefined'||!CFG)return;var c=freeCase(),g=b.querySelector('.gift');if(c&&c.img&&g&&g.dataset.k!==c.img){g.dataset.k=c.img;g.innerHTML=imgH(c.img)}
+ var p=$('freep');if(p){var need=ME.refNeed||5,n=(ME.refCount||0)%need;p.textContent=DEMO?'бесплатно в демо-режиме':(hasFree()?'готов к открытию!':'промокод или '+need+' друзей · '+n+'/'+need)}}
+function fcUI(){var x=$('fcx');if(!x)return;x.hidden=!(curCase&&curCase.free&&!DEMO);if(x.hidden)return;var need=ME.refNeed||5,n=(ME.refCount||0)%need,ready=(ME.refFree||0)>0;
+ $('fcrt').textContent=ready?'Друзья приглашены — кейс готов!':'Приглашено '+n+' из '+need;$('fcbi').style.width=(ready?100:n/need*100)+'%'}
+(function(){var f=$('fcpf');if(f)f.onsubmit=function(e){e.preventDefault();if(DEMO)return toast('Промокоды работают на реальном счёте');var v=$('fccode').value.trim();if(!v)return toast('Введи промокод');
+  call('promo',{code:v},true).then(function(r){$('fccode').value='';fcSync(r);toast('Промокод принят — открывай кейс!')}).catch(function(){})};
+ var iv=$('fcinv');if(iv)iv.onclick=function(){var link=CFG.settings.botUsername?'https://t.me/'+CFG.settings.botUsername+'?startapp=ref_'+ME.id:'';if(!link)return toast('Ссылка появится, когда владелец укажет имя бота');openTG('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent('Заходи в LunoCase — игры и подарки!'))}})();
 function openCase(id){var c=CFG.cases.filter(function(x){return x.id===id})[0];if(!c)return;curCase=c;go('casev');setTimeout(startOpen,350)}
 $('pf').onsubmit=function(e){e.preventDefault();if(DEMO)return toast('Промокоды работают на реальном счёте');var c=$('code').value.trim();if(!c)return toast('Введи промокод');call('promo',{code:c}).then(function(r){$('code').value='';openCase(r.caseId)}).catch(function(){})};
 
@@ -3180,7 +3211,7 @@ function blWin(m,pay){blStop();var b=$('blb');b.classList.add('fly');$('blm').in
 function blRelease(){if(BL.busy){BL.rel=1;return}if(!BL.on)return;blStop();BL.busy=1;call('balloon/cashout',{},true).then(function(r){BL.busy=0;sync(r);if(r.pop)blPop(r.cp);else blWin(r.mult,r.payout)},function(){BL.busy=0;blReset()})}
 (function(){var h=$('blhold');h.addEventListener('contextmenu',function(e){e.preventDefault()});
  h.addEventListener('pointerdown',function(e){e.preventDefault();if(BL.on||BL.busy||h.disabled)return;var bet=betOf('balloon');if(!bet)return;try{h.setPointerCapture(e.pointerId)}catch(x){}BL.busy=1;BL.rel=0;h.classList.add('on');
-  call('balloon/start',{bet:bet},true).then(function(r){BL.busy=0;sync(r);BL.on=1;BL.t0=r.t0;BL.setOff(r.now-Date.now());BL.k=r.k;BL.cap=r.cap;BL.bet=r.bet;blLoop();
+  call('balloon/start',{bet:bet},true).then(function(r){BL.busy=0;sync(r);BL.on=1;BL.t0=r.t0;BL.off=r.now-Date.now();BL.k=r.k;BL.cap=r.cap;BL.bet=r.bet;blLoop();
    BL.pt=setInterval(function(){if(!BL.on||BL.busy)return;api('balloon/tick').then(function(x){if(!BL.on)return;if(x.pop){sync(x);blPop(x.cp)}else if(x.done){sync(x);blWin(x.mult,x.payout)}})},180);if(BL.rel)blRelease()},function(){BL.busy=0;h.classList.remove('on')})});
  ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){h.addEventListener(ev,function(){blRelease()})})})();
 

@@ -13,8 +13,8 @@
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
-        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 10, upMinChance: 0.05, upMinMult: 1.5, wdFeeFixed: 25, autoPay: 0, starsFeePct: 0, rlZeros: 3, blMax: 50, cupsMult: 2.7, bjOn: 1, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
-        edges: { crash: 0.07, mines: 0.10, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05, tower: 0.08, hilo: 0.07, balloon: 0.08, slots3: 0.10 }, modes: { rocket: 1, mines: 1, upgrade: 1, slots: 1, plinko: 1, wheel: 1, coin: 1, tower: 1, bj: 1, du: 1, hilo: 1, roulette: 0, balloon: 1, cups: 1 }, tonAddress: '', giftDepositTo: '', giftDepositNote: 'Начисляем в течение 24 часов.', channelUrl: '', channelText: 'Наш канал', wdFeePct: 0, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
+        crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 8, upMinChance: 0.05, upMinMult: 1.5, wdFeeFixed: 25, autoPay: 0, starsFeePct: 0, rlZeros: 3, blMax: 50, cupsMult: 2.7, bjOn: 1, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
+        edges: { crash: 0.07, mines: 0.12, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05, tower: 0.08, hilo: 0.07, balloon: 0.08, slots3: 0.10 }, modes: { rocket: 1, mines: 1, upgrade: 1, slots: 1, plinko: 1, wheel: 1, coin: 1, tower: 1, bj: 1, du: 1, hilo: 1, roulette: 0, balloon: 1, cups: 1 }, tonAddress: '', giftDepositTo: '', giftDepositNote: 'Начисляем в течение 24 часов.', channelUrl: '', channelText: 'Наш канал', wdFeePct: 0, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
         hat: { name: 'Шляпа мага', img: '', value: 30, wd: false, up: true }, ring: { name: 'Кольцо', img: '', value: 60, wd: false, up: true },
@@ -44,10 +44,10 @@
 
   function defaultSlots3(art) {
     return { bets: [10, 25, 50, 100, 250, 500, 1000], pair: 2, symbols: [
-      { id: 'clover', name: 'Клевер', img: '', icon: 'clover', mult: 5, count: 8 }, { id: 'gem', name: 'Кристалл', img: '', icon: 'gem', mult: 10, count: 7 },
-      { id: 'hat', name: 'Шляпа мага', img: '', icon: 'hat', mult: 20, count: 5 }, { id: 'ring', name: 'Кольцо', img: '', icon: 'ring', mult: 40, count: 4 },
-      { id: 'plum', name: 'Слива', img: art.slotplum || art.plum || '', icon: 'star', mult: 100, count: 3 }, { id: 'dog', name: 'Пёс в худи', img: art.dog || '', icon: 'star', mult: 200, count: 2 },
-      { id: 'pepe', name: 'Жаба с сердцем', img: art.pepe || '', icon: 'star', mult: 500, count: 1 }] };
+      { id: 'clover', name: 'Клевер', img: '', icon: 'clover', mult: 5, count: 10 }, { id: 'gem', name: 'Кристалл', img: '', icon: 'gem', mult: 10, count: 8 },
+      { id: 'hat', name: 'Шляпа мага', img: '', icon: 'hat', mult: 20, count: 6 }, { id: 'ring', name: 'Кольцо', img: '', icon: 'ring', mult: 40, count: 3 },
+      { id: 'plum', name: 'Слива', img: art.slotplum || art.plum || '', icon: 'star', mult: 80, count: 2 }, { id: 'dog', name: 'Пёс в худи', img: art.dog || '', icon: 'star', mult: 150, count: 1 },
+      { id: 'pepe', name: 'Жаба с сердцем', img: art.pepe || '', icon: 'star', mult: 400, count: 1 }] };
   }
   // ---- Слоты 3x3: 3 барабана, 5 линий (3 горизонтали и 2 диагонали). Выплата = ставка × множитель линии.
   var S3LINES = [[1, 1, 1], [0, 0, 0], [2, 2, 2], [0, 1, 2], [2, 1, 0]];
@@ -124,6 +124,8 @@
       (function () { S.flags = S.flags || {}; if (!S.flags.s3v3) { S.flags.s3v3 = 1; var c3b = S.cfg.slots3; if (c3b && JSON.stringify(c3b.bets) === JSON.stringify([10, 25, 50, 100, 250])) { var mnB = +S.cfg.settings.minBet || 10, mxB = +S.cfg.settings.maxBet || 1000, nb = [10, 25, 50, 100, 250, 500, 1000].filter(function (x) { return x >= mnB && x <= mxB; }); if (nb.length >= 2) c3b.bets = nb; } } })();
       (function () { S.flags = S.flags || {}; if (!S.flags.s3v2) { S.flags.s3v2 = 1; var c3 = S.cfg.slots3, ed = S.cfg.settings.edges; if (c3 && +c3.pair === 2) c3.pair = 0; if (ed && +ed.slots3 === 0.06) ed.slots3 = 0.10; } })();
       (function () { S.flags = S.flags || {}; if (!S.flags.s3v4) { S.flags.s3v4 = 1; var c3d = S.cfg.slots3; if (c3d && +c3d.pair === 0) c3d.pair = 2; } })();
+      (function () { S.flags = S.flags || {}; if (!S.flags.mn2) { S.flags.mn2 = 1; var s9 = S.cfg.settings; s9.edges = s9.edges || {}; if (s9.edges.mines === undefined || +s9.edges.mines <= 0.10) s9.edges.mines = 0.12; if (!(+s9.minesMaxMult <= 8)) s9.minesMaxMult = 8; } })();
+      (function () { S.flags = S.flags || {}; if (!S.flags.s3v5) { S.flags.s3v5 = 1; var c5 = S.cfg.slots3; if (c5 && c5.symbols && c5.symbols.length === 7) { var cn = c5.symbols.map(function (x) { return x.count; }).join(','), ml = c5.symbols.map(function (x) { return x.mult; }).join(','); if (cn === '8,7,5,4,3,2,1' && ml === '5,10,20,40,100,200,500') { var nc = [10, 8, 6, 3, 2, 1, 1], nm = [5, 10, 20, 40, 80, 150, 400]; c5.symbols.forEach(function (x, i) { x.count = nc[i]; x.mult = nm[i]; }); } } } })();
       var ST0 = S.cfg.settings; ST0.edges = ST0.edges || {}; if (ST0.edges.tower === undefined) ST0.edges.tower = 0.06; if (ST0.edges.hilo === undefined) ST0.edges.hilo = 0.05;
       ST0.modes = ST0.modes || {}; ['rocket', 'mines', 'upgrade', 'slots', 'plinko', 'wheel', 'coin', 'tower', 'bj', 'du', 'hilo'].forEach(function (k) { if (ST0.modes[k] === undefined) ST0.modes[k] = 1; });
       if (ST0.tonAddress === undefined) ST0.tonAddress = ''; if (ST0.channelUrl === undefined) ST0.channelUrl = ''; if (ST0.channelText === undefined) ST0.channelText = 'Наш канал';
@@ -139,7 +141,7 @@
     function user(id, name, username, demo) {
       if (demo) id = 'd' + id;
       var u = S.users[id];
-      if (!u) u = S.users[id] = { id: id, demo: !!demo, name: name || 'Игрок', username: '', wagered: 0, balance: (demo ? set('demoBalance') : set('startBalance')) || 0, inv: [], nid: 1, tickets: {}, redeemed: {}, round: null, stats: { opened: 0, profit: 0 }, week: { start: 0, profit: 0 } };
+      if (!u) u = S.users[id] = { id: id, t0: now(), demo: !!demo, name: name || 'Игрок', username: '', wagered: 0, balance: (demo ? set('demoBalance') : set('startBalance')) || 0, inv: [], nid: 1, tickets: {}, redeemed: {}, round: null, stats: { opened: 0, profit: 0 }, week: { start: 0, profit: 0 } };
       if (name && u.name !== name) u.name = name; if (username !== undefined && u.username !== username) u.username = username || '';
       return u;
     }
@@ -155,7 +157,7 @@
       if (u.balance < bet) throw new Err('Не хватает звёзд'); u.balance -= bet; return bet;
     }
     function pay(u, game, bet, payout) { payout = Math.min(Math.floor(payout), set('maxPayout')); u.balance += payout; book(u, game, bet, payout); u.stats.profit += payout - bet; return payout; }
-    var mmult = function (k, M) { var r = 1 - edgeOf('mines'); for (var j = 0; j < k; j++) r *= (25 - j) / (25 - M - j); return Math.min(r, set('minesMaxMult') || 10); };
+    var mmult = function (k, M) { var r = (1 - edgeOf('mines')) * Math.pow(0.98, k); for (var j = 0; j < k; j++) r *= (25 - j) / (25 - M - j); return Math.min(r, set('minesMaxMult') || 10); };
     var mnext = function (k, M) { var cap = set('minesMaxMult') || 10; return (k >= 25 - M || mmult(k, M) >= cap) ? 0 : mmult(k + 1, M); };
     var s3c = { key: '', val: null };
     function s3info() { var c3 = cfg().slots3, ed = edgeOf('slots3'), key = JSON.stringify(c3) + '|' + ed; if (s3c.key !== key) s3c = { key: key, val: s3calc(c3, ed) }; return s3c.val; }
@@ -423,9 +425,11 @@
       if (r.cp >= r.cap) return { done: true, mult: r.cap, payout: pay(u, 'balloon', r.bet, r.bet * r.cap) };
       book(u, 'balloon', r.bet, 0); u.stats.profit -= r.bet; return { pop: true, cp: r.cp };
     }
+    var REF_NEED = 5; // сколько друзей нужно пригласить за одно бесплатное открытие
+    function refFreeAvail(u) { return Math.max(0, Math.floor((u.refCount || 0) / REF_NEED) - (u.refUsed || 0)); }
     var H = {
       me: function (u, b) {
-        if (b.ref && !u.refSet) { u.refSet = 1; var rf = S.users[String(b.ref)]; if (rf && rf.id !== u.id) { u.ref = rf.id; rf.refCount = (rf.refCount || 0) + 1; } }
+        if (b.ref && !u.refSet) { u.refSet = 1; var rf = S.users[String(b.ref)]; if (rf && rf.id !== u.id && !u.demo && !rf.demo && u.t0 && now() - u.t0 < 3600e3) { u.ref = rf.id; rf.refCount = (rf.refCount || 0) + 1; } } // считаем только новых игроков, пришедших по ссылке
         return { id: u.demo ? String(u.id).slice(1) : u.id, demo: !!u.demo, name: u.name, username: u.username || '', fair: o.fairInfo ? o.fairInfo(u) : null };
       },
       'demo/refill': function (u) { if (!u.demo) throw new Err('Только для демо-счёта'); u.balance = Math.max(u.balance, set('demoBalance')); return { balance: u.balance }; },
@@ -641,7 +645,7 @@
       'case/open': function (u, b) {
         var c = cfg().cases.filter(function (x) { return x.id === b.id && x.active; })[0]; if (!c) throw new Err('Кейс недоступен');
         var n = Math.floor(+b.count) || 1; if (n < 1 || n > 5) throw new Err('Можно открыть от 1 до 5 кейсов сразу'); if (c.free) n = 1;
-        if (c.free) { if (!u.demo) { if (!(u.tickets[c.id] > 0)) throw new Err('Нужен промокод'); u.tickets[c.id]--; } }
+        if (c.free) { if (!u.demo) { if (u.tickets[c.id] > 0) u.tickets[c.id]--; else if (refFreeAvail(u) > 0) u.refUsed = (u.refUsed || 0) + 1; else throw new Err('Нужен промокод или ' + REF_NEED + ' приглашённых друзей'); } }
         else { if (u.balance < c.price * n) throw new Err('Не хватает звёзд'); u.balance -= c.price * n; }
         var tot = 0, items = []; c.items.forEach(function (x) { tot += x.weight; });
         for (var q = 0; q < n; q++) {
@@ -692,7 +696,7 @@
         advance(); bjTick(); duTick(); var u = user(id, name, username, demo), f = H[path]; if (u.round && (u.round.game === 'tower' || u.round.game === 'hilo')) { if (u.round.game === 'tower') u.tw = u.round; else u.hl = u.round; u.round = null; } // свои раунды у Башни и Hi-Lo if (!f) throw new Err('Нет такого метода');
         if (MODE_OF[path] && !modeOn(MODE_OF[path])) throw new Err('Этот режим временно выключен'); if (u.demo && DEMO_NO.indexOf(path) >= 0) throw new Err('В демо-режиме это недоступно. Переключись на реальный счёт');
         if (u.banned && ['me', 'live', 'crash/state', 'leaders', 'wd/list'].indexOf(path) < 0) throw new Err('Аккаунт заблокирован. Напиши в поддержку.');
-        var r = f(u, body || {}) || {}; r.balance = u.balance; r.inv = u.inv; r.stats = u.stats; save(); return r;
+        var r = f(u, body || {}) || {}; r.balance = u.balance; r.inv = u.inv; r.stats = u.stats; if (!u.demo) { r.refCount = u.refCount || 0; r.refFree = refFreeAvail(u); r.refNeed = REF_NEED; r.tickets = u.tickets; } save(); return r;
       } catch (e) { if (e instanceof Err) return { error: e.message }; throw e; }
     }
     function tonAddr() { return o.tonAddress || String(cfg().settings.tonAddress || '').trim(); }

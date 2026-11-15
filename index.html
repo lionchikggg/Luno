@@ -1304,9 +1304,11 @@ h3{color:#8fb0ff}
  body[data-mode=home] main{max-width:980px;padding-left:32px;padding-right:32px}
  body[data-mode=cases] main,body[data-mode=leaders] main{max-width:1180px;padding-left:32px;padding-right:32px}
  body[data-mode=home] nav,body[data-mode=cases] nav,body[data-mode=leaders] nav{max-width:560px}
- #home .hh{display:none}
- #home .grid:not(.hall2){display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
- #home .grid:not(.hall2)>.game{grid-column:auto!important;min-height:176px!important;margin:0;padding:22px 28px!important}
+ #home .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+ #home .grid>.game,#home .hall2>.game{grid-column:auto!important;min-height:176px!important;margin:0;padding:22px 28px!important}
+ #home #modesc{min-height:176px!important;margin:14px 0 0;padding:22px 28px!important}
+ body[data-mode=modes] main{max-width:980px;padding-left:32px;padding-right:32px}
+ #modes .mgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
  #home .game strong{font-size:30px!important}
  #home .game{background:repeating-linear-gradient(115deg,rgba(255,255,255,.045) 0 120px,rgba(255,255,255,0) 120px 240px),linear-gradient(160deg,#0b1020,#101830)!important}
  #home .game>.art{inset:auto 28px auto 0;top:50%;bottom:auto;height:132px;transform:translateY(-50%) scale(1.25);transform-origin:100% 50%}
@@ -1321,10 +1323,6 @@ h3{color:#8fb0ff}
 .rin{background:radial-gradient(circle at 40% 35%,#16224e,#080e26)!important}.rptr b{border-top-color:#8fb0ff!important}
 
 /* ===== карточный зал: цветные карточки на главной ===== */
-#home .game[data-g=bj]{background:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 80px,rgba(255,255,255,0) 80px 160px),linear-gradient(160deg,#12935a,#0b5b38 65%,#073a25)!important;border-color:rgba(120,235,175,.55)!important;box-shadow:0 10px 24px rgba(0,0,0,.5),0 0 24px rgba(30,180,110,.18)!important}
-#home .game[data-g=du]{background:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 80px,rgba(255,255,255,0) 80px 160px),linear-gradient(160deg,#d23a55,#8a1c34 65%,#52101f)!important;border-color:rgba(255,160,175,.55)!important;box-shadow:0 10px 24px rgba(0,0,0,.5),0 0 24px rgba(220,60,90,.2)!important}
-#home .game[data-g=hilo]{background:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 80px,rgba(255,255,255,0) 80px 160px),linear-gradient(160deg,#5560f0,#2d34a8 65%,#1a1e6a)!important;border-color:rgba(170,180,255,.55)!important;box-shadow:0 10px 24px rgba(0,0,0,.5),0 0 24px rgba(80,90,240,.22)!important}
-#home .game[data-g=bj] .sb2,#home .game[data-g=du] .sb2,#home .game[data-g=hilo] .sb2{color:rgba(255,255,255,.85)!important}
 /* ===== БЛЭКДЖЕК: большой стол как в казино ===== */
 body[data-mode=bjt]::before{background:radial-gradient(90% 50% at 50% 30%,rgba(18,120,76,.28),transparent 70%),linear-gradient(180deg,#06100d,#050a0a 60%,#04070a)!important}
 #bjt{margin:0 -6px}
@@ -1390,7 +1388,62 @@ body[data-mode=bjt]::before{background:radial-gradient(90% 50% at 50% 30%,rgba(1
  #bjt .bchip{width:68px;height:68px;font-size:11px}
  .rkch{width:52px;height:52px;font-size:12px}
 }
+
+/* ===== v31: серо-синие кнопки, обводка как у Wunder, экран «Режимы» ===== */
+.btn.big,body.ingame .btn.big:not(.go):not(.gold):not(.bito):not(.take),body[data-mode=casev] .btn.big.copen{background:linear-gradient(180deg,#7790b9,#4a6490)!important;color:#fff!important;box-shadow:0 8px 18px rgba(28,42,78,.5),inset 0 1px 0 rgba(255,255,255,.22)!important}
+.btn.big.go{background:linear-gradient(120deg,#2fd68a,#17a867)!important}
+.bal button,.pp{background:linear-gradient(180deg,#7790b9,#4a6490)!important;box-shadow:0 0 12px rgba(100,130,185,.35)!important}
+nav button[aria-current="page"]{background:linear-gradient(180deg,#6f89b3,#465f8b)!important;box-shadow:0 0 14px rgba(110,140,190,.35)!important}
+.hdots i.on{background:linear-gradient(90deg,#6e87b0,#9db4d8)!important}
+.ch.on{background:linear-gradient(180deg,#7790b9,#4a6490)!important;box-shadow:0 0 12px rgba(100,130,185,.3)!important}
+.pm .bt,.fco .btn{background:linear-gradient(180deg,#7790b9,#4a6490)!important;color:#fff!important}
+/* обводка карточек: сверху серо-синяя, снизу яркая и с лёгким свечением */
+/* карточка и экран «Режимы» */
+.game[data-g=modes]{--g:150,120,255}
+.game[data-g=mines]{--g:150,110,255}.game[data-g=wheel]{--g:255,170,70}.game[data-g=coin]{--g:255,200,70}.game[data-g=tower]{--g:100,150,255}.game[data-g=cups]{--g:140,110,255}.game[data-g=balloon]{--g:255,110,176}
+.mgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+#modes .game{min-height:196px!important;padding:16px!important;background:radial-gradient(90% 75% at 78% 18%,rgba(var(--g,100,150,255),.34),transparent 70%),linear-gradient(160deg,#0b1020,#101830)!important}
+#modes .game strong{font:800 19px Unbounded!important}
+#modes .game .sb2{font-size:12px}
+#modes .game>.wart{right:18px!important;top:22px!important;width:90px!important;height:90px!important}
+#modes .game>.twart{right:22px!important;top:26px!important;transform:none!important}
+#modes .game>.cpart{zoom:1.7;right:20px!important;top:30px!important}
+#modes .game>.blart{right:36px!important;top:14px!important}
+/* карточный зал: тёмные карточки как у всех, но карты — цветные */
+#modesc{width:100%;margin:14px 0 4px}
+
+.mnft{position:absolute;right:18px;top:50%;transform:translateY(-50%);display:flex;align-items:center;pointer-events:none}
+.mnft i{display:block;width:84px;height:84px;filter:drop-shadow(0 8px 12px rgba(0,0,0,.5))}.mnft i img,.mnft i svg{width:100%;height:100%;object-fit:contain;display:block}
+.mnft i:nth-child(1){transform:rotate(-9deg);margin-right:-20px}.mnft i:nth-child(2){transform:rotate(8deg)}
+.game:not(.wide) .sp4w{right:6px;transform:translateY(-50%) scale(.6);transform-origin:100% 50%}
+@media (min-width:900px){#home #modesc .mnft i{width:116px;height:116px}#home #modesc .mnft{right:36px}.game:not(.wide) .sp4w{transform:translateY(-50%) scale(1)}}
+@media (min-width:900px){#home .game:not(.wide) .rng{width:108px!important;height:108px!important;right:8px!important;top:8px!important}#home .game:not(.wide) .rin{inset:11px!important;padding:14px!important}#home .game:not(.wide) .rptr{inset:-7px!important}#home .game:not(.wide) .rptr b{border-width:7px!important;border-top-width:12px!important;margin-left:-7px!important}}
+
+/* ===== v33: барабан в Спинах, масти, слоты в половинке ===== */
+.spw{position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;gap:6px;padding:8px;border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.28);box-shadow:0 10px 22px rgba(0,0,0,.45),0 0 26px rgba(230,90,210,.28);pointer-events:none;z-index:2}
+.spc{width:48px;height:92px;overflow:hidden;border-radius:14px;background:rgba(6,8,24,.55);-webkit-mask:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);mask:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent)}
+.spt{display:flex;flex-direction:column;animation:spscroll 1.5s linear infinite;will-change:transform}
+.spt i{display:block;flex:none;width:48px;height:46px;padding:5px}.spt i img,.spt i svg{width:100%;height:100%;object-fit:contain;display:block}
+.spc.c1 .spt{animation-duration:1.15s}.spc.c2 .spt{animation-duration:1.8s}
+@keyframes spscroll{to{transform:translateY(-50%)}}
+.game[data-g=slots] strong,.game[data-g=slots] .sb2{position:relative;z-index:3;text-shadow:0 2px 10px rgba(5,6,20,.9)}
+.st{display:inline-block;width:1em;height:1em;fill:currentColor;vertical-align:-.12em}
+.pcr i{line-height:1}.pcr i .st{width:.9em;height:.9em}
+.pcf{color:#111}.pc.rd .pcf,.dc.rd .f{color:#d80000}
+.game:not(.wide)[data-g=s3]>.art{transform:translateY(8px) scale(.5);transform-origin:100% 0}
+@media (min-width:900px){.game:not(.wide)[data-g=s3]>.art{transform:none}}
+
+/* ===== v34: цветные масти на карточках зала; барабан Слотов не заходит на текст ===== */
+.game .pc .pcf,.game .dc .f{color:#111!important}
+.game .pc.rd .pcf,.game .dc.rd .f{color:#d80000!important}
+.game .pc .pcf span,.game .pc .pcf i,.game .dc .f span,.game .dc .f i{color:inherit!important}
+.game .pc .pcf .st,.game .dc .f .st{fill:currentColor}
+#gmain .game:not(.wide){min-height:178px!important}
+.game[data-g=s3] strong,.game[data-g=s3] .sb2,.game[data-g=upgrade] strong,.game[data-g=upgrade] .sb2{position:relative;z-index:3}
+@media (max-width:384px){.spw{transform:translateY(-50%) scale(.8);transform-origin:100% 50%}}
+@media (max-width:340px){.spw{transform:translateY(-50%) scale(.68)}}
 </style></head><body data-mode="home"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="su-s" viewBox="0 0 100 100"><path d="M50 4C58 24 92 40 92 62C92 76 82 84 71 84C62 84 55 80 51 73C52 84 57 92 66 96L34 96C43 92 48 84 49 73C45 80 38 84 29 84C18 84 8 76 8 62C8 40 42 24 50 4Z"/></symbol><symbol id="su-h" viewBox="0 0 100 100"><path d="M50 94C28 74 4 56 4 32C4 17 15 7 28 7C38 7 46 12 50 20C54 12 62 7 72 7C85 7 96 17 96 32C96 56 72 74 50 94Z"/></symbol><symbol id="su-d" viewBox="0 0 100 100"><path d="M50 3L86 50L50 97L14 50Z"/></symbol><symbol id="su-c" viewBox="0 0 100 100"><circle cx="50" cy="29" r="21"/><circle cx="27" cy="60" r="21"/><circle cx="73" cy="60" r="21"/><path d="M50 50C50 74 46 88 36 96L64 96C54 88 50 74 50 50Z"/></symbol>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeaa3"/><stop offset="1" stop-color="#f5a623"/></linearGradient>
 <linearGradient id="gV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9a0ff"/><stop offset="1" stop-color="#6a47e0"/></linearGradient>
@@ -1414,24 +1467,26 @@ body[data-mode=bjt]::before{background:radial-gradient(90% 50% at 50% 30%,rgba(1
  </div></div>
  <div class="hdots" id="hdots"><i class="on"></i><i></i><i></i></div>
  <h3>Игры</h3>
- <div class="grid">
-  <button class="game wide c1" data-g="rocket"><div class="art" data-card="rocket"></div><strong>Ракетка</strong><span class="sb2">забери до краша</span></button>
-  <button class="game c3" data-g="mines"><div class="art" data-card="mines"></div><strong>Мины</strong><span class="sb2">разминируй поле</span></button>
+ <div class="grid" id="gmain"><button class="game wide c1" data-g="rocket"><div class="art" data-card="rocket"></div><strong>Ракетка</strong><span class="sb2">забери до краша</span></button>
   <button class="game c4" data-g="upgrade"><div class="art" data-card="upgrade"></div><strong>Апгрейд</strong><span class="sb2">прокачай подарок</span></button>
+  <button class="game c6" data-g="s3"><div class="art" data-card="slots3"></div><strong>Слоты</strong><span class="sb2">3 барабана, 5 линий</span></button>
   <button class="game wide c2" data-g="slots"><div class="art" data-card="slots"></div><strong>Спины</strong><span class="sb2">фриспины и ×1000</span></button>
-  <button class="game wide c6" data-g="s3"><div class="art" data-card="slots3"></div><strong>Слоты</strong><span class="sb2">3 барабана, 5 линий</span></button>
-  <button class="game c8" data-g="wheel" id="whcard"><div class="wart" aria-hidden="true"></div><strong>Колесо фортуны</strong><span class="sb2">крути и умножай</span></button>
-  <button class="game c5" data-g="coin"><div class="art" data-card="coin"></div><strong>Монетка</strong><span class="sb2">выбери сторону</span></button>
-  <button class="game wide c10" data-g="tower"><div class="twart" aria-hidden="true"><span></span><span class="tg1"></span><span></span><span class="tg1"></span><span></span><span></span><span></span><span></span><span class="tg1"></span><span class="tx1"></span><span class="tx1"></span><span class="tx1"></span></div><strong>Башня</strong><span class="sb2">поднимайся и умножай</span></button>
-  <button class="game c14" data-g="cups"><div class="cpart" id="cpart" aria-hidden="true"></div><strong>Колпачки</strong><span class="sb2">найди луну</span></button>
-  <button class="game c13" data-g="balloon"><div class="blart" id="blart" aria-hidden="true"><svg viewBox="0 0 100 150"><defs><radialGradient id="blgA" cx="35%" cy="30%"><stop offset="0" stop-color="#ffd0e6"/><stop offset=".45" stop-color="#ff6fb0"/><stop offset="1" stop-color="#c2307a"/></radialGradient></defs><path d="M50 4C24 4 8 26 8 50c0 28 22 48 38 54l-3 6h14l-3-6c16-6 38-26 38-54C92 26 76 4 50 4z" fill="url(#blgA)"/><ellipse cx="34" cy="30" rx="10" ry="16" fill="#fff" opacity=".35" transform="rotate(-20 34 30)"/><path d="M50 110c-6 10 6 18 0 28" stroke="#fff" stroke-opacity=".7" stroke-width="2" fill="none"/></svg></div><strong>Шарик</strong><span class="sb2">держи и не лопни</span></button>
  </div>
+ <button class="game wide cmodes" data-g="modes" id="modesc"><div class="mnft" id="mnft" aria-hidden="true"></div><strong>Режимы</strong><span class="sb2">Мины, колесо, монетка и ещё 4</span></button>
  <div id="hallw"><h3 class="hh">Карточный зал</h3>
- <div class="grid hall2"><button class="game c7" data-g="bj"><div class="bjart" aria-hidden="true"><div class="pc"><div class="pci"><div class="pcf"><span class="pcr">A<i>♠</i></span><span class="pcs">♠</span></div></div></div><div class="pc rd"><div class="pci"><div class="pcf"><span class="pcr">K<i>♥</i></span><span class="pcs">♥</span></div></div></div></div><strong>Блэкджек</strong><span class="sb2">столы против дилера</span></button><button class="game c9" data-g="du" id="ducard"><div class="duart" aria-hidden="true"><div class="dc"><div class="f"><span class="r">6<i>♠</i></span><span class="m">♠</span></div></div><div class="dc rd"><div class="f"><span class="r">10<i>♦</i></span><span class="m">♦</span></div></div><div class="dc rd"><div class="f"><span class="r">A<i>♥</i></span><span class="m">♥</span></div></div></div><strong>Дурак</strong><span class="sb2">игроки на ставку</span></button><button class="game c11 wide2" data-g="hilo"><div class="hlart" aria-hidden="true"><div class="dc"><div class="f"><span class="r">7<i>♣</i></span><span class="m">♣</span></div></div><div class="dc rd"><div class="f"><span class="r">Q<i>♥</i></span><span class="m">♥</span></div></div><b class="u">▲</b><b class="d">▼</b></div><strong>Hi-Lo</strong><span class="sb2">выше или ниже</span></button></div>
+ <div class="grid hall2"><button class="game c7" data-g="bj"><div class="bjart" aria-hidden="true"><div class="pc"><div class="pci"><div class="pcf"><span class="pcr">A<i><svg class="st"><use href="#su-s"/></svg></i></span><span class="pcs"><svg class="st"><use href="#su-s"/></svg></span></div></div></div><div class="pc rd"><div class="pci"><div class="pcf"><span class="pcr">K<i><svg class="st"><use href="#su-h"/></svg></i></span><span class="pcs"><svg class="st"><use href="#su-h"/></svg></span></div></div></div></div><strong>Блэкджек</strong><span class="sb2">столы против дилера</span></button><button class="game c9" data-g="du" id="ducard"><div class="duart" aria-hidden="true"><div class="dc"><div class="f"><span class="r">6<i><svg class="st"><use href="#su-s"/></svg></i></span><span class="m"><svg class="st"><use href="#su-s"/></svg></span></div></div><div class="dc rd"><div class="f"><span class="r">10<i><svg class="st"><use href="#su-d"/></svg></i></span><span class="m"><svg class="st"><use href="#su-d"/></svg></span></div></div><div class="dc rd"><div class="f"><span class="r">A<i><svg class="st"><use href="#su-h"/></svg></i></span><span class="m"><svg class="st"><use href="#su-h"/></svg></span></div></div></div><strong>Дурак</strong><span class="sb2">игроки на ставку</span></button><button class="game c11 wide2" data-g="hilo"><div class="hlart" aria-hidden="true"><div class="dc"><div class="f"><span class="r">7<i><svg class="st"><use href="#su-c"/></svg></i></span><span class="m"><svg class="st"><use href="#su-c"/></svg></span></div></div><div class="dc rd"><div class="f"><span class="r">Q<i><svg class="st"><use href="#su-h"/></svg></i></span><span class="m"><svg class="st"><use href="#su-h"/></svg></span></div></div><b class="u">▲</b><b class="d">▼</b></div><strong>Hi-Lo</strong><span class="sb2">выше или ниже</span></button></div>
 </div>
  <p class="note" id="tm"></p>
 </section>
 
+<section class="view" id="modes"><div class="mgrid">
+  <button class="game c3" data-g="mines"><div class="art" data-card="mines"></div><strong>Мины</strong><span class="sb2">разминируй поле</span></button>
+  <button class="game c8" data-g="wheel" id="whcard"><div class="wart" aria-hidden="true"></div><strong>Колесо фортуны</strong><span class="sb2">крути и умножай</span></button>
+  <button class="game c5" data-g="coin"><div class="art" data-card="coin"></div><strong>Монетка</strong><span class="sb2">выбери сторону</span></button>
+  <button class="game c10" data-g="tower"><div class="twart" aria-hidden="true"><span></span><span class="tg1"></span><span></span><span class="tg1"></span><span></span><span></span><span></span><span></span><span class="tg1"></span><span class="tx1"></span><span class="tx1"></span><span class="tx1"></span></div><strong>Башня</strong><span class="sb2">поднимайся и умножай</span></button>
+  <button class="game c14" data-g="cups"><div class="cpart" id="cpart" aria-hidden="true"></div><strong>Колпачки</strong><span class="sb2">найди луну</span></button>
+  <button class="game c13" data-g="balloon"><div class="blart" id="blart" aria-hidden="true"><svg viewBox="0 0 100 150"><defs><radialGradient id="blgA" cx="35%" cy="30%"><stop offset="0" stop-color="#ffd0e6"/><stop offset=".45" stop-color="#ff6fb0"/><stop offset="1" stop-color="#c2307a"/></radialGradient></defs><path d="M50 4C24 4 8 26 8 50c0 28 22 48 38 54l-3 6h14l-3-6c16-6 38-26 38-54C92 26 76 4 50 4z" fill="url(#blgA)"/><ellipse cx="34" cy="30" rx="10" ry="16" fill="#fff" opacity=".35" transform="rotate(-20 34 30)"/><path d="M50 110c-6 10 6 18 0 28" stroke="#fff" stroke-opacity=".7" stroke-width="2" fill="none"/></svg></div><strong>Шарик</strong><span class="sb2">держи и не лопни</span></button>
+ </div></section>
 <section class="view" id="cases"><h3>Кейсы</h3><div class="grid" id="cl"></div></section>
 <section class="view" id="casev">
  <div class="cpan"><div class="chd"><small id="cvp"></small></div>
@@ -2413,8 +2468,8 @@ I.spin=V('<path d="M32 10a22 22 0 0 1 21 15M32 54a22 22 0 0 1-21-15" stroke="#ff
 I.snd=V('<path d="M8 24h11l15-13v42L19 40H8z" fill="#fff"/><path d="M42 22c5 5 5 15 0 20M49 14c9 9 9 27 0 36" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>');
 function fill(r){(r||document).querySelectorAll('[data-i]').forEach(function(e){e.innerHTML=I[e.dataset.i]})}
 var $=function(i){return document.getElementById(i)},CFG,ME={id:'',balance:0,inv:[],stats:{opened:0,profit:0}},ONLINE=false,ENG=null,name='Игрок',uname='',photo='',cur='home';
-var TT={rocket:'Ракетка',mines:'Мины',coin:'Монетка',slots:'Спины',upgrade:'Апгрейд',plinko:'Plinko',s3:'Слоты',inventory:'Инвентарь',referrals:'Рефералы',support:'Поддержка',deposit:'Пополнение',casev:'Кейс',bj:'Блэкджек',bjt:'Блэкджек',wheel:'Колесо фортуны',du:'Дурак',dut:'Дурак',tower:'Башня',hilo:'Hi-Lo',roulette:'Рулетка',balloon:'Шарик',cups:'Колпачки'};
-var PARENT={inventory:'profile',referrals:'profile',support:'profile',deposit:'profile',casev:'cases',bjt:'bj',dut:'du'};
+var TT={modes:'Режимы',rocket:'Ракетка',mines:'Мины',coin:'Монетка',slots:'Спины',upgrade:'Апгрейд',plinko:'Plinko',s3:'Слоты',inventory:'Инвентарь',referrals:'Рефералы',support:'Поддержка',deposit:'Пополнение',casev:'Кейс',bj:'Блэкджек',bjt:'Блэкджек',wheel:'Колесо фортуны',du:'Дурак',dut:'Дурак',tower:'Башня',hilo:'Hi-Lo',roulette:'Рулетка',balloon:'Шарик',cups:'Колпачки'};
+var PARENT={mines:'modes',wheel:'modes',coin:'modes',tower:'modes',cups:'modes',balloon:'modes',inventory:'profile',referrals:'profile',support:'profile',deposit:'profile',casev:'cases',bjt:'bj',dut:'du'};
 var TGW=window.Telegram&&window.Telegram.WebApp,DEVQ=(location.search.match(/dev=(\d+)/)||[])[1]||'';
 function tgInit(){var v='';try{if(TGW&&TGW.initData)v=TGW.initData}catch(e){}
  if(!v){try{v=new URLSearchParams(location.hash.slice(1)).get('tgWebAppData')||''}catch(e){}} /* запасной способ: Telegram кладёт данные запуска в адрес */
@@ -2524,10 +2579,11 @@ function nft(k,fb){var it=itm(k);return it.img?imgH(it.img):I[fb]}
 function artRocket(){return '<div class="mn2">'+I.moonBig+'</div><div class="rm">×1.00</div><div class="rk2"><img class="rkn" src="/art/rknft.webp" alt="" draggable="false"></div>'}
 function artMines(){var d=CFG.skins.mines_closed,h='<div class="mgt">';for(var i=0;i<9;i++)h+=i===4?'<i class="st">'+I.star+'</i>':'<i>'+(d?imgH(d):I.moon)+'</i>';return h+'</div>'}
 function artUpgrade(sk){return '<div class="rng"><div class="rin"><i>'+(sk?imgH(sk):nft('arm','star'))+'</i></div><div class="rptr"><b></b></div></div>'}
-function artSpins(){var ids=[],all=[8,7,6,5,4,3,2,1,0],h='',sk=function(v){return CFG.skins['slot_s'+(v+1)]},bad=function(v){var u=sk(v);return !!u&&/plum|слив/i.test(String(u))};
+function artSpins(){var ids=[],all=[8,7,6,5,4,3,2,1,0],sk=function(v){return CFG.skins['slot_s'+(v+1)]},bad=function(v){var u=sk(v);return !!u&&/plum|слив/i.test(String(u))};
  all.forEach(function(v){if(ids.length<3&&!bad(v)&&sk(v))ids.push(v)});all.forEach(function(v){if(ids.length<3&&!bad(v)&&ids.indexOf(v)<0)ids.push(v)});
- ids.slice(0,3).forEach(function(v,k){var u=sk(v);h+='<div class="sp4 q'+k+'"><i>'+(u?imgH(u):I[SDEF[v]])+'</i></div>'});
- return '<div class="sp4w"><b class="sp4s s1">\u2726</b><b class="sp4s s2">\u2726</b>'+h+'</div>'}
+ var im=ids.slice(0,3).map(function(v){var u=sk(v);return u?imgH(u):I[SDEF[v]]}),cols='';
+ [[0,1,2],[1,2,0],[2,0,1]].forEach(function(o,k){var a2=o.map(function(i){return im[i]}),st=a2.concat(a2).map(function(h){return '<i>'+h+'</i>'}).join('');cols+='<div class="spc c'+k+'"><div class="spt">'+st+'</div></div>'});
+ return '<div class="spw">'+cols+'</div>'}
 function artPlinko(){var T=CFG.plinko||[],pk=[0,1,2,6,10,11,12],h='<svg class="pgs" viewBox="0 0 130 78">';
  for(var r=0;r<5;r++)for(var j=0;j<r+2;j++)h+='<circle cx="'+(65+(j-(r+1)/2)*17)+'" cy="'+(12+r*13)+'" r="2.6" fill="#c6ccf5"/>';
  return h+'<circle class="ball" cx="65" cy="3" r="5" fill="#ffd166"/></svg><div class="chp">'+pk.map(function(i){var m=T[i]||0;return '<b class="'+(m>=2?'hi':m>=1?'md':'')+'">×'+m+'</b>'}).join('')+'</div>'}
@@ -2842,9 +2898,12 @@ function freeBanner(){var b=$('freeb');if(!b||typeof CFG==='undefined'||!CFG)ret
  if(p)p.textContent=DEMO?'Бесплатно в демо-режиме':(ready?'Кейс готов — открывай!':'Промокод или '+need+' друзей · '+n+'/'+need);
  var pg=$('hpg');if(pg){var h='';for(var i=0;i<need;i++)h+='<i'+((ready||i<n)?' class="f"':'')+'></i>';pg.innerHTML=h;pg.style.display=DEMO?'none':'flex'}}
 var HC={end:0,top:null};
-function homeCards(){freeBanner();hcInvite();hcContest()}
+function homeCards(){freeBanner();hcInvite();hcContest();mnftFill()}
 function hcPrizes(){var el=$('prz');if(!el||!CFG||!CFG.items)return;var ks=Object.keys(CFG.items).filter(function(k){return CFG.items[k].value>0}).sort(function(a,b){return CFG.items[b].value-CFG.items[a].value}).slice(0,8);
  el.innerHTML=ks.map(function(k){return '<button class="pcx"><i>'+ik(k)+'</i><b>★ '+fmt(CFG.items[k].value)+'</b></button>'}).join('');el.onclick=function(e){if(e.target.closest('.pcx'))go('cases')};var m=$('prm');if(m&&ks[0])m.textContent='до '+fmt(CFG.items[ks[0]].value)+' ★'}
+function mnftFill(){var el=$('mnft');if(!el||!CFG||!CFG.items)return;var ks=Object.keys(CFG.items).filter(function(k){return CFG.items[k].value>0&&CFG.items[k].img}).sort(function(a,b){return CFG.items[b].value-CFG.items[a].value}).slice(0,2);
+ if(ks.length<2)ks=Object.keys(CFG.items).sort(function(a,b){return CFG.items[b].value-CFG.items[a].value}).slice(0,2);var sx=CFG.skins||{};
+ el.innerHTML=[sx.card_modes1,sx.card_modes2].map(function(u,i){return '<i>'+(u?imgH(u):ik(ks[i]))+'</i>'}).join('')}
 function hcInvite(){var p=$('hc3p'),pc=Math.round(((CFG.settings||{}).refPercent||0)*100);if(p)p.textContent=(pc?pc+'% от пополнений друзей — тебе':'Зови друзей и получай бонусы')+(ME.refCount?' · приглашено '+ME.refCount:'');var g=$('hc3').querySelector('.gift');if(g&&!g.innerHTML)g.innerHTML=I.users||I.star}
 function hcContest(){api('leaders').then(function(r){if(!r||r.error)return;HC.end=r.endsAt-r.now+Date.now();HC.top=(r.rows&&r.rows[0])||null;hcTick()}).catch(function(){})}
 function hcTick(){var e=$('hct');if(!e||!HC.end)return;var s=Math.floor(Math.max(0,HC.end-Date.now())/1000);
@@ -2875,11 +2934,7 @@ function fcUI(){var x=$('fcx');if(!x)return;x.hidden=!(curCase&&curCase.free&&!D
  window.addEventListener('pointerup',function(){if(!dn)return;dn=0;if(moved){h.classList.remove('drag');var i=Math.round(h.scrollLeft/step());h.style.scrollSnapType='';go2(i)}});
  h.addEventListener('click',function(e){if(moved){e.preventDefault();e.stopPropagation();moved=0}},true);
  h.addEventListener('dragstart',function(e){e.preventDefault()})})();
-/* ===== на ПК все режимы в одной ровной сетке ===== */
-function layoutGames(){var g1=document.querySelector('#home .grid:not(.hall2)'),g2=document.querySelector('#home .hall2');if(!g1||!g2)return;var wide=window.matchMedia('(min-width:900px)').matches;
- if(wide&&!g2.dataset.moved){[].slice.call(g2.children).forEach(function(c){c.dataset.orig='1';g1.appendChild(c)});g2.dataset.moved='1'}
- else if(!wide&&g2.dataset.moved){[].slice.call(g1.querySelectorAll('[data-orig]')).forEach(function(c){g2.appendChild(c)});g2.dataset.moved=''}}
-window.addEventListener('resize',layoutGames);layoutGames();
+
 
 /* ===== блэкджек: цвет фишек и стойка с фишками ===== */
 function bjChips(){document.querySelectorAll('#bjt .bchip').forEach(function(c){var n=parseInt(String(c.textContent).replace(/\D/g,''),10)||0,k=n>=10000?10000:n>=5000?5000:n>=1000?1000:n>=500?500:n>=100?100:n>=50?50:10;c.className=c.className.replace(/\bk\d+\b/g,'').replace(/\s+/g,' ').trim()+(n?' k'+k:'')})}
@@ -3032,8 +3087,8 @@ $('ugo').onclick=function(){if(upb||sel===null||tg===null)return;var target=tg;u
 /* ===== Блэкджек: живые столы, дилер на сервере ===== */
 var BJ=null,BJL=null,bjT=null,bjLT=null,bjOff=0,bjBusy=0,bjSeq=0,bjApplied=0,bjResAt=0,BJP={c:{},key:'',rr:-1,ctl:'',msg:'',animEnd:0,tm:0};
 var bjStake=10;try{bjStake=+localStorage.getItem('luno_bjst')||10}catch(e){}
-var SU={s:'♠',h:'♥',d:'♦',c:'♣'};
-function bjFace(c){var r=c[0]==='T'?'10':c[0],s=SU[c[1]];return '<span class="pcr">'+r+'<i>'+s+'</i></span><span class="pcs">'+s+'</span>'}
+var SU={s:'♠',h:'♥',d:'♦',c:'♣'},SUV={};['s','h','d','c'].forEach(function(k){SUV[k]='<svg class="st"><use href="#su-'+k+'"/></svg>'});
+function bjFace(c){var r=c[0]==='T'?'10':c[0],s=SUV[c[1]];return '<span class="pcr">'+r+'<i>'+s+'</i></span><span class="pcs">'+s+'</span>'}
 function bjCard(c){var d=document.createElement('div'),dn=c==='??';d.dataset.c=c;d.dataset.land='0';d.className='pc'+(dn?' dn':(c[1]==='h'||c[1]==='d'?' rd':''));
  d.innerHTML='<div class="pci"><div class="pcf">'+(dn?'':bjFace(c))+'</div><div class="pcb"></div></div>';d.setAttribute('aria-label',dn?'закрытая карта':(c[0]==='T'?'10':c[0])+SU[c[1]]);return d}
 function bjFlip(d,c){d.dataset.c=c;d.dataset.land=String(Date.now()+450);d.classList.add('lift');d.querySelector('.pcf').innerHTML=bjFace(c);d.classList.toggle('rd',c[1]==='h'||c[1]==='d');d.setAttribute('aria-label',(c[0]==='T'?'10':c[0])+SU[c[1]]);void d.offsetWidth;d.classList.remove('dn')}
@@ -3165,7 +3220,7 @@ $('wgo').onclick=function(){if(wsp)return;var bet=betOf('wheel');if(!bet)return;
 /* ===== Дурак: игроки против игроков ===== */
 var DU=null,DUL=null,duT=null,duLT=null,duOff=0,duBusy=0,duSeq=0,duApp=0,duSel=null,duKey='',duEv=0,duCnt={},duStake=10,duSize=2;
 try{duStake=+localStorage.getItem('luno_dust')||10;duSize=+localStorage.getItem('luno_dusz')||2}catch(e){}
-function duFace(c){var r=c[0]==='T'?'10':c[0],s=SU[c[1]];return '<div class="f"><span class="r">'+r+'<i>'+s+'</i></span><span class="m">'+s+'</span></div>'}
+function duFace(c){var r=c[0]==='T'?'10':c[0],s=SUV[c[1]];return '<div class="f"><span class="r">'+r+'<i>'+s+'</i></span><span class="m">'+s+'</span></div>'}
 function duH(c,cls,src){return '<div class="dc'+(c?((c[1]==='h'||c[1]==='d')?' rd':''):' bk')+(cls?' '+cls:'')+'"'+(c?' data-k="'+c+'"':'')+(src!==undefined&&src!==''?' data-src="'+src+'"':'')+'>'+(c?duFace(c):'<div class="f"></div>')+'</div>'}
 function duBt(d,a,tr){var R='6789TJQKA';return d[1]===a[1]?R.indexOf(d[0])>R.indexOf(a[0]):(d[1]===tr&&a[1]!==tr)}
 function plN(n,a,b,c){var m=n%10,h=n%100;return m===1&&h!==11?a:m>=2&&m<=4&&(h<10||h>=20)?b:c}
@@ -3230,7 +3285,7 @@ function duRender(v){if(!v)return;DU=v;duOff=v.now-Date.now();duMsg(v);
   oh+='<div class="opp'+cls+(pl&&!s.act?' gone':'')+'" data-s="'+i+'" id="dus'+i+'"><div class="av">'+esc((s.name||'И')[0])+'</div><span class="nm">'+esc(s.name)+'</span>'+(pl?'<div class="fan">'+fan+'</div><span class="cnt">'+s.n+'</span>':'')+tag+'</div>'}
  $('duop').innerHTML=oh;
  // колода и бито
- $('dudeck').innerHTML=pl?(v.deck?(v.trump?duH(v.trump,'tr'):'')+'<div class="st">'+(v.deck>1?duH('','')+duH('',''):'')+'</div><b>'+v.deck+'</b>':'<div class="ts'+(tr==='h'||tr==='d'?' rd':'')+'" title="козырь">'+SU[tr]+'</div><b>козырь</b>'):'';
+ $('dudeck').innerHTML=pl?(v.deck?(v.trump?duH(v.trump,'tr'):'')+'<div class="st">'+(v.deck>1?duH('','')+duH('',''):'')+'</div><b>'+v.deck+'</b>':'<div class="ts'+(tr==='h'||tr==='d'?' rd':'')+'" title="козырь">'+SUV[tr]+'</div><b>козырь</b>'):'';
  $('dudisc').innerHTML=v.disc?duH('','')+duH('','')+duH('','')+'<b>бито '+v.disc+'</b>':'';
  // стол
  if(v.phase==='wait'||v.phase==='start'){var dots='';v.seats.forEach(function(s){dots+='<i class="'+(s?'f':'')+'">'+(s?esc((s.name||'И')[0]):'')+'</i>'});

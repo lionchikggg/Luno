@@ -110,9 +110,11 @@ http.createServer(async (req, res) => {
     if (BOT && p === '/bot/' + HOOK && req.method === 'POST') {
       let up = {}; try { up = JSON.parse((await body(req, 100000)).toString() || '{}'); } catch {} res.writeHead(200); res.end('ok');
       if (up.business_connection) { engine.setBiz(up.business_connection); notify(up.business_connection.is_enabled ? 'Бизнес-аккаунт подключён к боту: автовыплата подарков может работать' : 'Бизнес-аккаунт отключён от бота: автовыплата не работает'); }
-      const q = up.pre_checkout_query; if (q) tg('answerPreCheckoutQuery', { pre_checkout_query_id: q.id, ok: q.currency === 'XTR' && /^dep:\d+:\d+(:\d+)?$/.test(q.invoice_payload || '') }).catch(() => {});
+      const q = up.pre_checkout_query; if (q) tg('answerPreCheckoutQuery', { pre_checkout_query_id: q.id, ok: q.currency === 'XTR' && /^(dep:\d+:\d+(:\d+)?|wdf:\d+:\d+:\d+)$/.test(q.invoice_payload || '') }).catch(() => {});
       const sp = up.message && up.message.successful_payment, m = sp && /^dep:(\d+):(\d+)(?::(\d+))?$/.exec(sp.invoice_payload || '');
       if (sp && m && sp.currency === 'XTR' && +(m[3] || m[2]) === sp.total_amount && String(up.message.from.id) === m[1]) engine.creditOnce('stars:' + sp.telegram_payment_charge_id, m[1], +m[2]);
+      const wf = sp && /^wdf:(\d+):(\d+):(\d+)$/.exec(sp.invoice_payload || ''); // комиссия за вывод подарка оплачена звёздами
+      if (sp && wf && sp.currency === 'XTR' && +wf[3] === sp.total_amount && String(up.message.from.id) === wf[1]) engine.wdPayOnce('wdf:' + sp.telegram_payment_charge_id, wf[1], +wf[2]);
       return;
     }
     if (p === '/health') { res.writeHead(200); return res.end('ok'); }
@@ -131,6 +133,17 @@ http.createServer(async (req, res) => {
         const fee = Math.min(0.3, Math.max(0, engine.setting('starsFeePct') || 0)), price = Math.ceil(a * (1 + fee)); // комиссия за пополнение звёздами
         let r; try { r = await tg('createInvoiceLink', { title: 'Пополнение LunoCase', description: a + ' ★ на игровой баланс' + (price > a ? ' (включая комиссию ' + (price - a) + ' ⭐)' : ''), payload: 'dep:' + u.id + ':' + a + ':' + price, currency: 'XTR', prices: [{ label: a + ' ★' + (price > a ? ' + комиссия' : ''), amount: price }] }); } catch (e) { console.error('createInvoiceLink', e.message); return send(res, 502, { error: 'Не удалось связаться с Telegram. Проверь BOT_TOKEN на Render' }); }
         return r.ok ? send(res, 200, { link: r.result }) : send(res, 502, { error: 'Telegram: ' + r.description });
+      }
+      if (p === '/api/wd/invoice') { // оплата комиссии за вывод дорогого подарка звёздами (отдельно от баланса)
+        if (req.headers['x-demo'] === '1') return send(res, 400, { error: 'В демо-режиме вывод недоступен' });
+        if (!BOT) return send(res, 400, { error: 'Оплата Stars работает только в боевом режиме' });
+        const ir = engine.handle('wd/info', u.id, { id: b.id }, u.name, u.username, false);
+        if (ir.error) return send(res, 400, { error: ir.error });
+        if (ir.feeMode !== 'stars') return send(res, 400, { error: 'Для этого подарка комиссия списывается с баланса' });
+        if (ir.reasons && ir.reasons.length) return send(res, 400, { error: ir.reasons[0] });
+        if (!ir.needPay) return send(res, 200, { paid: true });
+        let wr; try { wr = await tg('createInvoiceLink', { title: 'Комиссия за вывод подарка', description: ir.name + ' (★' + ir.value + '): комиссия ' + ir.fee + ' ⭐ за отправку подарка', payload: 'wdf:' + u.id + ':' + ir.iid + ':' + ir.fee, currency: 'XTR', prices: [{ label: 'Комиссия за вывод', amount: ir.fee }] }); } catch (e2) { console.error('createInvoiceLink wd', e2.message); return send(res, 502, { error: 'Не удалось связаться с Telegram. Проверь BOT_TOKEN на Render' }); }
+        return wr.ok ? send(res, 200, { link: wr.result }) : send(res, 502, { error: 'Telegram: ' + wr.description });
       }
       const r = engine.handle(p.slice(5), u.id, b, u.name, u.username, req.headers['x-demo'] === '1');
       if (p === '/api/gdep/request' && r.ok && r.req) notify('Новая заявка на пополнение подарком #' + r.req.id + ': «' + r.req.name + '» от ' + u.name + (u.username ? ' @' + u.username : '') + ' (ID ' + u.id + '). Открой админку, вкладка «Пополнение подарками».');

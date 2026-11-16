@@ -13,7 +13,7 @@
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
-        toon: 1, crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 8, upMinChance: 0.05, upMinMult: 1.5, wdFeeFixed: 25, autoPay: 0, starsFeePct: 0, rlZeros: 3, blMax: 50, cupsMult: 2.7, bjOn: 1, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
+        toon: 1, crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 8, upMinChance: 0.05, upMinMult: 1.5, wdFeeFixed: 25, wdStarsFrom: 100, wdFeeStars: 25, autoPay: 0, starsFeePct: 0, rlZeros: 3, blMax: 50, cupsMult: 2.7, bjOn: 1, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
         edges: { crash: 0.07, mines: 0.12, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05, tower: 0.08, hilo: 0.07, balloon: 0.08, slots3: 0.10 }, modes: { rocket: 1, mines: 1, upgrade: 1, slots: 1, plinko: 1, wheel: 1, coin: 1, tower: 1, bj: 1, du: 1, hilo: 1, roulette: 0, balloon: 1, cups: 1 }, tonAddress: '', giftDepositTo: '', giftDepositNote: 'Начисляем в течение 24 часов.', channelUrl: '', channelText: 'Наш канал', wdFeePct: 0, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
@@ -127,7 +127,7 @@
       (function () { S.flags = S.flags || {}; if (!S.flags.mn2) { S.flags.mn2 = 1; var s9 = S.cfg.settings; s9.edges = s9.edges || {}; if (s9.edges.mines === undefined || +s9.edges.mines <= 0.10) s9.edges.mines = 0.12; if (!(+s9.minesMaxMult <= 8)) s9.minesMaxMult = 8; } })();
       (function () { S.flags = S.flags || {}; if (!S.flags.s3v5) { S.flags.s3v5 = 1; var c5 = S.cfg.slots3; if (c5 && c5.symbols && c5.symbols.length === 7) { var cn = c5.symbols.map(function (x) { return x.count; }).join(','), ml = c5.symbols.map(function (x) { return x.mult; }).join(','); if (cn === '8,7,5,4,3,2,1' && ml === '5,10,20,40,100,200,500') { var nc = [10, 8, 6, 3, 2, 1, 1], nm = [5, 10, 20, 40, 80, 150, 400]; c5.symbols.forEach(function (x, i) { x.count = nc[i]; x.mult = nm[i]; }); } } } })();
       (function () { S.flags = S.flags || {}; if (!S.flags.nobots) { S.flags.nobots = 1; S.live = (S.live || []).filter(function (x) { return String(x).indexOf('b:') !== 0; }); delete S.botNext; } })();
-      if (S.cfg.settings.toon === undefined) S.cfg.settings.toon = 1;
+      if (S.cfg.settings.toon === undefined) S.cfg.settings.toon = 1; if (S.cfg.settings.wdStarsFrom === undefined) S.cfg.settings.wdStarsFrom = 100; if (S.cfg.settings.wdFeeStars === undefined) S.cfg.settings.wdFeeStars = 25;
       var ST0 = S.cfg.settings; ST0.edges = ST0.edges || {}; if (ST0.edges.tower === undefined) ST0.edges.tower = 0.06; if (ST0.edges.hilo === undefined) ST0.edges.hilo = 0.05;
       ST0.modes = ST0.modes || {}; ['rocket', 'mines', 'upgrade', 'slots', 'plinko', 'wheel', 'coin', 'tower', 'bj', 'du', 'hilo'].forEach(function (k) { if (ST0.modes[k] === undefined) ST0.modes[k] = 1; });
       if (ST0.tonAddress === undefined) ST0.tonAddress = ''; if (ST0.channelUrl === undefined) ST0.channelUrl = ''; if (ST0.channelText === undefined) ST0.channelText = 'Наш канал';
@@ -197,14 +197,20 @@
       raw.forEach(function (x, i) { e += x * comb(n, i) / 4096; }); var k = (1 - edgeOf('plinko')) / e; return raw.map(function (x) { return Math.round(x * k * 100) / 100; });
     }
     function comb(n, k) { var r = 1; for (var i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); }
-    function wdCheck(u, it) {
-      var reasons = [], fee = Math.ceil(set('wdFeeFixed') || 0), need = Math.ceil((u.deposited || 0) * set('wdWagerMult')), have = Math.floor(u.wagered || 0);
+    function wdCheck(u, it, iid) {
+      // Подарки дешевле порога: комиссия ★wdFeeFixed списывается с игрового баланса.
+      // Подарки от порога (по умолчанию ★100): комиссия оплачивается отдельно звёздами Telegram, как пополнение.
+      var big = it.value >= (set('wdStarsFrom') || 100), reasons = [], fee = big ? Math.ceil(set('wdFeeStars') || 0) : Math.ceil(set('wdFeeFixed') || 0), need = Math.ceil((u.deposited || 0) * set('wdWagerMult')), have = Math.floor(u.wagered || 0);
       if (!it.wd) reasons.push('Этот предмет нельзя вывести, его можно продать за звёзды или использовать в апгрейде');
       if (it.value < set('wdMinValue')) reasons.push('Минимальная стоимость подарка для вывода ★' + set('wdMinValue'));
       if (!u.username) reasons.push('Для вывода нужен username в Telegram. Укажи его в Настройки → Имя пользователя и открой приложение заново');
       if (have < need) reasons.push('Сначала нужно отыграть пополнения: сделай ставок ещё на ★' + (need - have));
-      if (u.balance < fee) reasons.push('Для комиссии за вывод (★' + fee + ') не хватает звёзд на балансе');
-      return { ok: !reasons.length, reasons: reasons, fee: fee };
+      if (!big && u.balance < fee) reasons.push('Для комиссии за вывод (★' + fee + ') не хватает звёзд на балансе');
+      var paid = big && !!(u.wdPaid && u.wdPaid[iid]);
+      return { ok: !reasons.length, reasons: reasons, fee: fee, big: big, paid: paid };
+    }
+    function wdPayOnce(key, uid, iid) { // комиссия за вывод оплачена звёздами Telegram (вызывает сервер после successful_payment)
+      if (S.paid[key]) return false; var u = S.users[String(uid)]; if (!u) return false; u.wdPaid = u.wdPaid || {}; u.wdPaid[iid] = now(); S.paid[key] = 1; save(); return true;
     }
 
     // ---- Блэкджек: живые столы с реальными игроками, дилер играет по правилам на сервере ----
@@ -673,10 +679,12 @@
         var r = { id: ++S.gseq, uid: u.id, name: name, link: link, user: u.name, username: u.username || '', status: 'pending', t: now(), credited: 0, note: '' }; S.gdep.push(r); save(); return { ok: true, req: r };
       },
       'gdep/list': function (u) { return { list: S.gdep.filter(function (x) { return x.uid === u.id; }).slice(-20).reverse().map(function (x) { return { id: x.id, name: x.name, status: x.status, credited: x.credited, note: x.note, t: x.t }; }) }; },
-      'wd/info': function (u, b) { var i = inv(u, +b.id); if (i < 0) throw new Err('Нет такого подарка'); var it = cfg().items[u.inv[i].k], c = wdCheck(u, it);
-        return { ok: c.ok, reasons: c.reasons, fee: c.fee, username: u.username || '', value: it.value, name: it.name, k: u.inv[i].k, eta: cfg().settings.wdNote, feePct: set('wdFeePct'), noUser: !u.username }; },
-      'wd/request': function (u, b) { var i = inv(u, +b.id); if (i < 0) throw new Err('Нет такого подарка'); var k = u.inv[i].k, it = cfg().items[k], c = wdCheck(u, it); if (!c.ok) throw new Err(c.reasons[0]);
-        u.balance -= c.fee; S.fees += c.fee; u.inv.splice(i, 1); var r = { id: ++S.wdSeq, uid: u.id, username: u.username, name: u.name, k: k, item: it.name, value: it.value, fee: c.fee, status: 'pending', t: now() }; S.wd.push(r);
+      'wd/info': function (u, b) { var i = inv(u, +b.id); if (i < 0) throw new Err('Нет такого подарка'); var it = cfg().items[u.inv[i].k], c = wdCheck(u, it, u.inv[i].id);
+        return { ok: c.ok, reasons: c.reasons, fee: c.fee, feeMode: c.big ? 'stars' : 'balance', needPay: c.big && !c.paid, iid: u.inv[i].id, starsFrom: set('wdStarsFrom') || 100, test: !!o.allowTest, username: u.username || '', value: it.value, name: it.name, k: u.inv[i].k, eta: cfg().settings.wdNote, feePct: set('wdFeePct'), noUser: !u.username }; },
+      'wd/testpay': function (u, b) { if (!o.allowTest) throw new Err('Недоступно'); var i = inv(u, +b.id); if (i < 0) throw new Err('Нет такого подарка'); u.wdPaid = u.wdPaid || {}; u.wdPaid[u.inv[i].id] = now(); return { ok: true }; },
+      'wd/request': function (u, b) { var i = inv(u, +b.id); if (i < 0) throw new Err('Нет такого подарка'); var k = u.inv[i].k, it = cfg().items[k], iid = u.inv[i].id, c = wdCheck(u, it, iid); if (!c.ok) throw new Err(c.reasons[0]);
+        if (c.big) { if (!c.paid) throw new Err('Сначала оплати комиссию ★' + c.fee + ' звёздами Telegram'); delete u.wdPaid[iid]; S.starsFees = (S.starsFees || 0) + c.fee; } else { u.balance -= c.fee; S.fees += c.fee; }
+        u.inv.splice(i, 1); var r = { id: ++S.wdSeq, uid: u.id, username: u.username, name: u.name, k: k, item: it.name, value: it.value, fee: c.fee, feeStars: !!c.big, status: 'pending', t: now() }; S.wd.push(r);
         if (o.notify) o.notify('Новая заявка на вывод #' + r.id + ': ' + it.name + ' (★' + it.value + ') для @' + u.username + ', ID ' + u.id); if (o.autoPay && set('autoPay') && it.tg) setTimeout(function () { o.autoPay(r, it); }, 0); return { id: r.id, eta: cfg().settings.wdNote, auto: !!(o.autoPay && set('autoPay') && it.tg) }; },
       'wd/list': function (u) { return { list: S.wd.filter(function (x) { return x.uid === u.id; }).slice(-20).reverse().map(function (x) { return { id: x.id, item: x.item, k: x.k, value: x.value, status: x.status, t: x.t, note: x.note || '' }; }) }; },
       'inv/sell': function (u, b) { var i = inv(u, +b.id); if (i < 0) throw new Err('Нет такого подарка'); var v = cfg().items[u.inv[i].k].value; u.inv.splice(i, 1); u.balance += v; return { sold: v }; },
@@ -687,8 +695,8 @@
         u.redeemed[code] = 1; p.uses--; u.tickets[p.caseId] = (u.tickets[p.caseId] || 0) + 1; return { caseId: p.caseId };
       },
       leaders: function () {
-        var ws = weekStart(), rows = Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return !u.demo && u.week.start === ws && u.week.profit > 0; })
-          .sort(function (a, b) { return b.week.profit - a.week.profit; }).slice(0, 20).map(function (u) { return { name: maskName(u.name), profit: u.week.profit, wagered: u.week.wagered || 0 }; });
+        var ws = weekStart(), rows = Object.keys(S.users).map(function (k) { return S.users[k]; }).filter(function (u) { return !u.demo && !u.banned && u.week.start === ws && (u.week.wagered || 0) > 0; })
+          .sort(function (a, b) { return (b.week.wagered || 0) - (a.week.wagered || 0); }).slice(0, 30).map(function (u) { return { name: maskName(u.name), profit: u.week.profit, wagered: u.week.wagered || 0 }; });
         return { rows: rows, endsAt: ws + 7 * 864e5, now: now() };
       }
     };
@@ -718,7 +726,7 @@
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.wheelMaxRtp = WHEEL_MAX_RTP; c.biz = S.biz || null; c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; c.s3 = s3info(); return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17', bjP22: 'перебор дилера на 22', duOn: 'дурак включён', duFee: 'комиссия в дураке', upMinChance: 'минимальный шанс апгрейда', upMinMult: 'минимальный множитель апгрейда', wdFeeFixed: 'фиксированная комиссия за вывод', starsFeePct: 'комиссия за пополнение звёздами', rlZeros: 'число зеро в рулетке', cupsMult: 'выплата в колпачках', blMax: 'потолок шарика', autoPay: 'автовыплата подарков', toon: 'мультяшный дизайн' };
+      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17', bjP22: 'перебор дилера на 22', duOn: 'дурак включён', duFee: 'комиссия в дураке', upMinChance: 'минимальный шанс апгрейда', upMinMult: 'минимальный множитель апгрейда', wdFeeFixed: 'фиксированная комиссия за вывод', starsFeePct: 'комиссия за пополнение звёздами', rlZeros: 'число зеро в рулетке', cupsMult: 'выплата в колпачках', blMax: 'потолок шарика', autoPay: 'автовыплата подарков', toon: 'мультяшный дизайн', wdStarsFrom: 'порог: комиссия звёздами отдельно', wdFeeStars: 'комиссия звёздами за дорогие подарки' };
       Object.keys(LBL).forEach(function (k) {
         var raw = s[k], cur = set(k); if (!(cur >= 0)) cur = Number(DS0[k]); // поле не пришло или пустое: оставляем текущее значение
         var v = (raw === undefined || raw === null || raw === '' || isNaN(+raw)) ? cur : +raw; if (!(v >= 0)) throw new Err('Неверная настройка: ' + LBL[k]); out.settings[k] = v;
@@ -812,7 +820,7 @@
     function userBan(id, flag) { var u = S.users[String(id)]; if (!u) throw new Err('Игрок не найден'); u.banned = !!flag; save(); return { banned: u.banned }; }
     function tick() { advance(); bjTick(); duTick(); save(); }
     function seedHistory(n) { if (S.hist.length) return; for (var i = 0; i < n; i++) S.hist.push(Math.max(1, Math.min(set('crashMax') || 50, Math.floor(100 * (1 - edgeOf('crash')) / (1 - roll(S.sys))) / 100))); }
-    return { gdepList: gdepList, gdepResolve: gdepResolve, setBiz: setBiz, bizInfo: bizInfo, tonAddr: tonAddr, tick: tick, seedHistory: seedHistory, wdList: wdList, wdResolve: wdResolve, usersList: usersList, userAdjust: userAdjust, userBan: userBan, credit: credit, creditOnce: creditOnce, setting: set, handle: handle, publicConfig: publicConfig, adminConfig: adminConfig, putConfig: putConfig, stats: stats, Err: Err };
+    return { gdepList: gdepList, gdepResolve: gdepResolve, setBiz: setBiz, bizInfo: bizInfo, tonAddr: tonAddr, tick: tick, seedHistory: seedHistory, wdList: wdList, wdResolve: wdResolve, usersList: usersList, userAdjust: userAdjust, userBan: userBan, credit: credit, creditOnce: creditOnce, wdPayOnce: wdPayOnce, setting: set, handle: handle, publicConfig: publicConfig, adminConfig: adminConfig, putConfig: putConfig, stats: stats, Err: Err };
   }
   var api = { _s3: { calc: s3calc, lines: S3LINES, wins: s3wins }, _slots: { slotGame: slotGame, SLOT: SLOT }, create: create, newState: newState, defaultConfig: defaultConfig, SKINS: SKINS, Err: Err };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.Engine = api;

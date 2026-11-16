@@ -1517,6 +1517,26 @@ nav button[aria-current="page"]{background:linear-gradient(180deg,#6f89b3,#465f8
 /* новый узор только на карточке «Режимы» (на ПК и на телефоне) */
 #modesc,#home #modesc{isolation:isolate;background:radial-gradient(70% 100% at 90% 10%,rgba(150,120,255,.26),transparent 70%),linear-gradient(160deg,#0b1020,#101830)!important}
 #modesc::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;background:radial-gradient(circle,rgba(185,208,255,.32) 1.2px,transparent 1.9px) 0 0/16px 16px;-webkit-mask:radial-gradient(75% 115% at 92% 18%,#000 0,transparent 72%);mask:radial-gradient(75% 115% at 92% 18%,#000 0,transparent 72%)}
+
+/* ===== v37: компактнее шапка, Live и призы; кнопки в окне выигрыша ===== */
+.logo{gap:6px!important}.logo .lt{font-size:22px!important}.logo .lgm{width:30px!important;height:30px!important}
+.bal{height:44px!important;padding:4px 4px 4px 12px!important;gap:8px!important}
+.bal i{width:24px!important;height:24px!important}.bal #bal{font-size:18px!important}
+.bal button{width:36px!important;height:36px!important;padding:10px!important}
+.live{gap:8px!important}.live>b{height:48px!important;padding:8px 6px!important;font-size:10px!important;border-radius:18px!important}
+.lc{height:48px!important;padding:0 12px 0 6px!important;border-radius:18px!important;gap:6px!important}
+.lc .li{width:38px!important;height:38px!important}.lc .lv{font-size:16px!important}.lc .lv u{font-size:14px!important}
+.shd{margin:14px 2px 8px!important}.shd h3{font-size:16px!important}
+.pcx{width:104px!important;height:128px!important;border-radius:26px!important;padding:10px 4px!important}.pcx i{width:74px!important;height:74px!important}.pcx b{font-size:13px!important}
+@media (min-width:900px){.lc{height:52px!important}.lc .li{width:42px!important;height:42px!important}}
+.won .row2.rsl{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.won .row2.rsl .btn{margin:0;border:0;display:flex;align-items:center;justify-content:center;gap:8px;height:56px;border-radius:28px;font:800 15px Manrope}
+.won .row2.rsl #keep{grid-column:1/-1;height:60px;border-radius:30px;font:800 17px Unbounded}
+.won .row2.rsl #sell:only-of-type{grid-column:1/-1}
+.rs-sell{background:linear-gradient(180deg,#f3d27a,#c99a2e)!important;color:#2a1c04!important;box-shadow:0 8px 18px rgba(201,154,46,.32),inset 0 1px 0 rgba(255,255,255,.5)!important}
+.rs-sell b{font:800 15px Manrope}
+.rs-up{background:linear-gradient(180deg,#8f94e8,#5a60b8)!important;color:#fff!important;box-shadow:0 8px 18px rgba(90,96,184,.4),inset 0 1px 0 rgba(255,255,255,.3)!important}
+.rs-up b{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:15px}
 </style></head><body data-mode="home"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="su-s" viewBox="0 0 100 100"><path d="M50 4C58 24 92 40 92 62C92 76 82 84 71 84C62 84 55 80 51 73C52 84 57 92 66 96L34 96C43 92 48 84 49 73C45 80 38 84 29 84C18 84 8 76 8 62C8 40 42 24 50 4Z"/></symbol><symbol id="su-h" viewBox="0 0 100 100"><path d="M50 94C28 74 4 56 4 32C4 17 15 7 28 7C38 7 46 12 50 20C54 12 62 7 72 7C85 7 96 17 96 32C96 56 72 74 50 94Z"/></symbol><symbol id="su-d" viewBox="0 0 100 100"><path d="M50 3L86 50L50 97L14 50Z"/></symbol><symbol id="su-c" viewBox="0 0 100 100"><circle cx="50" cy="29" r="21"/><circle cx="27" cy="60" r="21"/><circle cx="73" cy="60" r="21"/><path d="M50 50C50 74 46 88 36 96L64 96C54 88 50 74 50 50Z"/></symbol>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
@@ -2960,9 +2980,10 @@ function cvRoll(c,r,items){var n=items.length,W=n===1?140:104,step=W+10,WI=34,re
 function cvDone(c,r,items,fast){opening=0;$('cvo').disabled=false;sync(r);var best=0,tot=0;items.forEach(function(x){var v=itm(x.k).value;tot+=v;if(v>best)best=v});
  chime3(best>=500?2:best>=120?1:0);setTimeout(function(){cvResult(c,items,tot)},fast?120:450)}
 function cvResult(c,items,tot){var md=$('md'),h;
- if(items.length===1){var it=itm(items[0].k);h='<h2 style="text-align:center;margin-bottom:14px;font-size:18px">'+esc(c.name)+'</h2><div class="won"><div class="wi">'+ik(items[0].k)+'</div><b>'+esc(it.name)+'</b><span>★ '+it.value+'</span><div class="row2"><button class="btn big" id="keep">Забрать</button><button class="btn" id="sell">Продать ★'+it.value+'</button></div></div>'}
+ if(items.length===1){var it=itm(items[0].k),upOK=it.up!==false&&it.value>=((CFG.settings&&CFG.settings.minBet)||10)&&!DEMO;h='<h2 style="text-align:center;margin-bottom:14px;font-size:18px">'+esc(c.name)+'</h2><div class="won"><div class="wi">'+ik(items[0].k)+'</div><b>'+esc(it.name)+'</b><span>★ '+it.value+'</span><div class="row2 rsl"><button class="btn big" id="keep">Забрать</button><button class="btn rs-sell" id="sell"><span>Продать</span><b>★ '+it.value+'</b></button>'+(upOK?'<button class="btn rs-up" id="upgo"><span>Апгрейд</span><b>→</b></button>':'')+'</div></div>'}
  else{h='<h2 style="text-align:center;margin-bottom:12px;font-size:18px">'+esc(c.name)+' · '+items.length+' шт.</h2><div class="rwg">'+items.map(function(x,i){var it=itm(x.k);return '<div class="rwc" style="--rc:'+rar(it.value)+';animation-delay:'+i*90+'ms"><i>'+ik(x.k)+'</i><b>'+esc(it.name)+'</b><span>★ '+it.value+'</span></div>'}).join('')+'</div><div class="row2"><button class="btn big" id="keep">Забрать всё</button><button class="btn" id="sell">Продать всё ★'+tot+'</button></div>'}
  $('mbody').innerHTML=h;md.classList.add('on');$('keep').onclick=function(){md.classList.remove('on')};
+ if($('upgo'))$('upgo').onclick=function(){md.classList.remove('on');sel=items[0].id;tg=null;go('upgrade')};
  $('sell').onclick=function(){this.disabled=true;var ids=items.map(function(x){return x.id});(items.length===1?call('inv/sell',{id:ids[0]}):call('inv/sellmany',{ids:ids})).then(function(x){toast('Продано +'+x.sold+' ★');md.classList.remove('on')}).catch(function(){})}}
 
 /* ===== бесплатный кейс: промокод ИЛИ 5 приглашённых друзей ===== */

@@ -1566,17 +1566,38 @@ nav button[aria-current="page"]{background:linear-gradient(180deg,#6f89b3,#465f8
 .toon .stage{border-radius:38px!important}
 .toon .felt{border-radius:30px 30px 50% 50%/30px 30px 17% 17%!important}
 .toon .bjrack{border-radius:999px}
-/* профиль в мультяшном дизайне */
-.toon #profile .pbal{padding:20px;border-radius:38px;background:linear-gradient(165deg,#0f1a3c,#0a1128);box-shadow:inset 0 3px 0 rgba(255,255,255,.1),inset 0 -8px 0 rgba(0,0,0,.28),0 8px 0 -2px #050919,0 20px 28px rgba(0,0,0,.45);margin-bottom:18px;text-align:center}
-.toon #profile .pbal small{color:#9fb0d8;font-size:13px;font-weight:700}
-.toon #profile .pbal b{display:block;font:800 44px Unbounded;margin:2px 0 14px;line-height:1.1}.toon #profile .pbal b i{color:#ffc83a;font-style:normal}
-.pbtn{display:flex;gap:12px}.pbtn .btn{flex:1;height:58px;margin:0;font-size:16px}
-.pout{background:#0e1738!important;border:1px solid rgba(150,180,255,.3)!important;color:#fff!important;box-shadow:0 6px 0 #060a1c!important}
-.pstat{display:flex;gap:10px;margin-top:18px}.pstat div{flex:1;padding:12px 4px;border-radius:24px;background:rgba(255,255,255,.04);border:1px solid rgba(150,180,255,.14)}.pstat b{display:block;font:800 17px Manrope}.pstat b.up{color:#5fe0a0}.pstat b.dn{color:#ff8aa0}.pstat span{font-size:11px;color:#9fb0d8}
-.toon #profile .mi[data-go=deposit]{display:none}
-.toon #profile .pavw{margin-bottom:16px}
-.toon #profile .blk{position:relative}
+
+/* ===== v39: профиль красивее; звезда-картинка ===== */
+.toon #profile .pavw{margin:4px 0 20px}
+.toon #profile .avb{width:104px!important;height:104px!important;border:4px solid #8fb0ff!important;box-shadow:0 0 0 8px rgba(90,130,230,.14),0 18px 36px rgba(50,90,210,.42),0 6px 0 #1b2c66!important}
+.toon #profile .pavw h2{font:800 26px Unbounded;margin-top:14px}
+.toon #profile .chip{height:42px;padding:0 22px;font-weight:800;border-radius:999px;box-shadow:inset 0 2px 0 rgba(255,255,255,.1),0 4px 0 #060a1c}
+.toon #profile .blk{padding:22px!important}
 .toon #profile .blk .bt2{display:flex;align-items:center;gap:12px;font:800 20px Unbounded;margin:-2px 0 16px;padding-bottom:16px;border-bottom:2px dashed rgba(150,180,255,.3)}
+.toon .btn.gold{background:linear-gradient(180deg,#ffe28f,#f2b53c)!important;color:#2a1a02!important;height:54px;padding:0 22px;font-weight:800;box-shadow:inset 0 3px 0 rgba(255,255,255,.6),0 6px 0 #b8801a,0 14px 22px rgba(224,160,32,.35)!important}
+.toon #profile .chl{display:flex;align-items:center;gap:14px;height:62px;padding:0 20px 0 12px;border-radius:999px;margin-top:14px;background:linear-gradient(180deg,#3d9be8,#1f6fc4)!important;border:0!important;color:#fff!important;font-weight:800;box-shadow:inset 0 3px 0 rgba(255,255,255,.38),0 6px 0 #14508e,0 14px 22px rgba(20,90,170,.4)!important}
+.toon #profile .chl i{width:42px;height:42px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none}
+.toon #profile .chl em{margin-left:auto;font-style:normal;font-size:24px}
+.toon #profile .mi{display:flex;align-items:center;gap:14px;padding:14px 16px!important;border-radius:34px!important;text-align:left}
+.toon #profile .mi .mt{width:58px!important;height:58px!important;border-radius:22px!important;padding:14px!important;flex:none;box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 4px 0 rgba(0,0,0,.35)!important}
+.toon #profile .mi[data-go=deposit] .mt{background:linear-gradient(135deg,#34d395,#1b8f63)!important}
+.toon #profile .mi[data-go=inventory] .mt{background:linear-gradient(135deg,#9a86ff,#5a45d8)!important}
+.toon #profile .mi[data-go=referrals] .mt{background:linear-gradient(135deg,#55c0ff,#2a73d8)!important}
+.toon #profile .mi[data-go=support] .mt{background:linear-gradient(135deg,#ffcb5a,#e08a1a)!important}
+.toon #profile .mi b{font:800 17px Manrope}
+.toon #profile .mi em{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.08);box-shadow:inset 0 2px 0 rgba(255,255,255,.12),0 3px 0 rgba(0,0,0,.35);display:grid;place-items:center;font-size:24px;font-style:normal;color:#cfe0ff;margin-left:auto;flex:none}
+.toon #profile .mi:active{transform:translateY(3px)}
+@media (min-width:900px){
+ body[data-mode=profile] main{max-width:800px;padding-left:32px;padding-right:32px}
+ #profile.on{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start}
+ #profile.on>.pavw,#profile.on>.blk{grid-column:1/-1}
+ #profile .mi{margin:0}
+}
+/* картинка-звезда вместо значка и символа ★ */
+.stg{display:inline-block;width:1.08em;height:1.08em;vertical-align:-.18em;object-fit:contain;margin:0 .04em;pointer-events:none;-webkit-user-drag:none}
+.sg{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;-webkit-user-drag:none}
+.chips button::before{content:"";display:inline-block;width:1.05em;height:1.05em;vertical-align:-.17em;margin-right:.25em;background:url(/star.webp) center/contain no-repeat}
+#dsc button::before{content:""!important;display:inline-block;width:1.05em;height:1.05em;margin-right:.3em;vertical-align:-.17em;background:url(/star.webp) center/contain no-repeat;opacity:1!important}
 </style></head><body data-mode="home" class="toon"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="su-s" viewBox="0 0 100 100"><path d="M50 4C58 24 92 40 92 62C92 76 82 84 71 84C62 84 55 80 51 73C52 84 57 92 66 96L34 96C43 92 48 84 49 73C45 80 38 84 29 84C18 84 8 76 8 62C8 40 42 24 50 4Z"/></symbol><symbol id="su-h" viewBox="0 0 100 100"><path d="M50 94C28 74 4 56 4 32C4 17 15 7 28 7C38 7 46 12 50 20C54 12 62 7 72 7C85 7 96 17 96 32C96 56 72 74 50 94Z"/></symbol><symbol id="su-d" viewBox="0 0 100 100"><path d="M50 3L86 50L50 97L14 50Z"/></symbol><symbol id="su-c" viewBox="0 0 100 100"><circle cx="50" cy="29" r="21"/><circle cx="27" cy="60" r="21"/><circle cx="73" cy="60" r="21"/><path d="M50 50C50 74 46 88 36 96L64 96C54 88 50 74 50 50Z"/></symbol>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
@@ -1647,7 +1668,6 @@ nav button[aria-current="page"]{background:linear-gradient(180deg,#6f89b3,#465f8
 
 <section class="view" id="profile">
  <div class="pavw"><div class="avb" id="pav"></div><h2 id="pn"></h2><div class="note" id="pu" style="margin:4px 0 0"></div><button class="chip" id="pid"></button></div>
- <div class="pbal toonly"><small>Баланс</small><b id="pbal"></b><div class="pbtn"><button class="btn big" data-go="deposit">Пополнить</button><button class="btn pout" data-go="inventory">Вывести</button></div><div class="pstat" id="pstat"></div></div>
  <div class="blk"><div class="bt2">Промо-код</div><form class="pr" id="pf"><input class="in" id="code" placeholder="Введите промо-код" autocomplete="off" aria-label="Промокод"><button class="btn gold">Активировать</button></form><div class="hint" id="hint">Для теста: LUNO</div><a class="chl" id="chl" href="#" hidden><i><svg viewBox="0 0 24 24"><path d="M21.5 4.2 2.9 11.4c-1 .4-1 1.8.1 2.1l4.6 1.4 1.8 5.6c.3.8 1.3 1 1.9.4l2.6-2.5 4.8 3.5c.7.5 1.6.1 1.8-.7l3-15.6c.2-1-.8-1.8-1.8-1.4zM9.6 14.6l8.3-7.4-6.6 8.6-.3 3.3z" fill="#2a8bd8"/></svg></i><span>Наш канал</span><em>›</em></a></div>
  <button class="mi" data-go="deposit"><i class="mt" data-i="wallet"></i><div><b>Пополнить баланс</b><span>Stars и Gram (TON)</span></div><em>›</em></button>
  <button class="mi" data-go="inventory"><i class="mt" data-i="bag"></i><div><b>Инвентарь</b><span id="invs">Ваши подарки и призы</span></div><em>›</em></button>
@@ -2570,7 +2590,7 @@ var I={
 rocket:V('<path class="fl" d="M25 47Q32 72 39 47z" fill="url(#gF)"/><path d="M22 38L9 54l15-5zM42 38l13 16-15-5z" fill="#ff5c7a"/><path d="M32 3C45 13 47 33 43 49H21C17 33 19 13 32 3z" fill="url(#gB)"/><path d="M32 3C45 13 47 33 43 49H32z" fill="#8f9dff" opacity=".35"/><circle cx="32" cy="25" r="8" fill="#ffd166"/><circle cx="32" cy="25" r="6" fill="#0c1030"/><circle cx="30" cy="23" r="2" fill="#7fe3ff"/><rect x="21" y="40" width="22" height="4" fill="#8b6bff"/>'),
 frog:V('<ellipse cx="32" cy="42" rx="26" ry="18" fill="url(#gR)"/><circle cx="19" cy="22" r="12" fill="url(#gR)"/><circle cx="45" cy="22" r="12" fill="url(#gR)"/><circle cx="19" cy="22" r="8" fill="#fff"/><circle cx="45" cy="22" r="8" fill="#fff"/><g class="bl"><circle cx="21" cy="23" r="4.2" fill="#14203a"/><circle cx="43" cy="23" r="4.2" fill="#14203a"/></g><path d="M13 42Q32 58 51 42" stroke="#0f5a33" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="12" cy="45" r="4" fill="#ff8fb0" opacity=".6"/><circle cx="52" cy="45" r="4" fill="#ff8fb0" opacity=".6"/><path d="M32 2l2 5h5l-4 3 1.500 5-4.500-3-4.500 3 1.500-5-4-3h5z" fill="url(#gG)"/>'),
 moon:V('<circle cx="30" cy="34" r="26" fill="url(#gB)" mask="url(#cm)"/>'),
-star:V('<path d="M32 4l8 18 20 2-15 13 5 20-18-10-18 10 5-20L4 24l20-2z" fill="url(#gG)" stroke="#fff3b0" stroke-width="2" stroke-linejoin="round"/>'),
+star:'<img class="sg" src="/star.webp" alt="">',
 gem:V('<path d="M16 8h32l12 16-28 34L4 24z" fill="url(#gE)"/><path d="M4 24h56M22 8l-6 16 16 34 16-34-6-16" stroke="#fff" stroke-opacity=".7" fill="none"/>'),
 bomb:V('<circle cx="29" cy="38" r="21" fill="#252a70"/><circle cx="22" cy="30" r="6" fill="#fff" opacity=".18"/><rect x="24" y="12" width="12" height="8" rx="2" fill="#555d9a"/><path d="M34 14q10-10 16-4" stroke="#ffd166" stroke-width="3" fill="none"/><circle cx="52" cy="9" r="5" fill="url(#gF)"><animate attributeName="r" values="4;7;4" dur=".5s" repeatCount="indefinite"/></circle>'),
 boom:V('<path d="M32 2l6 18 18-10-10 18 16 4-16 6 10 18-18-10-6 18-6-18-18 10 10-18L2 32l16-4L8 10l18 10z" fill="url(#gF)"/><circle cx="32" cy="32" r="9" fill="#fff3b0"/>'),
@@ -3083,14 +3103,23 @@ $('bjrack').onclick=function(e){var c=e.target.closest('.rkch');if(!c||!BJ)retur
  var tgt=$('bch'+BJ.me)||$('bmch0');if(tgt){var a=c.getBoundingClientRect(),t=tgt.getBoundingClientRect(),f=c.cloneNode(true);f.style.cssText='position:fixed;left:'+a.left+'px;top:'+a.top+'px;margin:0;z-index:50;pointer-events:none;opacity:1';document.body.appendChild(f);
   f.animate([{transform:'translate(0,0) scale(1.1)'},{transform:'translate('+(t.left+t.width/2-a.left-a.width/2)+'px,'+(t.top+t.height/2-a.top-a.height/2)+'px) scale(1.25)',offset:.8},{transform:'translate('+(t.left+t.width/2-a.left-a.width/2)+'px,'+(t.top+t.height/2-a.top-a.height/2)+'px) scale(1)'}],{duration:480,easing:'cubic-bezier(.3,.8,.4,1)'}).onfinish=function(){f.remove()}}
  beep(620,.05,'triangle');btn.click()};
+
+/* ===== символ ★ везде заменяется картинкой-звездой ===== */
+(function(){var SP='/star.webp',RE=/\u2605/,BAD=/^(SCRIPT|STYLE|TEXTAREA|OPTION|TITLE|INPUT)$/;
+ function mk(){var i=document.createElement('img');i.className='stg';i.src=SP;i.alt='\u2605';i.draggable=false;return i}
+ function split(t){var p=t.parentNode;if(!p||BAD.test(p.tagName||''))return;var parts=t.nodeValue.split('\u2605'),f=document.createDocumentFragment();parts.forEach(function(s,i){if(s)f.appendChild(document.createTextNode(s));if(i<parts.length-1)f.appendChild(mk())});p.replaceChild(f,t)}
+ function proc(n){if(!n)return;if(n.nodeType===3){if(RE.test(n.nodeValue))split(n);return}if(n.nodeType!==1||BAD.test(n.tagName))return;
+  var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),list=[],x;while((x=w.nextNode())){if(RE.test(x.nodeValue))list.push(x)}list.forEach(split)}
+ var q=[],sch=0;function flush(){sch=0;var a=q;q=[];a.forEach(function(n){if(n.parentNode)proc(n)})}
+ new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==='characterData')q.push(m.target);else for(var i=0;i<m.addedNodes.length;i++)q.push(m.addedNodes[i])});if(!sch){sch=1;requestAnimationFrame(flush)}}).observe(document.body,{childList:true,subtree:true,characterData:true});
+ proc(document.body)})();
 function toonApply(){document.body.classList.toggle('toon',!(CFG&&CFG.settings&&+CFG.settings.toon===0))}
 function openCase(id){var c=CFG.cases.filter(function(x){return x.id===id})[0];if(!c)return;curCase=c;go('casev');setTimeout(startOpen,350)}
 $('pf').onsubmit=function(e){e.preventDefault();if(DEMO)return toast('Промокоды работают на реальном счёте');var c=$('code').value.trim();if(!c)return toast('Введи промокод');call('promo',{code:c}).then(function(r){$('code').value='';openCase(r.caseId)}).catch(function(){})};
 
 /* ===== ПРОФИЛЬ, ИНВЕНТАРЬ, ЛИДЕРЫ ===== */
 function stat(a,b){return '<div class="stt"><b>'+b+'</b><span>'+a+'</span></div>'}
-function rProf(){var pb=$('pbal');if(pb){pb.innerHTML='<i>★</i> '+fmt(ME.balance);var pt=ME.stats||{},pf=pt.profit||0;$('pstat').innerHTML='<div><b>'+(pt.opened||0)+'</b><span>кейсов открыто</span></div><div><b class="'+(pf>=0?'up':'dn')+'">'+(pf>=0?'+':'')+fmt(pf)+'</b><span>прибыль</span></div><div><b>'+ME.inv.length+'</b><span>подарков</span></div>'}
- $('pav').innerHTML=photo?imgH(photo):esc(name[0]||'И');$('pn').textContent=name;$('pu').textContent=ME.username?'@'+ME.username:'username не указан';$('pid').textContent='ID: '+ME.id;$('pid').onclick=function(){copy(ME.id)};
+function rProf(){$('pav').innerHTML=photo?imgH(photo):esc(name[0]||'И');$('pn').textContent=name;$('pu').textContent=ME.username?'@'+ME.username:'username не указан';$('pid').textContent='ID: '+ME.id;$('pid').onclick=function(){copy(ME.id)};
  $('invs').textContent=ME.inv.length?'Подарков: '+ME.inv.length:'Ваши подарки и призы';$('hint').style.display=ONLINE?'none':''}
 var WDST={pending:['В обработке','st-p'],done:['Отправлен','st-d'],rejected:['Отклонён','st-r']};
 function rInv(){var val=ME.inv.reduce(function(a,x){return a+itm(x.k).value},0),p=ME.stats.profit;

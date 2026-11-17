@@ -11,6 +11,7 @@ try { fs.mkdirSync(path.dirname(DATA), { recursive: true }); } catch {}
 let state;
 try { state = JSON.parse(fs.readFileSync(DATA, 'utf8')); }
 catch { state = Engine.newState({ pepe: '/art/pepe.webp', plum: '/art/plum.webp', dog: '/art/dog.webp', arm: '/art/arm.webp', minedog: '/art/minedog.webp', slotplum: '/art/slotplum.webp' }); }
+state.mods = state.mods || []; state.modLog = state.modLog || [];
 let dirty = false;
 const markDirty = () => { dirty = true; };
 setInterval(() => { if (!dirty) return; dirty = false; const tmp = DATA + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(state)); fs.renameSync(tmp, DATA); }, 1000).unref();
@@ -100,7 +101,32 @@ function imgExt(b) {
   if (b.slice(0, 4).toString() === 'RIFF' && b.slice(8, 12).toString() === 'WEBP') return 'webp';
   if (b.slice(0, 4).toString() === 'GIF8') return 'gif'; return null;
 }
-const adminOk = req => ADMIN && crypto.timingSafeEqual(crypto.createHash('sha256').update(String(req.headers['x-admin-token'] || '')).digest(), crypto.createHash('sha256').update(ADMIN).digest());
+const shaB = s => crypto.createHash('sha256').update(String(s)).digest();
+const pwHash = (pw, salt) => crypto.scryptSync(String(pw), salt, 32).toString('hex');
+const modCache = new Map(); // sha256(пароль) -> { id, until }: чтобы не считать scrypt на каждый запрос
+const adminFails = new Map(); // подбор паролей: не больше 15 неудачных попыток за 15 минут с одного адреса
+const ipOf = req => String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+function adminAuth(req) {
+  const t = String(req.headers['x-admin-token'] || ''); if (!t) return null;
+  if (ADMIN && crypto.timingSafeEqual(shaB(t), shaB(ADMIN))) return { role: 'owner', name: 'Владелец' };
+  const key = shaB(t).toString('hex'), c = modCache.get(key), now0 = Date.now();
+  if (c && c.until > now0) { const m = state.mods.find(x => x.id === c.id && x.active !== false); if (m) return { role: 'mod', id: m.id, name: m.name }; modCache.delete(key); }
+  for (const m of state.mods) {
+    if (m.active === false) continue;
+    if (crypto.timingSafeEqual(Buffer.from(pwHash(t, m.salt), 'hex'), Buffer.from(m.hash, 'hex'))) {
+      modCache.set(key, { id: m.id, until: now0 + 5 * 60 * 1000 }); if (!m.last || now0 - m.last > 5 * 60 * 1000) { m.last = now0; markDirty(); }
+      return { role: 'mod', id: m.id, name: m.name };
+    }
+  }
+  return null;
+}
+const adminOk = req => !!adminAuth(req);
+function modLog(name, text) { state.modLog.unshift({ t: Date.now(), mod: name, text }); if (state.modLog.length > 100) state.modLog.length = 100; markDirty(); }
+function cfgDiff(a, b, label) { // что именно поменялось (для журнала владельца)
+  a = a || {}; b = b || {}; const ks = new Set([...Object.keys(a), ...Object.keys(b)]); let add = 0, del = 0, chg = 0;
+  ks.forEach(k => { if (!(k in a)) add++; else if (!(k in b)) del++; else if (JSON.stringify(a[k]) !== JSON.stringify(b[k])) chg++; });
+  return (add || del || chg) ? label + ': +' + add + ' −' + del + ' ~' + chg : '';
+}
 const hits = new Map(); // простой лимит запросов: 20 в секунду на игрока
 const limited = id => { const t = Date.now(), a = (hits.get(id) || []).filter(x => t - x < 1000); a.push(t); hits.set(id, a); return a.length > 20; };
 
@@ -150,10 +176,38 @@ http.createServer(async (req, res) => {
       return send(res, r.error ? 400 : 200, r);
     }
     if (p.startsWith('/admin/')) {
-      if (!adminOk(req)) return send(res, 403, { error: 'Неверный токен' });
+      const ip = ipOf(req), fl = adminFails.get(ip); if (fl && fl.n >= 15 && Date.now() - fl.t < 15 * 60 * 1000) return send(res, 429, { error: 'Слишком много неверных попыток. Подожди 15 минут' });
+      const au = adminAuth(req);
+      if (!au) { const f = adminFails.get(ip); if (!f || Date.now() - f.t > 15 * 60 * 1000) adminFails.set(ip, { n: 1, t: Date.now() }); else f.n++; return send(res, 403, { error: 'Неверный пароль' }); }
+      adminFails.delete(ip);
+      const owner = au.role === 'owner';
+      if (p === '/admin/whoami') return send(res, 200, { role: au.role, name: au.name });
+      // модератору доступны только: чтение настроек, сохранение NFT и кейсов, загрузка картинок
+      const modOk = (p === '/admin/config') || (p === '/admin/upload' && req.method === 'POST');
+      if (!owner && !modOk) return send(res, 403, { error: 'Нет прав: это может делать только владелец' });
+      if (p === '/admin/mods') {
+        if (req.method === 'GET') return send(res, 200, { list: state.mods.map(m => ({ id: m.id, name: m.name, created: m.created, last: m.last || 0, active: m.active !== false })), log: state.modLog.slice(0, 50) });
+        let b2 = {}; try { b2 = JSON.parse((await body(req, 5000)).toString() || '{}'); } catch {}
+        const pwOk = pw => { pw = String(pw || ''); if (pw.length < 6 || pw.length > 64) return 'Пароль от 6 до 64 символов'; if (ADMIN && crypto.timingSafeEqual(shaB(pw), shaB(ADMIN))) return 'Этот пароль совпадает с паролем владельца'; if (state.mods.some(m => crypto.timingSafeEqual(Buffer.from(pwHash(pw, m.salt), 'hex'), Buffer.from(m.hash, 'hex')))) return 'Такой пароль уже у другого модератора'; return ''; };
+        if (b2.action === 'add') {
+          const name = String(b2.name || '').trim().slice(0, 30); if (name.length < 2) return send(res, 400, { error: 'Имя модератора от 2 символов' });
+          const bad = pwOk(b2.password); if (bad) return send(res, 400, { error: bad });
+          const salt = crypto.randomBytes(16).toString('hex'); state.mods.push({ id: crypto.randomBytes(4).toString('hex'), name, salt, hash: pwHash(b2.password, salt), created: Date.now(), active: true }); markDirty();
+          return send(res, 200, { ok: true });
+        }
+        const m = state.mods.find(x => x.id === b2.id); if (!m) return send(res, 404, { error: 'Модератор не найден' });
+        if (b2.action === 'del') { state.mods = state.mods.filter(x => x.id !== m.id); modCache.clear(); markDirty(); return send(res, 200, { ok: true }); }
+        if (b2.action === 'pass') { const bad = pwOk(b2.password); if (bad) return send(res, 400, { error: bad }); m.salt = crypto.randomBytes(16).toString('hex'); m.hash = pwHash(b2.password, m.salt); modCache.clear(); markDirty(); return send(res, 200, { ok: true }); }
+        return send(res, 400, { error: 'Неизвестное действие' });
+      }
       if (p === '/admin/config' && req.method === 'GET') return send(res, 200, engine.adminConfig());
       if (p === '/admin/config' && req.method === 'PUT') {
         let n; try { n = JSON.parse((await body(req, 500000)).toString()); } catch { return send(res, 400, { error: 'Неверный JSON' }); }
+        if (!owner) { // модератор меняет только NFT и кейсы, всё остальное берётся из текущих настроек
+          const cur = engine.adminConfig(), m2 = Object.assign({}, cur, { items: n.items || cur.items, cases: n.cases || cur.cases });
+          const note = [cfgDiff(cur.items, m2.items, 'NFT'), cfgDiff((cur.cases || []).reduce((o, c) => (o[c.id] = c, o), {}), (m2.cases || []).reduce((o, c) => (o[c.id] = c, o), {}), 'кейсы')].filter(Boolean).join('; ');
+          try { const r = engine.putConfig(m2); if (note) modLog(au.name, note); return send(res, 200, r); } catch (e) { if (e instanceof Engine.Err) return send(res, 400, { error: e.message }); throw e; }
+        }
         try { return send(res, 200, engine.putConfig(n)); } catch (e) { if (e instanceof Engine.Err) return send(res, 400, { error: e.message }); throw e; }
       }
       if (p === '/admin/stats') return send(res, 200, engine.stats());

@@ -13,7 +13,7 @@
     var W = function (k, w) { return { k: k, weight: w }; };
     return {
       settings: { edge: 0.03, minBet: 10, maxBet: 1000, maxPayout: 20000, maxCaseRtp: 0.95, startBalance: 1000, demoBalance: 10000, tonToStars: 200, minDeposit: 10, refPercent: 0.05, botUsername: '', supportUsername: '',
-        toon: 1, crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 8, upMinChance: 0.05, upMinMult: 1.5, upMaxChance: 0.75, wdFeeFixed: 25, wdStarsFrom: 100, wdFeeStars: 25, autoPay: 0, starsFeePct: 0, rlZeros: 3, blMax: 50, blMin: 1.5, twMaxMult: 50, cupsMult: 2.7, bjOn: 1, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
+        toon: 1, crashMax: 50, crashSpeed: 0.7, minesMin: 5, minesMaxMult: 8, upMinChance: 0.05, upMinMult: 1.5, upMaxChance: 0.75, wdFeeFixed: 25, wdStarsFrom: 100, wdFeeStars: 25, autoPay: 0, starsFeePct: 0, rlZeros: 3, blMax: 50, blMin: 1.5, twMaxMult: 50, cupsMult: 2.7, bjOn: 1, bjMin: 10, bjMax: 10000, bjPay: 1.2, bjH17: 1, bjP22: 0, duOn: 1, duFee: 0.05,
         edges: { crash: 0.07, mines: 0.12, plinko: 0.08, coin: 0.05, upgrade: 0.06, slots: 0.05, tower: 0.08, hilo: 0.07, balloon: 0.08, slots3: 0.10 }, modes: { rocket: 1, mines: 1, upgrade: 1, slots: 1, plinko: 1, wheel: 1, coin: 1, tower: 1, bj: 1, du: 1, hilo: 1, roulette: 0, balloon: 1, cups: 1 }, tonAddress: '', giftDepositTo: '', giftDepositNote: 'Начисляем в течение 24 часов.', channelUrl: '', channelText: 'Наш канал', wdFeePct: 0, wdMinValue: 50, wdWagerMult: 1, wdNote: 'в течение 24 часов' },
       items: {
         clover: { name: 'Клевер', img: '', value: 5, wd: false, up: true }, gem: { name: 'Кристалл', img: '', value: 15, wd: false, up: true },
@@ -119,6 +119,7 @@
       S.flags = S.flags || {}; if (!S.flags.m10) { S.flags.m10 = 1; var ed0 = S.cfg.settings.edges || {}; if (ed0.mines === 0.06) ed0.mines = 0.10; var sk1 = S.cfg.skins || {}; if (!sk1.sprite_rocket || /pepe\.webp$/.test(sk1.sprite_rocket)) sk1.sprite_rocket = '/art/minedog.webp'; }
       var sk0 = S.cfg.skins = S.cfg.skins || {}; if (sk0.mines_closed === undefined) sk0.mines_closed = '/art/minedog.webp'; ['mines_safe', 'mines_bomb', 'card_mines'].forEach(function (k) { if (sk0[k] === undefined) sk0[k] = ''; });
       if (!S.flags.lr1) { S.flags.lr1 = 1; var edL = S.cfg.settings.edges || {}; if (edL.tower === 0.08) edL.tower = 0.12; if (edL.balloon === 0.08) edL.balloon = 0.12; if (+S.cfg.settings.wdWagerMult === 1) S.cfg.settings.wdWagerMult = 3; }
+      if (S.bj) { var oldBj = false; ['real', 'demo'].forEach(function (k) { var Ab = S.bj[k]; if (Ab) Object.keys(Ab).forEach(function (id) { var Tb = Ab[id]; if (Tb.stake !== undefined) { oldBj = true; (Tb.seats || []).forEach(function (sb) { if (!sb) return; var ub = S.users[sb.uid]; if (!ub) return; if (Tb.phase !== 'done') { var back = sb.hands && sb.hands.length ? sb.hands.reduce(function (a, h) { return a + h.bet; }, 0) : (sb.bet || 0); ub.balance += back; } ub.bjt = ''; }); } }); }); if (oldBj) S.bj = {}; } // столы со своей ставкой: старые столы закрываются, ставки возвращаются
       Object.keys(S.cfg.items).forEach(function (k) { var it = S.cfg.items[k]; if (it.wd === undefined) it.wd = !!it.img; if (it.up === undefined) it.up = true; });
       if (!S.cfg.slots3) S.cfg.slots3 = defaultSlots3({ slotplum: '/art/slotplum.webp', dog: '/art/dog.webp', pepe: '/art/pepe.webp' }); if (S.cfg.skins.card_slots3 === undefined) S.cfg.skins.card_slots3 = ''; if (S.cfg.skins.card_modes1 === undefined) S.cfg.skins.card_modes1 = ''; if (S.cfg.skins.card_modes2 === undefined) S.cfg.skins.card_modes2 = '';
       (function () { var st9 = S.cfg.settings; if (st9.giftDepositTo === undefined) st9.giftDepositTo = ''; if (st9.giftDepositNote === undefined) st9.giftDepositNote = 'Начисляем в течение 24 часов.'; st9.edges = st9.edges || {}; if (st9.edges.slots3 === undefined) st9.edges.slots3 = 0.10; })();
@@ -215,16 +216,18 @@
     }
 
     // ---- Блэкджек: живые столы с реальными игроками, дилер играет по правилам на сервере ----
-    var BJ_ST = [10, 50, 100, 500, 1000, 5000, 10000], BJ_TN = ['Луна', 'Орбита', 'Сатурн'], BJ_BET = 9000, BJ_TURN = 15000, BJ_IDLE = 40000;
+    var BJ_TN = ['Луна', 'Орбита', 'Сатурн', 'Комета', 'Квазар', 'Пульсар', 'Зенит', 'Аврора', 'Нептун', 'Венера'], BJ_BET = 9000, BJ_TURN = 15000, BJ_IDLE = 40000;
+    function bjMin() { return Math.max(1, Math.floor(set('bjMin') || 10)); }
+    function bjMax() { return Math.max(bjMin(), Math.floor(set('bjMax') || 10000)); }
     function bjAll(demo) {
       var B = S.bj || (S.bj = {}), k = demo ? 'demo' : 'real';
-      if (!B[k]) { B[k] = {}; BJ_ST.forEach(function (st) { BJ_TN.forEach(function (n, i) { var id = (demo ? 'd' : 'r') + st + '_' + i; B[k][id] = { id: id, stake: st, name: n, seats: [null, null, null, null, null], phase: 'wait', dl: 0, dealer: [], hole: false, shoe: [], round: 0, turn: -1, th: 0 }; }); }); }
+      if (!B[k]) { B[k] = {}; BJ_TN.forEach(function (n, i) { var id = (demo ? 'd' : 'r') + 't' + i; B[k][id] = { id: id, name: n, seats: [null, null, null, null, null], phase: 'wait', dl: 0, dealer: [], hole: false, shoe: [], round: 0, turn: -1, th: 0 }; }); }
       return B[k];
     }
     function bjTable(id) { var B = S.bj || {}; return (B.real && B.real[id]) || (B.demo && B.demo[id]) || null; }
-    function bjSolo(u, st) { // личный стол один на один с дилером: в лобби не виден, сесть может только владелец
-      var B = bjAll(u.demo), id = 'p' + u.id + '_' + st;
-      if (!B[id]) B[id] = { id: id, priv: u.id, stake: st, name: 'Один на один', seats: [null, null, null, null, null], phase: 'wait', dl: 0, dealer: [], hole: false, shoe: [], round: 0, turn: -1, th: 0 };
+    function bjSolo(u) { // личный стол один на один с дилером: в лобби не виден, сесть может только владелец
+      var B = bjAll(u.demo), id = 'p' + u.id;
+      if (!B[id]) B[id] = { id: id, priv: u.id, name: 'Один на один', seats: [null, null, null, null, null], phase: 'wait', dl: 0, dealer: [], hole: false, shoe: [], round: 0, turn: -1, th: 0 };
       return B[id];
     }
     var bjV = function (c) { var r = c[0]; return r === 'A' ? 11 : 'TJQK'.indexOf(r) >= 0 ? 10 : +r; };
@@ -297,7 +300,7 @@
     }
     function bjView(u, T) {
       var t = now(), me = bjSeatOf(T, u.id); if (me >= 0) T.seats[me].seen = t;
-      return { bj: { id: T.id, name: T.name, stake: T.stake, phase: T.phase, dl: T.dl, now: t, round: T.round, turn: T.turn, th: T.th, me: me, pay: set('bjPay') || 1.2, h17: !!set('bjH17'), p22: !!set('bjP22'),
+      return { bj: { id: T.id, name: T.name, min: bjMin(), max: bjMax(), phase: T.phase, dl: T.dl, now: t, round: T.round, turn: T.turn, th: T.th, me: me, pay: set('bjPay') || 1.2, h17: !!set('bjH17'), p22: !!set('bjP22'),
         solo: !!T.priv, dealer: T.hole && T.dealer.length > 1 ? [T.dealer[0], '??'] : T.dealer.slice(),
         seats: T.seats.map(function (s) { return s ? { name: s.uid === u.id ? s.name : maskName(s.name), me: s.uid === u.id, bet: s.bet, hands: s.hands.map(function (h) { return { c: h.c.slice(), bet: h.bet, done: !!h.done, res: h.res || '', pay: h.pay || 0, split: !!h.split }; }) } : null; }) } };
     }
@@ -599,7 +602,7 @@
       },
       'bj/lobby': function (u) {
         var B = bjAll(u.demo), p = u.demo ? 'd' : 'r';
-        return { on: !!set('bjOn'), at: u.bjt || '', solo: true, stakes: BJ_ST.map(function (st) { return { stake: st, tables: BJ_TN.map(function (n, i) { var T = B[p + st + '_' + i]; return { id: T.id, name: T.name, players: T.seats.filter(Boolean).length }; }) }; }) };
+        return { on: !!set('bjOn'), at: u.bjt || '', solo: true, min: bjMin(), max: bjMax(), tables: BJ_TN.map(function (n, i) { var T = B[p + 't' + i]; return { id: T.id, name: T.name, players: T.seats.filter(Boolean).length }; }) };
       },
       'bj/sit': function (u, b) {
         if (!set('bjOn')) throw new Err('Блэкджек временно закрыт');
@@ -609,8 +612,8 @@
         u.bjt = T.id; return bjView(u, T);
       },
       'bj/solo': function (u, b) {
-        if (!set('bjOn')) throw new Err('Блэкджек временно закрыт'); var st = Math.floor(+b.stake); if (BJ_ST.indexOf(st) < 0) throw new Err('Нет такой ставки');
-        var T = bjSolo(u, st); if (u.bjt && u.bjt !== T.id) bjLeaveU(u);
+        if (!set('bjOn')) throw new Err('Блэкджек временно закрыт');
+        var T = bjSolo(u); if (u.bjt && u.bjt !== T.id) bjLeaveU(u);
         if (bjSeatOf(T, u.id) < 0) T.seats[2] = { uid: u.id, name: u.name, seen: now(), bet: 0, hands: [] };
         u.bjt = T.id; return bjView(u, T);
       },
@@ -621,10 +624,11 @@
         return { i: i, mult: m, payout: pay(u, 'wheel', bet, bet * m) };
       },
       'bj/state': function (u) { var T = u.bjt && bjTable(u.bjt); if (!T || bjSeatOf(T, u.id) < 0) { u.bjt = ''; return { gone: true }; } return bjView(u, T); },
-      'bj/bet': function (u) {
+      'bj/bet': function (u, b) {
         if (!set('bjOn')) throw new Err('Блэкджек временно закрыт');
         var m = bjMine(u), T = m.T, s = m.s; if (T.phase !== 'wait' && T.phase !== 'bet') throw new Err('Дождись следующей раздачи'); if (s.bet > 0) throw new Err('Ставка уже сделана');
-        if (u.balance < T.stake) throw new Err('Не хватает звёзд'); u.balance -= T.stake; s.bet = T.stake; s.seen = now();
+        var amt = Math.floor(+(b && b.amount)); if (!(amt >= bjMin())) throw new Err('Минимальная ставка ★' + bjMin()); if (amt > bjMax()) throw new Err('Максимальная ставка ★' + bjMax());
+        if (u.balance < amt) throw new Err('Не хватает звёзд'); u.balance -= amt; s.bet = amt; s.seen = now();
         if (T.phase === 'wait') { T.phase = 'bet'; T.dl = now() + BJ_BET; } bjAdvance(T, now()); return bjView(u, T);
       },
       'bj/act': function (u, b) {
@@ -730,12 +734,12 @@
     function adminConfig() { var c = JSON.parse(JSON.stringify(cfg())); c.wheelMaxRtp = WHEEL_MAX_RTP; c.biz = S.biz || null; c.rtp = {}; c.cases.forEach(function (x) { c.rtp[x.id] = caseRtp(x, c.items); }); c.skinList = SKINS; c.s3 = s3info(); return c; }
     function putConfig(n) {
       var s = n.settings || {}, items = n.items || {}, out = { settings: {}, items: {}, cases: [], skins: {}, promos: {} };
-      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17', bjP22: 'перебор дилера на 22', duOn: 'дурак включён', duFee: 'комиссия в дураке', upMinChance: 'минимальный шанс апгрейда', upMinMult: 'минимальный множитель апгрейда', wdFeeFixed: 'фиксированная комиссия за вывод', starsFeePct: 'комиссия за пополнение звёздами', rlZeros: 'число зеро в рулетке', cupsMult: 'выплата в колпачках', blMax: 'потолок шарика', autoPay: 'автовыплата подарков', toon: 'мультяшный дизайн', upMaxChance: 'апгрейд: максимальный шанс со звёздами', blMin: 'шарик: минимальный множитель', twMaxMult: 'башня: потолок множителя', wdStarsFrom: 'порог: комиссия звёздами отдельно', wdFeeStars: 'комиссия звёздами за дорогие подарки' };
+      var DS0 = defaultConfig({}).settings, LBL = { edge: 'общий процент прибыли', minBet: 'минимальная ставка', maxBet: 'максимальная ставка', demoBalance: 'демо-баланс', maxPayout: 'максимальная выплата', maxCaseRtp: 'максимальный RTP кейса', startBalance: 'стартовый баланс', tonToStars: 'курс TON', minDeposit: 'минимальное пополнение', refPercent: 'реферальный процент', wdFeePct: 'комиссия за вывод', wdMinValue: 'минимальная стоимость вывода', wdWagerMult: 'отыгрыш пополнений', crashMax: 'максимум ракеты', crashSpeed: 'скорость ракеты', minesMin: 'минимум мин', minesMaxMult: 'потолок в минах', bjOn: 'блэкджек включён', bjPay: 'выплата за блэкджек', bjH17: 'дилер на мягких 17', bjP22: 'перебор дилера на 22', duOn: 'дурак включён', duFee: 'комиссия в дураке', upMinChance: 'минимальный шанс апгрейда', upMinMult: 'минимальный множитель апгрейда', wdFeeFixed: 'фиксированная комиссия за вывод', starsFeePct: 'комиссия за пополнение звёздами', rlZeros: 'число зеро в рулетке', cupsMult: 'выплата в колпачках', blMax: 'потолок шарика', autoPay: 'автовыплата подарков', toon: 'мультяшный дизайн', bjMin: 'блэкджек: минимальная ставка', bjMax: 'блэкджек: максимальная ставка', upMaxChance: 'апгрейд: максимальный шанс со звёздами', blMin: 'шарик: минимальный множитель', twMaxMult: 'башня: потолок множителя', wdStarsFrom: 'порог: комиссия звёздами отдельно', wdFeeStars: 'комиссия звёздами за дорогие подарки' };
       Object.keys(LBL).forEach(function (k) {
         var raw = s[k], cur = set(k); if (!(cur >= 0)) cur = Number(DS0[k]); // поле не пришло или пустое: оставляем текущее значение
         var v = (raw === undefined || raw === null || raw === '' || isNaN(+raw)) ? cur : +raw; if (!(v >= 0)) throw new Err('Неверная настройка: ' + LBL[k]); out.settings[k] = v;
       });
-      out.settings.toon = +out.settings.toon === 0 ? 0 : 1; out.settings.upMaxChance = Math.max(0.2, Math.min(0.95, +out.settings.upMaxChance || 0.75)); out.settings.blMin = Math.max(1, Math.min(20, +out.settings.blMin || 1)); out.settings.twMaxMult = Math.max(2, Math.min(100000, +out.settings.twMaxMult || 50)); out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.autoPay = out.settings.autoPay ? 1 : 0; out.settings.bjP22 = out.settings.bjP22 ? 1 : 0; out.settings.duOn = out.settings.duOn ? 1 : 0; out.settings.rlZeros = Math.min(3, Math.max(1, Math.round(out.settings.rlZeros) || 3)); if (out.settings.cupsMult < 1.5 || out.settings.cupsMult > 2.95) throw new Err('Выплата в колпачках от ×1.5 до ×2.95 (×3 — это уже ноль прибыли)'); if (out.settings.blMax < 2 || out.settings.blMax > 1000) throw new Err('Потолок шарика от 2 до 1000'); if (out.settings.starsFeePct > 0.3) throw new Err('Комиссия за пополнение звёздами не больше 0.3 (30%)'); if (out.settings.upMinMult < 1 || out.settings.upMinMult > 5) throw new Err('Минимальный множитель апгрейда от 1 до 5'); if (out.settings.upMinChance > 0.5) throw new Err('Минимальный шанс апгрейда не больше 0.5 (50%)'); if (out.settings.duFee > 0.2) throw new Err('Комиссия в дураке не больше 0.2 (20%)'); out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
+      out.settings.toon = +out.settings.toon === 0 ? 0 : 1; out.settings.bjMin = Math.max(1, Math.min(1000000, Math.floor(+out.settings.bjMin || 10))); out.settings.bjMax = Math.max(out.settings.bjMin, Math.min(10000000, Math.floor(+out.settings.bjMax || 10000))); out.settings.upMaxChance = Math.max(0.2, Math.min(0.95, +out.settings.upMaxChance || 0.75)); out.settings.blMin = Math.max(1, Math.min(20, +out.settings.blMin || 1)); out.settings.twMaxMult = Math.max(2, Math.min(100000, +out.settings.twMaxMult || 50)); out.settings.bjOn = out.settings.bjOn ? 1 : 0; out.settings.autoPay = out.settings.autoPay ? 1 : 0; out.settings.bjP22 = out.settings.bjP22 ? 1 : 0; out.settings.duOn = out.settings.duOn ? 1 : 0; out.settings.rlZeros = Math.min(3, Math.max(1, Math.round(out.settings.rlZeros) || 3)); if (out.settings.cupsMult < 1.5 || out.settings.cupsMult > 2.95) throw new Err('Выплата в колпачках от ×1.5 до ×2.95 (×3 — это уже ноль прибыли)'); if (out.settings.blMax < 2 || out.settings.blMax > 1000) throw new Err('Потолок шарика от 2 до 1000'); if (out.settings.starsFeePct > 0.3) throw new Err('Комиссия за пополнение звёздами не больше 0.3 (30%)'); if (out.settings.upMinMult < 1 || out.settings.upMinMult > 5) throw new Err('Минимальный множитель апгрейда от 1 до 5'); if (out.settings.upMinChance > 0.5) throw new Err('Минимальный шанс апгрейда не больше 0.5 (50%)'); if (out.settings.duFee > 0.2) throw new Err('Комиссия в дураке не больше 0.2 (20%)'); out.settings.bjH17 = out.settings.bjH17 ? 1 : 0;
       if (!(out.settings.bjPay >= 1 && out.settings.bjPay <= 1.5)) throw new Err('Выплата за блэкджек от 1 до 1.5 (6 к 5 = 1.2, 3 к 2 = 1.5)');
       ['botUsername', 'supportUsername', 'giftDepositTo'].forEach(function (k) { var v = String(s[k] || '').replace(/^@/, '').trim(); if (!/^[A-Za-z0-9_]{0,32}$/.test(v)) throw new Err('Имя в Telegram: латиница, цифры, _ (' + k + ')'); out.settings[k] = v; });
       out.settings.wdNote = String(s.wdNote || '').slice(0, 80); out.settings.giftDepositNote = String(s.giftDepositNote === undefined ? (cfg().settings.giftDepositNote || '') : s.giftDepositNote).slice(0, 500); out.settings.edges = {};

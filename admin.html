@@ -13,7 +13,7 @@ button.b{padding:9px 14px;border-radius:10px;border:0;background:var(--v);color:
 </style></head><body>
 <div class="top"><h1>LunoCase: админка</h1><a href="/" target="_blank" id="openapp" hidden>Открыть приложение</a></div>
 <div class="row" id="login"><input id="tok" type="password" placeholder="Токен админа" autocomplete="off"><button class="b" id="go">Войти</button></div>
-<div id="app" hidden><div class="tabs" id="tabs"></div><div id="view"></div>
+<div id="app" hidden><div class="help" id="who" hidden></div><div class="tabs" id="tabs"></div><div id="view"></div>
  <div id="save"><button class="b" id="sv">Сохранить всё</button><span id="msg" class="m">Изменения применяются сразу после сохранения.</span></div></div>
 <script src="/engine.js"></script>
 <script>
@@ -24,15 +24,31 @@ document.addEventListener('input',function(e){if(!LIVE[tab]&&e.target.id!=='tok'
 document.addEventListener('change',function(e){if(!LIVE[tab]&&e.target.type!=='file'){dirty=true;say('Есть несохранённые изменения. Нажми «Сохранить всё» внизу.',0);$('msg').className='warn'}},true);
 function say(t,bad){$('msg').textContent=t;$('msg').className=bad?'err':'okc'}
 function fmtT(t){return new Date(t).toLocaleString('ru-RU')}
-$('go').onclick=function(){T=$('tok').value;api('GET','config').then(function(c){C=c;sessionStorage.setItem('t',T);$('login').hidden=true;$('app').hidden=false;$('openapp').hidden=false;api('GET','stats').then(function(s){ST=s;draw()})}).catch(function(e){alert(e.message)})};
+var ROLE='owner',WHO='';
+$('go').onclick=function(){T=$('tok').value;api('GET','config').then(function(c){C=c;return api('GET','whoami').then(function(w){ROLE=w.role;WHO=w.name;if(ROLE==='mod'){TABS=[['items','NFT и подарки'],['cases','Кейсы']];tab='items'}else if(!TABS.some(function(t){return t[0]==='mods'}))TABS.push(['mods','Модераторы']);sessionStorage.setItem('t',T);$('login').hidden=true;$('app').hidden=false;$('openapp').hidden=false;$('who').hidden=ROLE!=='mod';$('who').textContent='Вы вошли как модератор «'+WHO+'». Вам доступны только NFT и кейсы.';if(ROLE==='mod')draw();else api('GET','stats').then(function(s){ST=s;draw()})})}).catch(function(e){alert(e.message)})};
 try{var s0=sessionStorage.getItem('t');if(s0){$('tok').value=s0;$('go').click()}}catch(e){}
 var TABS=[['start','Начало работы'],['items','NFT и подарки'],['cases','Кейсы'],['s3','Слоты'],['up','Апгрейд'],['skins','Режимы и картинки'],['wheel','Колесо фортуны'],['promos','Промокоды'],['settings','Настройки'],['wd','Выводы'],['gdep','Пополнение подарками'],['users','Игроки'],['stats','Статистика']];
-var LIVE={start:1,wd:1,gdep:1,users:1,stats:1};
-function draw(){$('tabs').innerHTML='';TABS.forEach(function(t){var b=h('button',{class:tab===t[0]?'on':'',on:{click:function(){tab=t[0];api('GET','stats').then(function(s){ST=s;draw()}).catch(function(){draw()})}}},[t[1]]);if(t[0]==='wd'&&ST&&ST.wdPending)b.appendChild(h('span',{class:'pill'},[''+ST.wdPending]));if(t[0]==='gdep'&&ST&&ST.gdepPending)b.appendChild(h('span',{class:'pill'},[''+ST.gdepPending]));$('tabs').appendChild(b)});
- $('view').innerHTML='';({start:vStart,items:vItems,cases:vCases,s3:vS3,gdep:vGdep,up:vUp,skins:vSkins,promos:vPromos,wheel:vWheel,settings:vSet,wd:vWd,users:vUsers,stats:vStats})[tab]();$('save').hidden=!!LIVE[tab]}
+var LIVE={start:1,wd:1,gdep:1,users:1,stats:1,mods:1};
+function draw(){$('tabs').innerHTML='';TABS.forEach(function(t){var b=h('button',{class:tab===t[0]?'on':'',on:{click:function(){tab=t[0];if(ROLE==='mod'){draw();return}api('GET','stats').then(function(s){ST=s;draw()}).catch(function(){draw()})}}},[t[1]]);if(t[0]==='wd'&&ST&&ST.wdPending)b.appendChild(h('span',{class:'pill'},[''+ST.wdPending]));if(t[0]==='gdep'&&ST&&ST.gdepPending)b.appendChild(h('span',{class:'pill'},[''+ST.gdepPending]));$('tabs').appendChild(b)});
+ $('view').innerHTML='';({start:vStart,items:vItems,cases:vCases,s3:vS3,gdep:vGdep,up:vUp,skins:vSkins,promos:vPromos,wheel:vWheel,settings:vSet,wd:vWd,users:vUsers,stats:vStats,mods:vMods})[tab]();$('save').hidden=!!LIVE[tab]}
 function img(get,set,rerender){var w=h('span',{class:'row'}),pv=h('img',{class:'pv',src:get()||'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='});
  var f=h('input',{type:'file',accept:'image/png,image/jpeg,image/webp,image/gif',on:{change:function(){var file=f.files[0];if(!file)return;say('Загружаю…');file.arrayBuffer().then(function(b){return api('POST','upload',null,b)}).then(function(r){set(r.url);say('Картинка загружена. Не забудь сохранить.');rerender()}).catch(function(e){say(e.message,1)})}}});
  w.appendChild(pv);w.appendChild(f);if(get())w.appendChild(h('button',{class:'b g',on:{click:function(){set('');rerender()}}},['Убрать']));return w}
+
+function vMods(){var v=$('view');v.appendChild(h('div',{class:'help'},['Модератор входит в эту же админку по своему личному паролю (в поле «Токен админа»). Он может добавлять и менять только NFT и кейсы, настройки, выводы, игроков, промокоды и остальное ему недоступны. Ты можешь в любой момент сменить ему пароль или исключить.']));
+ var nm=h('input',{type:'text',placeholder:'Имя модератора',maxlength:'30'}),pw=h('input',{type:'text',placeholder:'Пароль от 6 символов',autocomplete:'off'});
+ function gen(){var a='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='',b=new Uint8Array(12);crypto.getRandomValues(b);for(var i=0;i<12;i++)s+=a[b[i]%a.length];return s}
+ v.appendChild(h('div',{class:'card'},[h('b',{class:'big'},['Добавить модератора']),h('div',{class:'row'},[nm,pw,h('button',{class:'b g',on:{click:function(){pw.value=gen()}}},['Придумать пароль']),h('button',{class:'b',on:{click:function(){var p=pw.value;api('POST','mods',{action:'add',name:nm.value,password:p}).then(function(){alert('Модератор создан.\nИмя: '+nm.value+'\nПароль: '+p+'\n\nПередай ему пароль. Вход: эта же админка, поле «Токен админа».');vMods2()}).catch(function(e){alert(e.message)})}}},['Создать'])])]));
+ var box=h('div',{});v.appendChild(box);
+ function vMods2(){$('view').innerHTML='';vMods()}
+ api('GET','mods').then(function(r){var card=h('div',{class:'card'},[h('b',{class:'big'},['Модераторы ('+r.list.length+')'])]);
+  if(!r.list.length)card.appendChild(h('p',{class:'m'},['Пока нет ни одного модератора.']));
+  r.list.forEach(function(m){card.appendChild(h('div',{class:'row'},[h('b',{},[m.name]),h('span',{class:'m'},['создан '+fmtT(m.created)+(m.last?' · был в админке '+fmtT(m.last):' · ещё не заходил')]),
+   h('button',{class:'b g',on:{click:function(){var p=prompt('Новый пароль для «'+m.name+'» (от 6 символов):',gen());if(!p)return;api('POST','mods',{action:'pass',id:m.id,password:p}).then(function(){alert('Пароль изменён.\nНовый пароль: '+p);}).catch(function(e){alert(e.message)})}}},['Сменить пароль']),
+   h('button',{class:'b r',on:{click:function(){if(!confirm('Исключить модератора «'+m.name+'»? Он сразу потеряет доступ.'))return;api('POST','mods',{action:'del',id:m.id}).then(vMods2).catch(function(e){alert(e.message)})}}},['Исключить'])]))});
+  box.appendChild(card);
+  var lg=h('div',{class:'card'},[h('b',{class:'big'},['Что делали модераторы'])]);if(!r.log.length)lg.appendChild(h('p',{class:'m'},['Пока ничего.']));
+  r.log.forEach(function(x){lg.appendChild(h('div',{class:'row'},[h('span',{class:'m'},[fmtT(x.t)]),h('b',{},[x.mod]),h('span',{},[x.text])]))});box.appendChild(lg)}).catch(function(e){say(e.message,1)})}
 function ownImgs(){return Object.keys(C.items).filter(function(k){return /^\/uploads\//.test(C.items[k].img||'')}).length}
 function vStart(){var v=$('view'),S=C.settings,n=Object.keys(C.items).length;
  v.appendChild(h('div',{class:'help'},['Здесь ты управляешь всем приложением. Любые изменения применяются, только когда ты нажмёшь «Сохранить всё» внизу. Игроки увидят новые картинки и кейсы сразу после сохранения. Сначала пройди эти шаги по порядку.']));
@@ -148,7 +164,8 @@ function vSet(){var v=$('view'),S=C.settings;S.edges=S.edges||{};S.modes=S.modes
  var tbl=h('div',{class:'card m'});function pt(){var e=+S.edges.crash||0,mx=+S.crashMax||50,rows=[1.5,2,3,5,10,25,50,100].filter(function(x){return x<=mx});tbl.textContent='Шанс долететь: '+rows.map(function(x){return '×'+x+' = '+((1-e)/x*100).toFixed(1)+'%'}).join(' · ')+'. Игрок, который каждый раз забирает на ×2, выигрывает в '+((1-e)/2*100).toFixed(0)+'% раундов и в среднем возвращает '+((1-e)*100).toFixed(0)+'% ставок, то есть теряет '+(e*100).toFixed(0)+'%.'}pt();tbl.id='crashtbl';v.appendChild(tbl);
  document.addEventListener('input',function(){if($('crashtbl'))pt()},true);
  v.appendChild(h('h2',{},['Дизайн']));v.appendChild(h('div',{class:'card row'},[h('label',{style:'flex:1'},[h('input',{type:'checkbox',ck:S.toon===undefined||+S.toon!==0,on:{change:function(){S.toon=this.checked?1:0}}}),' Мультяшный дизайн: закруглённые объёмные карточки и кнопки. Сними галочку, чтобы вернуть прежний вид приложения'])]));
-v.appendChild(h('h2',{},['Мины: ограничения']));
+v.appendChild(h('h2',{},['Блэкджек: ставки']));v.appendChild(num('Минимальная ставка за столом, ★',function(){return S.bjMin||10},function(x){S.bjMin=x}));v.appendChild(num('Максимальная ставка за столом, ★',function(){return S.bjMax||10000},function(x){S.bjMax=x}));
+ v.appendChild(h('h2',{},['Мины: ограничения']));
  v.appendChild(h('div',{class:'help'},['Минимум мин: меньше мин значит больше шансов дойти далеко, поэтому по умолчанию 5. Потолок выигрыша: когда множитель достигает его, игра сама забирает выигрыш (по умолчанию ×10). Первая открытая клетка при ставке ★10 даёт около ★11. Процент прибыли по минам задаётся выше, в блоке «Твоя прибыль по играм».']));
  v.appendChild(num('Минимум мин на поле (от 1 до 20)',function(){return S.minesMin},function(x){S.minesMin=x}));
  v.appendChild(num('Потолок выигрыша в минах, ×',function(){return S.minesMaxMult},function(x){S.minesMaxMult=x}));

@@ -3440,8 +3440,8 @@ function ugSpin(f,done){var fast=UGFAST,dur=fast?1200:6400,rot=fast?2:7,start=an
   var s0=Math.floor(last/5),s1=Math.floor(a/5);if(s1>s0&&now-lastTick>(fast?32:46)){ugTick(s1);lastTick=now}last=a;
   if(k<1)ugRAF=requestAnimationFrame(frame);else{ang=target%360;pt.style.transform='rotate('+ang+'deg)';ugStop();setTimeout(done,fast?160:420)}}
  ugRAF=requestAnimationFrame(frame)}
-/* куда остановится стрелка (доля круга от верха по часовой). Проигрыш чаще «почти успех»: стрелка встаёт сразу за краем зелёной зоны */
-function ugLand(p,win){if(win){return rnd()<.35?p*(.84+.13*rnd()):p*(.06+.8*rnd())}var q=Math.pow(rnd(),2.2);return p+(1-p)*(.04+.92*q)}
+/* куда остановится стрелка (доля круга от верха по часовой). Проигрыш: часть остановок «почти успех» сразу за краем зелёной зоны, остальные по всей красной зоне до самого верха (до 0%) */
+function ugLand(p,win){if(win){return rnd()<.3?p*(.86+.12*rnd()):p*(.05+.9*rnd())}var q=rnd()<.4?Math.pow(rnd(),2.2)*.35:rnd();return p+(1-p)*(.03+.94*q)}
 function ugDone(r,target){upb=0;sync(r);var win=!!r.win,dl=$('dial');ugChime(win);dl.classList.add(win?'win':'lose');$('ch').textContent=win?'УСПЕХ!':'НЕ ПОВЕЗЛО';$('ugchl').textContent=win?itm(target).name:'подарок сгорел';
  toast(win?'Апгрейд удался: '+itm(target).name:'Не повезло, подарок сгорел');try{if(navigator.vibrate)navigator.vibrate(win?[25,40,60]:30)}catch(e){}
  setTimeout(function(){dl.classList.remove('win','lose');sel=null;tg=null;addv=0;ugLock(false);upd()},UGFAST?900:1900)}

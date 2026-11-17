@@ -1712,6 +1712,23 @@ body #ugo:disabled{filter:grayscale(.65);opacity:.55}
 }
 @media (max-width:370px){.upst{gap:22px 8px;padding:26px 8px 16px}#upgrade .ugcard b{font-size:14px}.ugpr{font-size:12.5px}.dial{--ds:min(74vw,270px)}}
 .dial,.dial *{pointer-events:none}
+
+/* ===== v46: на ПК карусель и Live чуть крупнее ===== */
+@media (min-width:900px){
+ #home .hcc{min-height:276px!important;padding:28px 32px!important;border-radius:36px!important}
+ #home .hcc h2{font-size:31px!important;margin:14px 0 10px!important}
+ #home .hcc p{font-size:16px!important}
+ #home .hcc .gift{width:196px!important;height:178px!important;right:16px!important;top:22px!important}
+ #home .wb{padding:16px 30px!important;font-size:17px!important}
+ #home .tmr2 div{width:64px!important;padding:10px 0 8px!important;font-size:23px!important}
+ #home .hcc .tg,#home .hcc .bd{font-size:12px!important}
+ .live{gap:12px!important}
+ .live>b{height:68px!important;padding:12px 9px!important;font-size:11.5px!important;border-radius:24px!important}
+ .lc{height:68px!important;padding:0 20px 0 9px!important;border-radius:26px!important;gap:9px!important}
+ .lc .li{width:54px!important;height:54px!important}
+ .lc .lv{font-size:21px!important}.lc .lv u{font-size:18px!important}
+}
+.dial .ptr{transform:translateZ(0);backface-visibility:hidden}
 </style></head><body data-mode="home" class="toon"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="su-s" viewBox="0 0 100 100"><path d="M50 4C58 24 92 40 92 62C92 76 82 84 71 84C62 84 55 80 51 73C52 84 57 92 66 96L34 96C43 92 48 84 49 73C45 80 38 84 29 84C18 84 8 76 8 62C8 40 42 24 50 4Z"/></symbol><symbol id="su-h" viewBox="0 0 100 100"><path d="M50 94C28 74 4 56 4 32C4 17 15 7 28 7C38 7 46 12 50 20C54 12 62 7 72 7C85 7 96 17 96 32C96 56 72 74 50 94Z"/></symbol><symbol id="su-d" viewBox="0 0 100 100"><path d="M50 3L86 50L50 97L14 50Z"/></symbol><symbol id="su-c" viewBox="0 0 100 100"><circle cx="50" cy="29" r="21"/><circle cx="27" cy="60" r="21"/><circle cx="73" cy="60" r="21"/><path d="M50 50C50 74 46 88 36 96L64 96C54 88 50 74 50 50Z"/></symbol>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
@@ -3398,29 +3415,39 @@ function upd(){if(sel!==null&&!getInv(sel))sel=null;rows();var sk2=sel!==null?ge
 /* --- звук (WebAudio, без файлов) --- */
 function ugCtx(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){AC=null}return AC}
 function ugNoise(c){if(ugNB)return ugNB;var n=Math.floor(c.sampleRate*.6),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);return ugNB=b}
-function ugWhoosh(){if(!SND)return;var c=ugCtx();if(!c)return;try{var t=c.currentTime,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=ugNoise(c);f.type='bandpass';f.Q.value=1.1;f.frequency.setValueAtTime(260,t);f.frequency.exponentialRampToValueAtTime(1900,t+.45);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.05,t+.12);g.gain.exponentialRampToValueAtTime(.0005,t+.55);s.connect(f);f.connect(g);g.connect(c.destination);s.start(t);s.stop(t+.6)}catch(e){}}
-function ugTick(sp){if(!SND)return;var c=ugCtx();if(!c)return;try{var t=c.currentTime,o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();o.type='triangle';o.frequency.setValueAtTime(820+sp*760,t);o.frequency.exponentialRampToValueAtTime(480+sp*260,t+.045);f.type='lowpass';f.frequency.value=3400;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.07,t+.004);g.gain.exponentialRampToValueAtTime(.0006,t+.07);o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.08)}catch(e){}}
-function ugBell(c,dest,f,t,v,dur){var o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain();o.type='sine';o2.type='triangle';o.frequency.value=f;o2.frequency.value=f*2;var g2=c.createGain();g2.gain.value=.3;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.0005,t+dur);o.connect(g);o2.connect(g2);g2.connect(g);g.connect(dest);o.start(t);o2.start(t);o.stop(t+dur+.05);o2.stop(t+dur+.05)}
-function ugChime(win){if(!SND)return;var c=ugCtx();if(!c)return;try{var t=c.currentTime+.02,m=c.createGain(),dl=c.createDelay(),fb=c.createGain();m.gain.value=1;dl.delayTime.value=.17;fb.gain.value=.3;m.connect(c.destination);m.connect(dl);dl.connect(fb);fb.connect(dl);dl.connect(c.destination);
- if(win){[523.25,659.25,783.99,1046.5,1318.5].forEach(function(f,i){ugBell(c,m,f,t+i*.085,.085,.95)})}
- else{var lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;lp.connect(c.destination);[[392,0],[311.1,.22],[261.6,.46]].forEach(function(n){ugBell(c,lp,n[0],t+n[1],.08,.55)})}}catch(e){}}
-function ugStop(){if(!SND)return;var c=ugCtx();if(!c)return;try{var t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(300,t);o.frequency.exponentialRampToValueAtTime(150,t+.12);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.09,t+.005);g.gain.exponentialRampToValueAtTime(.0005,t+.14);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.16)}catch(e){}}
+var UGA=null,UGN=0;
+function ugAudio(){var c=ugCtx();if(!c)return null;if(UGA&&UGA.c===c)return UGA;
+ try{var sr=c.sampleRate,out=c.createGain();out.gain.value=.9;var lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=6200;out.connect(lp);lp.connect(c.destination);
+  var dl=c.createDelay(.6),fb=c.createGain(),wet=c.createGain();dl.delayTime.value=.15;fb.gain.value=.3;wet.gain.value=.26;lp.connect(dl);dl.connect(fb);fb.connect(dl);dl.connect(wet);wet.connect(c.destination);
+  var mk=function(f,len,dec){var n=Math.floor(sr*len),b=c.createBuffer(1,n,sr),d=b.getChannelData(0),w=6.283185307*f;for(var i=0;i<n;i++){var t=i/sr,e=Math.exp(-t*dec),at=Math.min(1,t/.004);d[i]=at*e*(Math.sin(w*t)*.62+Math.sin(w*2.01*t)*.22*Math.exp(-t*dec*.8)+Math.sin(w*3.99*t)*.1*Math.exp(-t*dec*1.6)+Math.sin(w*5.4*t)*.05*Math.exp(-t*dec*3))}return b};
+  var sc=[261.63,293.66,329.63,392,440,523.25,587.33,659.25,783.99,880,1046.5,1174.66];
+  UGA={c:c,out:out,tick:sc.map(function(f){return mk(f,.3,17)}),bell:sc.map(function(f){return mk(f,1.5,3)}),low:[196,164.81,130.81].map(function(f){return mk(f,1,4.5)})}}catch(e){UGA=null}
+ return UGA}
+function ugPlay(buf,v,rate){var A=ugAudio();if(!A||!buf)return;try{var s=A.c.createBufferSource(),g=A.c.createGain();s.buffer=buf;if(rate)s.playbackRate.value=rate;g.gain.value=v;s.connect(g);g.connect(A.out);s.start()}catch(e){}}
+function ugWhoosh(){if(!SND)return;var A=ugAudio();if(!A)return;var c=A.c;try{var t=c.currentTime,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=ugNoise(c);f.type='bandpass';f.Q.value=.9;f.frequency.setValueAtTime(240,t);f.frequency.exponentialRampToValueAtTime(1500,t+.5);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.032,t+.16);g.gain.exponentialRampToValueAtTime(.0005,t+.58);s.connect(f);f.connect(g);g.connect(A.out);s.start(t);s.stop(t+.6)}catch(e){}}
+/* каждый «щелчок» стрелки играет мягкую ноту пентатоники: бегущая вверх-вниз мелодия, как музыкальная шкатулка */
+function ugTick(n){if(!SND)return;var A=ugAudio();if(!A)return;var m=n%22,i=m<12?m:22-m;ugPlay(A.tick[i],.1)}
+function ugChime(win){if(!SND)return;var A=ugAudio();if(!A)return;
+ if(win){[5,7,8,10,11].forEach(function(i,k){setTimeout(function(){ugPlay(A.bell[i],.2-k*.012)},k*95)});setTimeout(function(){ugPlay(A.bell[3],.12,.5)},40)}
+ else{[0,1,2].forEach(function(i,k){setTimeout(function(){ugPlay(A.low[i],.3-k*.05)},k*240)})}}
+function ugStop(){if(!SND)return;var A=ugAudio();if(!A)return;ugPlay(A.tick[2],.16,.5)}
 /* --- анимация и результат --- */
 var ugRAF=0;
 function ugLock(b){$('upgrade').classList.toggle('busy',!!b);ugView()}
-function ugSpin(f,done){var red=false;try{red=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
- var fast=UGFAST||red,dur=fast?1100:5200,rot=fast?2:6,start=ang,target=Math.floor(ang/360)*360+rot*360+f*360,t0=0,last=start,lastT=0,lastTick=0;ugWhoosh();var pt=$('ptr');
- function frame(now){if(!t0){t0=now;lastT=now}var k=Math.min(1,(now-t0)/dur),e2=1-Math.pow(1-k,fast?3:4),a=start+(target-start)*e2;pt.style.transform='rotate('+a+'deg)';
-  var steps=Math.floor(a/5)-Math.floor(last/5);if(steps>0&&now-lastTick>(fast?20:28)){var v=(a-last)/Math.max(1,now-lastT);ugTick(Math.min(1,v/1.6));lastTick=now}
-  if(now-lastT>40||steps>0){lastT=now;last=a}
-  if(k<1)ugRAF=requestAnimationFrame(frame);else{ang=target%360;pt.style.transform='rotate('+ang+'deg)';ugStop();setTimeout(done,fast?160:380)}}
+function ugSpin(f,done){var fast=UGFAST,dur=fast?1200:6400,rot=fast?2:7,start=ang,target=Math.floor(ang/360)*360+rot*360+f*360,t0=0,last=start,lastTick=0,pt=$('ptr'),a0=.07;ugWhoosh();
+ function ease(k){var w=(k<a0?k*k/(2*a0):k-a0/2)/(1-a0/2);return 1-Math.pow(1-w,fast?3:4)}
+ function frame(now){if(!t0)t0=now;var k=Math.min(1,(now-t0)/dur),a=start+(target-start)*ease(k);pt.style.transform='rotate('+a.toFixed(3)+'deg)';
+  var s0=Math.floor(last/5),s1=Math.floor(a/5);if(s1>s0&&now-lastTick>(fast?32:46)){ugTick(s1);lastTick=now}last=a;
+  if(k<1)ugRAF=requestAnimationFrame(frame);else{ang=target%360;pt.style.transform='rotate('+ang+'deg)';ugStop();setTimeout(done,fast?160:420)}}
  ugRAF=requestAnimationFrame(frame)}
+/* куда остановится стрелка (доля круга от верха по часовой). Проигрыш чаще «почти успех»: стрелка встаёт сразу за краем зелёной зоны */
+function ugLand(p,win){if(win){return rnd()<.35?p*(.84+.13*rnd()):p*(.06+.8*rnd())}var q=Math.pow(rnd(),2.2);return p+(1-p)*(.04+.92*q)}
 function ugDone(r,target){upb=0;sync(r);var win=!!r.win,dl=$('dial');ugChime(win);dl.classList.add(win?'win':'lose');$('ch').textContent=win?'УСПЕХ!':'НЕ ПОВЕЗЛО';$('ugchl').textContent=win?itm(target).name:'подарок сгорел';
  toast(win?'Апгрейд удался: '+itm(target).name:'Не повезло, подарок сгорел');try{if(navigator.vibrate)navigator.vibrate(win?[25,40,60]:30)}catch(e){}
  setTimeout(function(){dl.classList.remove('win','lose');sel=null;tg=null;addv=0;ugLock(false);upd()},UGFAST?900:1900)}
 $('upr').oninput=function(){if(upb)return;addv=Math.min(UGMX,Math.max(0,Math.floor(+this.value)));ugView()};
 $('upchips').onclick=function(e){var b=e.target.closest('button');if(!b||upb||b.disabled)return;addv=Math.round(UGMX*(+b.dataset.p));ugView()};
-$('ugSnd').onclick=function(){SND=!SND;try{localStorage.setItem('luno_snd',SND?'1':'0')}catch(e){}if($('snd'))$('snd').classList.toggle('off',!SND);ugOpts();if(SND){ugCtx();ugTick(.5)}toast(SND?'Звук включён':'Звук выключен')};
+$('ugSnd').onclick=function(){SND=!SND;try{localStorage.setItem('luno_snd',SND?'1':'0')}catch(e){}if($('snd'))$('snd').classList.toggle('off',!SND);ugOpts();if(SND){ugCtx();ugAudio();ugTick(7)}toast(SND?'Звук включён':'Звук выключен')};
 $('ugFast').onclick=function(){UGFAST=!UGFAST;try{localStorage.setItem('luno_ugfast',UGFAST?'1':'0')}catch(e){}ugOpts();toast(UGFAST?'Быстрый прокрут включён':'Быстрый прокрут выключен')};
 function ugTargets(sv){var ed=1-((CFG.settings.edges||{}).upgrade||0),mc=CFG.settings.upMinChance||0,mm=CFG.settings.upMinMult||1,lim=mc?sv*ed/mc:Infinity,low=sv*mm,a=[];
  Object.keys(CFG.items).forEach(function(k){var it=CFG.items[k];if(it.up===false||!(it.value>0))return;if(it.value<=sv||it.value<low-1e-9||it.value>lim+1e-9)return;a.push(k)});a.sort(function(x,y){return CFG.items[x].value-CFG.items[y].value});return a}
@@ -3436,8 +3463,8 @@ function ugAuto(o){if(upb)return;
  else pick=list[0];
  tg=pick;upd()}
 $('ugq').onclick=function(e){var b=e.target.closest('button');if(!b)return;ugAuto({c:b.dataset.c?+b.dataset.c:0,m:b.dataset.m?+b.dataset.m:0,a:b.dataset.a||''})};
-$('ugo').onclick=function(){if(upb||sel===null||tg===null)return;ugCtx();var target=tg,stake=sel,add=addv;upb=1;ugLock(true);
- call('upgrade',{stake:stake,target:target,add:add},true).then(function(r){var p=r.chance,f=r.win?p*(.08+.84*rnd()):p+(1-p)*(.08+.84*rnd());ugSpin(f,function(){ugDone(r,target)})}).catch(function(){upb=0;ugLock(false)})};
+$('ugo').onclick=function(){if(upb||sel===null||tg===null)return;ugCtx();ugAudio();var target=tg,stake=sel,add=addv;upb=1;ugLock(true);
+ call('upgrade',{stake:stake,target:target,add:add},true).then(function(r){ugSpin(ugLand(r.chance,!!r.win),function(){ugDone(r,target)})}).catch(function(){upb=0;ugLock(false)})};
 
 
 /* ===== Блэкджек: живые столы, дилер на сервере ===== */

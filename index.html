@@ -1780,6 +1780,9 @@ body #ugo:disabled{filter:grayscale(.65);opacity:.55}
 body.stm #bal,body.stm .bchip,body.stm #upv,body.stm input[aria-label="Ставка"]{filter:blur(8px);transition:filter .2s}
 body.stm #bal.rv,body.stm .bchip.rv,body.stm #upv.rv,body.stm input[aria-label="Ставка"].rv{filter:none}
 body.stm #dp{filter:blur(12px);pointer-events:none;transition:filter .2s}body.stm #dp.rv{filter:none;pointer-events:auto}
+
+body.stm .stmx,body.stm .rlchip,body.stm #rltot{filter:blur(7px);transition:filter .2s}
+body.stm .stmx.rv,body.stm .rlchip.rv,body.stm #rltot.rv{filter:none}
 </style></head><body data-mode="home" class="toon"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="su-s" viewBox="0 0 100 100"><path d="M50 4C58 24 92 40 92 62C92 76 82 84 71 84C62 84 55 80 51 73C52 84 57 92 66 96L34 96C43 92 48 84 49 73C45 80 38 84 29 84C18 84 8 76 8 62C8 40 42 24 50 4Z"/></symbol><symbol id="su-h" viewBox="0 0 100 100"><path d="M50 94C28 74 4 56 4 32C4 17 15 7 28 7C38 7 46 12 50 20C54 12 62 7 72 7C85 7 96 17 96 32C96 56 72 74 50 94Z"/></symbol><symbol id="su-d" viewBox="0 0 100 100"><path d="M50 3L86 50L50 97L14 50Z"/></symbol><symbol id="su-c" viewBox="0 0 100 100"><circle cx="50" cy="29" r="21"/><circle cx="27" cy="60" r="21"/><circle cx="73" cy="60" r="21"/><path d="M50 50C50 74 46 88 36 96L64 96C54 88 50 74 50 50Z"/></symbol>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
@@ -1914,7 +1917,6 @@ body.stm #dp{filter:blur(12px);pointer-events:none;transition:filter .2s}body.st
     <div class="dial" id="dial"><svg class="dsv" id="dsv" viewBox="-6 -6 312 312" aria-hidden="true"></svg><div class="ptr" id="ptr"><svg viewBox="-6 -6 312 312"><polygon points="150,27 135,-3 165,-3" fill="#ffc83a" stroke="#a8700f" stroke-width="3" stroke-linejoin="round"/></svg></div><div class="dctr"><b id="ch">—</b><small id="ugchl">выбери подарки</small></div></div>
     <button class="btn big" id="ugo" disabled>Выбери подарки</button>
     <p class="ugp" id="ugp"></p>
-    <div class="ugsug" id="ugsug"></div>
    </div>
    <button class="ugcard ug-b" id="ugB" aria-label="Выбрать подарок, который хочешь получить"><span class="ugl">ХОЧУ ПОЛУЧИТЬ</span><div class="ugim" id="ugBi"></div><b id="ugBt">Выбрать цель</b><span class="ugpr" id="ugBs">Нажми, чтобы выбрать</span></button>
   </div>
@@ -3477,15 +3479,9 @@ function ugView(){var ck=ugCheck(),ok=ck.ok,sv=ck.sv,tv=ck.tv,ed=ugEdge();
  $('ugp').textContent=ok?'Приз ×'+(tv/(sv+addv)).toFixed(2)+' от вложенного':ck.msg;
  document.querySelectorAll('#upchips button').forEach(function(b){var p=+b.dataset.p;b.classList.toggle('on',p===0?addv===0:(UGMX>0&&addv===Math.round(UGMX*p)))});
  document.querySelectorAll('#upchips button').forEach(function(b){b.disabled=!ok||UGMX<=0||!!upb})}
-function ugSug(){var el=$('ugsug');if(!el)return;var ks=ugKeys(),sv=ugSum(ks);if(!ks.length){el.innerHTML='';return}
- var list=ugTargets(sv),ed=ugEdge(),h='<div class="ugsh">Можно получить:</div>';
- if(!list.length)h+='<div class="ugsn">Для этого набора пока нет подходящих NFT. Поставь подарков больше или подороже.</div>';
- else h+='<div class="ugsr">'+list.slice(0,40).map(function(k){var it=itm(k);return '<button class="ugsc'+(tg[0]===k?' on':'')+'" data-k="'+esc(k)+'"><i>'+ik(k)+'</i><b>'+esc(it.name)+'</b><span>★ '+fmt(it.value)+'</span><em>'+Math.round(sv/it.value*ed*100)+'%</em></button>'}).join('')+'</div>';
- el.innerHTML=h}
-$('ugsug').onclick=function(e){var b=e.target.closest('.ugsc');if(!b||upb)return;tg=[b.dataset.k];upd()};
 function ugOpts(){var s=$('ugSnd'),f=$('ugFast');if(!s)return;var st=$('ugStyle');if(st)st.querySelector('span').textContent='Тон звука: '+UGSL[UGST];s.classList.toggle('on',!!SND);s.setAttribute('aria-pressed',SND?'true':'false');s.querySelector('span').textContent=SND?'Звук: вкл':'Звук: выкл';
  f.classList.toggle('on',!!UGFAST);f.setAttribute('aria-pressed',UGFAST?'true':'false');f.querySelector('span').textContent=UGFAST?'Быстрый прокрут: вкл':'Быстрый прокрут: выкл'}
-function upd(){sel=sel.filter(function(id){return !!getInv(id)});rows();ugCards();ugDial();ugView();ugSug();ugOpts();if(PKopen){pkFill();pkCount()}}
+function upd(){sel=sel.filter(function(id){return !!getInv(id)});rows();ugCards();ugDial();ugView();ugOpts();if(PKopen){pkFill();pkCount()}}
 /* --- звук (WebAudio, без файлов) --- */
 function ugCtx(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){AC=null}return AC}
 function ugNoise(c){if(ugNB)return ugNB;var n=Math.floor(c.sampleRate*.6),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);return ugNB=b}
@@ -3547,10 +3543,20 @@ $('ugo').onclick=function(){if(upb||!ugCheck().ok)return;ugCtx();ugAudio();var t
 
 
 /* ===== режим стримера: баланс, ставки и пополнение скрыты на экране ===== */
-function stmApply(){document.body.classList.toggle('stm',STM);var s=$('stms'),b=$('stmi');if(s)s.textContent=STM?'Включён: баланс, ставки и пополнение скрыты':'Выключен, всё видно';if(b)b.classList.toggle('on',STM)}
+var STMSEL='#rocket,#mines,#coin,#slots,#s3,#plinko,#wheel,#tower,#hilo,#roulette,#balloon,#cups,#bj,#bjt,#du,#dut,#deposit,#upgrade',STMSAFE='.ugpr,#pkl,.ugim,.ci,.rwc,.ugsc';
+function stmWrapRange(tn,a,b){var mid=tn.splitText(a);mid.splitText(b-a);var sp=document.createElement('span');sp.className='stmx';mid.parentNode.insertBefore(sp,mid);sp.appendChild(mid)}
+function stmText(t){if(!t.parentNode||t.nodeValue.length>400)return;var p=t.parentNode;if(p.nodeType!==1||p.closest('.stmx')||!p.closest(STMSEL)||p.closest(STMSAFE))return;var v=t.nodeValue,m;
+ if(v.indexOf('★')>=0){var re=/[−+\-]?\s?★\s?[−+\-]?\d[\d\s.,]*|[−+\-]?\d[\d\s.,]*\s?★/;m=re.exec(v);if(m){stmWrapRange(t,m.index,m.index+m[0].length);return}}
+ var pv=t.previousSibling,nx=t.nextSibling;
+ if(pv&&pv.nodeType===1&&pv.classList&&pv.classList.contains('stg')){m=/^\s*[−+\-]?\d[\d\s.,]*/.exec(v);if(m&&m[0].trim()){stmWrapRange(t,0,m[0].length);return}}
+ if(nx&&nx.nodeType===1&&nx.classList&&nx.classList.contains('stg')){m=/[−+\-]?\d[\d\s.,]*\s*$/.exec(v);if(m&&m[0].trim())stmWrapRange(t,m.index,v.length)}}
+function stmScan(n){if(!STM||!n)return;if(n.nodeType===3)return stmText(n);if(n.nodeType!==1||(n.classList&&n.classList.contains('stmx')))return;var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),l=[],x;while((x=w.nextNode()))l.push(x);l.forEach(stmText)}
+new MutationObserver(function(ms){if(!STM)return;ms.forEach(function(m){if(m.type==='characterData')stmScan(m.target);else for(var i=0;i<m.addedNodes.length;i++)stmScan(m.addedNodes[i])})}).observe(document.body,{childList:true,subtree:true,characterData:true});
+function stmAll(){document.querySelectorAll(STMSEL).forEach(stmScan)}
+function stmApply(){document.body.classList.toggle('stm',STM);if(STM)stmAll();var s=$('stms'),b=$('stmi');if(s)s.textContent=STM?'Включён: баланс, ставки и пополнение скрыты':'Выключен, всё видно';if(b)b.classList.toggle('on',STM)}
 function stmShow(el){if(!el)return;el.classList.add('rv');clearTimeout(el._rt);el._rt=setTimeout(function(){el.classList.remove('rv')},4000)}
 $('stmi').onclick=function(){STM=!STM;try{localStorage.setItem('luno_stm',STM?'1':'0')}catch(e){}stmApply();toast(STM?'Режим стримера включён':'Режим стримера выключен')};
-document.addEventListener('click',function(e){if(!STM)return;var t=e.target.closest('#bal,.bchip,#upv');if(t)return stmShow(t);if(e.target.closest('#deposit'))stmShow($('dp'))},true);
+document.addEventListener('click',function(e){if(!STM)return;var t=e.target.closest('#bal,.bchip,#upv,.stmx,.rlchip');if(t)return stmShow(t);if(e.target.closest('#deposit'))stmShow($('dp'))},true);
 document.addEventListener('focusin',function(e){if(STM&&e.target.matches&&e.target.matches('input[aria-label="Ставка"]'))stmShow(e.target)});
 stmApply();
 /* ===== Блэкджек: живые столы, дилер на сервере ===== */

@@ -2896,7 +2896,7 @@ function shipFx(ts,pos,ph,m){var k=$('rk'),pd=RK.pd=$('pad'),el=pos.el,s=pos.s0;
   if(RK.arr){var q=Math.min(1,(ts-RK.arr)/700);pd.style.opacity=q;k.style.opacity=q;RK.op=q>=1?1:-2;if(q>=1)RK.arr=0}else if(pd.style.opacity!==''){pd.style.opacity=''}}
  k.classList.toggle('fire',ph==='fly'&&el>0);var idx=0;
  if(ph==='fly'){if(!RK.swn)RK.swn=el<SHIP.LT+800?SHIP.LT+800:el+800+Math.random()*1500;if(!RK.swT0&&!RK.roll&&el>=RK.swn){RK.swT0=ts;RK.swD=Math.random()<.5?1:-1;RK.swn=el+6500+Math.random()*5500}
-  if(!RK.nr)RK.nr=el<SHIP.FR?SHIP.FR:el+700+Math.random()*1200;
+  RK.nr=1e15; /* оборот отключён: ракета просто летит */
   if(!RK.roll&&el>=RK.nr){RK.roll=ts;RK.rdir=Math.random()<.5?1:-1}
   if(RK.roll){var p=(ts-RK.roll)/SHIP.RD;if(p>=1){RK.roll=0;RK.nr=el+6000+Math.random()*5500}else{var ee=(1-Math.cos(Math.PI*p))/2;idx=Math.floor(ee*RKR.n)%RKR.n;if(RK.rdir<0)idx=(RKR.n-idx)%RKR.n}}}
  else if(ph==='crashed')RK.roll=0;

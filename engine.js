@@ -648,15 +648,19 @@
         if (s.hands[T.th] && !s.hands[T.th].done) T.dl = t + BJ_TURN; else bjNext(T, t);
         return bjView(u, T);
       },
-      upgrade: function (u, b) {
-        var i = inv(u, +b.stake), t = cfg().items[b.target]; if (i < 0 || !t) throw new Err('Выбери подарки');
-        var sv = cfg().items[u.inv[i].k].value; if (sv < set('minBet')) throw new Err('Для апгрейда нужен подарок стоимостью от ★' + set('minBet')); if (!(t.value > sv)) throw new Err('Цель должна быть дороже');
-        if (t.up === false) throw new Err('Эту цель выбрать нельзя'); if (t.value < sv * (set('upMinMult') || 1) - 1e-9) throw new Err('Цель должна быть минимум в ×' + set('upMinMult') + ' дороже подарка'); var ed = 1 - edgeOf('upgrade'), base = sv / t.value * ed; if (base < (set('upMinChance') || 0) - 1e-9) throw new Err('Цель слишком дорогая для этого подарка, выбери подешевле');
+      upgrade: function (u, b) { // можно поставить до 4 своих подарков и выбрать до 4 целей: шанс считается по сумме цен
+        var UPN = 4, ids = (Array.isArray(b.stakes) ? b.stakes : [b.stake]).map(function (x) { return +x; }).filter(function (x, i, a) { return isFinite(x) && a.indexOf(x) === i; }), tks = (Array.isArray(b.targets) ? b.targets : [b.target]).map(String).filter(function (x, i, a) { return a.indexOf(x) === i; });
+        if (!ids.length || !tks.length) throw new Err('Выбери подарки'); if (ids.length > UPN) throw new Err('Можно поставить не больше ' + UPN + ' подарков'); if (tks.length > 1) throw new Err('Получить можно только один подарок');
+        var idx = ids.map(function (id) { return inv(u, id); }); if (idx.some(function (i) { return i < 0; })) throw new Err('Выбери подарки');
+        var tl = tks.map(function (k) { return cfg().items[k]; }); if (tl.some(function (t) { return !t; })) throw new Err('Выбери подарки');
+        var sv = idx.reduce(function (a, i) { return a + cfg().items[u.inv[i].k].value; }, 0), tv = tl.reduce(function (a, t) { return a + t.value; }, 0);
+        if (sv < set('minBet')) throw new Err('Для апгрейда нужен подарок стоимостью от ★' + set('minBet')); if (!(tv > sv)) throw new Err('Цель должна быть дороже');
+        if (tl.some(function (t) { return t.up === false; })) throw new Err('Эту цель выбрать нельзя'); if (tv < sv * (set('upMinMult') || 1) - 1e-9) throw new Err('Цель должна быть минимум в ×' + set('upMinMult') + ' дороже подарка'); var ed = 1 - edgeOf('upgrade'), base = sv / tv * ed; if (base < (set('upMinChance') || 0) - 1e-9) throw new Err('Цель слишком дорогая для этого подарка, выбери подешевле');
         var add = Math.max(0, Math.floor(+b.add || 0)); // звёзды с баланса, которые повышают шанс; шанс не может стать выше upMaxChance (по умолчанию 75%)
-        if (add > 0) { var capC = Math.min(0.95, Math.max(0.2, set('upMaxChance') || 0.75)), maxAdd = Math.max(0, Math.floor(capC * t.value / ed - sv + 1e-9)); if (add > maxAdd) throw new Err(maxAdd > 0 ? 'Больше ★' + maxAdd + ' добавить нельзя: максимум шанса ' + Math.round(capC * 100) + '%' : 'Звёзды добавлять не нужно: шанс уже высокий'); if (u.balance < add) throw new Err('Не хватает звёзд'); }
-        var chance = (sv + add) / t.value * ed, win = roll(u) < chance; u.balance -= add; u.inv.splice(i, 1);
-        if (win) u.inv.push({ id: u.nid++, k: b.target });
-        book(u, 'upgrade', sv + add, win ? t.value : 0); u.stats.profit += (win ? t.value : 0) - sv - add; return { win: win, chance: chance, add: add };
+        if (add > 0) { var capC = Math.min(0.95, Math.max(0.2, set('upMaxChance') || 0.75)), maxAdd = Math.max(0, Math.floor(capC * tv / ed - sv + 1e-9)); if (add > maxAdd) throw new Err(maxAdd > 0 ? 'Больше ★' + maxAdd + ' добавить нельзя: максимум шанса ' + Math.round(capC * 100) + '%' : 'Звёзды добавлять не нужно: шанс уже высокий'); if (u.balance < add) throw new Err('Не хватает звёзд'); }
+        var chance = (sv + add) / tv * ed, win = roll(u) < chance; u.balance -= add; idx.slice().sort(function (x, y) { return y - x; }).forEach(function (i) { u.inv.splice(i, 1); });
+        if (win) tks.forEach(function (k) { u.inv.push({ id: u.nid++, k: k }); });
+        book(u, 'upgrade', sv + add, win ? tv : 0); u.stats.profit += (win ? tv : 0) - sv - add; return { win: win, chance: chance, add: add, n: tks.length };
       },
       'case/open': function (u, b) {
         var c = cfg().cases.filter(function (x) { return x.id === b.id && x.active; })[0]; if (!c) throw new Err('Кейс недоступен');

@@ -1759,6 +1759,10 @@ body #ugo:disabled{filter:grayscale(.65);opacity:.55}
 #rk.fire .rkfl{opacity:1;animation:rkflk .09s linear infinite alternate}
 @keyframes rkflk{from{transform:scaleY(1) scaleX(1)}to{transform:scaleY(1.2) scaleX(.9)}}
 #freeb .gift{animation:none!important}
+
+/* v53: ракета на карточке «Ракетка» крупнее */
+.rk2{width:150px!important;height:132px!important;right:12px!important;bottom:4px!important}
+.rk2 .rkn{filter:drop-shadow(0 6px 12px rgba(70,120,255,.5))}
 </style></head><body data-mode="home" class="toon"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="su-s" viewBox="0 0 100 100"><path d="M50 4C58 24 92 40 92 62C92 76 82 84 71 84C62 84 55 80 51 73C52 84 57 92 66 96L34 96C43 92 48 84 49 73C45 80 38 84 29 84C18 84 8 76 8 62C8 40 42 24 50 4Z"/></symbol><symbol id="su-h" viewBox="0 0 100 100"><path d="M50 94C28 74 4 56 4 32C4 17 15 7 28 7C38 7 46 12 50 20C54 12 62 7 72 7C85 7 96 17 96 32C96 56 72 74 50 94Z"/></symbol><symbol id="su-d" viewBox="0 0 100 100"><path d="M50 3L86 50L50 97L14 50Z"/></symbol><symbol id="su-c" viewBox="0 0 100 100"><circle cx="50" cy="29" r="21"/><circle cx="27" cy="60" r="21"/><circle cx="73" cy="60" r="21"/><path d="M50 50C50 74 46 88 36 96L64 96C54 88 50 74 50 50Z"/></symbol>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
@@ -2907,7 +2911,7 @@ function rocketHTML(){var b=CFG.skins.rocket_body;RK.sprite=0;RK.ship=!b;RK.svg=
  +'<path d="M33 82A27 21 0 0 0 87 82" fill="none" stroke="url(#gBs)" stroke-width="4.5" stroke-linecap="round"/><text x="60" y="148.5" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" font-family="Unbounded,Arial,sans-serif" letter-spacing="2.5">LUNO</text>'
  +'<path d="M46 177h28l5 14H41z" fill="#15298a" stroke="#a9d7ff" stroke-width="1.2"/></svg>'}
 function nft(k,fb){var it=itm(k);return it.img?imgH(it.img):I[fb]}
-function artRocket(){return '<div class="mn2">'+I.moonBig+'</div><div class="rm">×1.00</div><div class="rk2"><img class="rkn" src="/art/rknft.webp" alt="" draggable="false"></div>'}
+function artRocket(){return '<div class="mn2">'+I.moonBig+'</div><div class="rm">×1.00</div><div class="rk2"><img class="rkn" src="/lunorocket.webp" alt="" draggable="false"></div>'}
 function artMines(){var d=CFG.skins.mines_closed,h='<div class="mgt">';for(var i=0;i<9;i++)h+=i===4?'<i class="st">'+I.star+'</i>':'<i>'+(d?imgH(d):I.moon)+'</i>';return h+'</div>'}
 function artUpgrade(sk){return '<div class="rng"><div class="rin"><i>'+(sk?imgH(sk):nft('arm','star'))+'</i></div><div class="rptr"><b></b></div></div>'}
 function artSpins(){var ids=[],all=[8,7,6,5,4,3,2,1,0],sk=function(v){return CFG.skins['slot_s'+(v+1)]},bad=function(v){var u=sk(v);return !!u&&/plum|слив/i.test(String(u))};
@@ -3125,7 +3129,7 @@ $('pgo').onclick=function(){if(plb)return;var b=betOf('plinko');if(!b)return;plb
 
 /* ===== КЕЙСЫ ===== */
 function rCases(){homeCards();var g=$('cl');if(!g)return;g.innerHTML='';CFG.cases.forEach(function(c){var b=document.createElement('button'),h=((260+(+c.hue||0))%360+360)%360;b.className='cx';
- b.innerHTML='<div class="ca" style="--h:'+h+'"><div class="cart" style="'+(c.img?'':'filter:hue-rotate('+(+c.hue||0)+'deg)')+'">'+(c.img?imgH(c.img):(c.free?imgH('/freebox.webp'):I.chest))+'</div></div><div class="cb"><strong>'+esc(c.name)+'</strong><span class="pp">'+(c.free?'Бесплатно':'<i>'+I.star+'</i>'+c.price)+'</span></div>';
+ b.innerHTML='<div class="ca" style="--h:'+h+'"><div class="cart" style="'+(c.img?'':'filter:hue-rotate('+(+c.hue||0)+'deg)')+'">'+(c.img?imgH(c.img):(c.free?imgH('/freechest.webp'):I.chest))+'</div></div><div class="cb"><strong>'+esc(c.name)+'</strong><span class="pp">'+(c.free?'Бесплатно':'<i>'+I.star+'</i>'+c.price)+'</span></div>';
  b.onclick=function(){curCase=c;go('casev')};g.appendChild(b)})}
 I.users=V('<circle cx="24" cy="22" r="10" fill="currentColor"/><path d="M6 54c0-11 8-18 18-18s18 7 18 18z" fill="currentColor"/><circle cx="46" cy="24" r="8" fill="currentColor" opacity=".7"/><path d="M42 38c10-1 18 5 18 16H46c0-6-1-11-4-16z" fill="currentColor" opacity=".7"/>');
 I.wifi=V('<path d="M6 24c14-14 38-14 52 0M16 34c9-9 23-9 32 0M26 44c4-4 8-4 12 0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="54" r="3.6" fill="currentColor"/>');
@@ -3226,7 +3230,7 @@ function cvResult(c,items,tot){var md=$('md'),h;
 function freeCase(){return CFG&&CFG.cases?CFG.cases.filter(function(x){return x.free})[0]||null:null}
 function hasFree(){var c=freeCase();if(!c)return false;return !!(DEMO||(ME.tickets&&ME.tickets[c.id]>0)||ME.refFree>0)}
 function fcSync(r){if(!r)return;if(r.refCount!==undefined)ME.refCount=r.refCount;if(r.refFree!==undefined)ME.refFree=r.refFree;if(r.refNeed)ME.refNeed=r.refNeed;if(r.tickets)ME.tickets=r.tickets;freeBanner();if(cur==='casev'&&curCase&&curCase.free){cvBtn();fcUI()}}
-function freeBanner(){var b=$('freeb');if(!b||typeof CFG==='undefined'||!CFG)return;var g=b.querySelector('.gift');if(g&&g.dataset.k!=='lr'){g.dataset.k='lr';g.innerHTML=imgH('/lunorocket.webp')}
+function freeBanner(){var b=$('freeb');if(!b||typeof CFG==='undefined'||!CFG)return;var g=b.querySelector('.gift');if(g&&g.dataset.k!=='fc'){g.dataset.k='fc';g.innerHTML=imgH('/freechest.webp')}
  var need=ME.refNeed||5,n=(ME.refCount||0)%need,ready=hasFree(),p=$('freep');
  if(p)p.textContent=DEMO?'Бесплатно в демо-режиме':(ready?'Кейс готов — открывай!':'Промокод или '+need+' друзей · '+n+'/'+need);
  var pg=$('hpg');if(pg){var h='';for(var i=0;i<need;i++)h+='<i'+((ready||i<n)?' class="f"':'')+'></i>';pg.innerHTML=h;pg.style.display=DEMO?'none':'flex'}}

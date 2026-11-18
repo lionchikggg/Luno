@@ -210,6 +210,7 @@ http.createServer(async (req, res) => {
         }
         try { return send(res, 200, engine.putConfig(n)); } catch (e) { if (e instanceof Engine.Err) return send(res, 400, { error: e.message }); throw e; }
       }
+      if (p === '/admin/bets') return send(res, 200, { list: (state.betlog || []).slice(0, 200) });
       if (p === '/admin/stats') return send(res, 200, engine.stats());
       if (p === '/admin/withdrawals' && req.method === 'GET') return send(res, 200, { list: engine.wdList(url.searchParams.get('status') || '') });
       if (p === '/admin/withdrawals' && req.method === 'POST') {

@@ -25,12 +25,12 @@ document.addEventListener('change',function(e){if(!LIVE[tab]&&e.target.type!=='f
 function say(t,bad){$('msg').textContent=t;$('msg').className=bad?'err':'okc'}
 function fmtT(t){return new Date(t).toLocaleString('ru-RU')}
 var ROLE='owner',WHO='';
-$('go').onclick=function(){T=$('tok').value;api('GET','config').then(function(c){C=c;return api('GET','whoami').then(function(w){ROLE=w.role;WHO=w.name;if(ROLE==='mod'){TABS=[['items','NFT и подарки'],['cases','Кейсы']];tab='items'}else if(!TABS.some(function(t){return t[0]==='mods'}))TABS.push(['mods','Модераторы']);sessionStorage.setItem('t',T);$('login').hidden=true;$('app').hidden=false;$('openapp').hidden=false;$('who').hidden=ROLE!=='mod';$('who').textContent='Вы вошли как модератор «'+WHO+'». Вам доступны только NFT и кейсы.';if(ROLE==='mod')draw();else api('GET','stats').then(function(s){ST=s;draw()})})}).catch(function(e){alert(e.message)})};
+$('go').onclick=function(){T=$('tok').value;api('GET','config').then(function(c){C=c;return api('GET','whoami').then(function(w){ROLE=w.role;WHO=w.name;if(ROLE==='mod'){TABS=[['items','NFT и подарки'],['cases','Кейсы']];tab='items'}else if(!TABS.some(function(t){return t[0]==='mods'})){TABS.push(['bets','Ставки']);TABS.push(['mods','Модераторы'])};sessionStorage.setItem('t',T);$('login').hidden=true;$('app').hidden=false;$('openapp').hidden=false;$('who').hidden=ROLE!=='mod';$('who').textContent='Вы вошли как модератор «'+WHO+'». Вам доступны только NFT и кейсы.';if(ROLE==='mod')draw();else api('GET','stats').then(function(s){ST=s;draw()})})}).catch(function(e){alert(e.message)})};
 try{var s0=sessionStorage.getItem('t');if(s0){$('tok').value=s0;$('go').click()}}catch(e){}
 var TABS=[['start','Начало работы'],['items','NFT и подарки'],['cases','Кейсы'],['s3','Слоты'],['up','Апгрейд'],['skins','Режимы и картинки'],['wheel','Колесо фортуны'],['promos','Промокоды'],['settings','Настройки'],['wd','Выводы'],['gdep','Пополнение подарками'],['users','Игроки'],['stats','Статистика']];
-var LIVE={start:1,wd:1,gdep:1,users:1,stats:1,mods:1};
+var LIVE={start:1,wd:1,gdep:1,users:1,stats:1,mods:1,bets:1};
 function draw(){$('tabs').innerHTML='';TABS.forEach(function(t){var b=h('button',{class:tab===t[0]?'on':'',on:{click:function(){tab=t[0];if(ROLE==='mod'){draw();return}api('GET','stats').then(function(s){ST=s;draw()}).catch(function(){draw()})}}},[t[1]]);if(t[0]==='wd'&&ST&&ST.wdPending)b.appendChild(h('span',{class:'pill'},[''+ST.wdPending]));if(t[0]==='gdep'&&ST&&ST.gdepPending)b.appendChild(h('span',{class:'pill'},[''+ST.gdepPending]));$('tabs').appendChild(b)});
- $('view').innerHTML='';({start:vStart,items:vItems,cases:vCases,s3:vS3,gdep:vGdep,up:vUp,skins:vSkins,promos:vPromos,wheel:vWheel,settings:vSet,wd:vWd,users:vUsers,stats:vStats,mods:vMods})[tab]();$('save').hidden=!!LIVE[tab]}
+ $('view').innerHTML='';({start:vStart,items:vItems,cases:vCases,s3:vS3,gdep:vGdep,up:vUp,skins:vSkins,promos:vPromos,wheel:vWheel,settings:vSet,wd:vWd,users:vUsers,stats:vStats,mods:vMods,bets:vBets})[tab]();$('save').hidden=!!LIVE[tab]}
 function img(get,set,rerender){var w=h('span',{class:'row'}),pv=h('img',{class:'pv',src:get()||'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='});
  var f=h('input',{type:'file',accept:'image/png,image/jpeg,image/webp,image/gif',on:{change:function(){var file=f.files[0];if(!file)return;say('Загружаю…');file.arrayBuffer().then(function(b){return api('POST','upload',null,b)}).then(function(r){set(r.url);say('Картинка загружена. Не забудь сохранить.');rerender()}).catch(function(e){say(e.message,1)})}}});
  w.appendChild(pv);w.appendChild(f);if(get())w.appendChild(h('button',{class:'b g',on:{click:function(){set('');rerender()}}},['Убрать']));return w}
@@ -49,6 +49,13 @@ function vMods(){var v=$('view');v.appendChild(h('div',{class:'help'},['Моде
   box.appendChild(card);
   var lg=h('div',{class:'card'},[h('b',{class:'big'},['Что делали модераторы'])]);if(!r.log.length)lg.appendChild(h('p',{class:'m'},['Пока ничего.']));
   r.log.forEach(function(x){lg.appendChild(h('div',{class:'row'},[h('span',{class:'m'},[fmtT(x.t)]),h('b',{},[x.mod]),h('span',{},[x.text])]))});box.appendChild(lg)}).catch(function(e){say(e.message,1)})}
+
+function vBets(){var v=$('view');v.appendChild(h('div',{class:'help'},['Последние 200 ставок игроков в реальных играх (демо не считаются). Видишь только ты: режим стримера скрывает суммы на экране игрока, но здесь они всегда настоящие. Список обновляется сам каждые 4 секунды.']));
+ var box=h('div',{});v.appendChild(box);
+ function load(){if(tab!=='bets')return;api('GET','bets').then(function(r){if(tab!=='bets')return;box.innerHTML='';var t=h('table',{},[h('tr',{},['Время','Игрок','Игра','Ставка','Выплата','Итог'].map(function(x){return h('th',{},[x])}))]);
+  r.list.forEach(function(x){var d=x.p-x.b;t.appendChild(h('tr',{},[h('td',{},[fmtT(x.t)]),h('td',{},[x.n]),h('td',{},[x.g]),h('td',{},['★'+x.b]),h('td',{},['★'+x.p]),h('td',{class:d>=0?'good':'bad'},[(d>=0?'+':'')+Math.round(d*100)/100])]))});
+  if(!r.list.length)box.appendChild(h('p',{class:'m'},['Пока нет ставок.']));else box.appendChild(t);setTimeout(load,4000)}).catch(function(e){say(e.message,1)})}
+ load()}
 function ownImgs(){return Object.keys(C.items).filter(function(k){return /^\/uploads\//.test(C.items[k].img||'')}).length}
 function vStart(){var v=$('view'),S=C.settings,n=Object.keys(C.items).length;
  v.appendChild(h('div',{class:'help'},['Здесь ты управляешь всем приложением. Любые изменения применяются, только когда ты нажмёшь «Сохранить всё» внизу. Игроки увидят новые картинки и кейсы сразу после сохранения. Сначала пройди эти шаги по порядку.']));

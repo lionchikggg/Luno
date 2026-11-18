@@ -151,6 +151,7 @@
     }
     function book(u, game, bet, payout) {
       if (u.demo) return; // демо-игры не попадают ни в статистику, ни в лидеры, ни в Live
+      var bl = S.betlog || (S.betlog = []); bl.unshift({ t: now(), u: u.id, n: u.name || u.username || String(u.id), g: game, b: bet, p: payout }); if (bl.length > 400) bl.length = 400; // журнал последних ставок (виден только владельцу в админке)
       var t = S.totals[game] || (S.totals[game] = { n: 0, wagered: 0, paid: 0 }); t.n++; t.wagered += bet; t.paid += payout;
       u.wagered = (u.wagered || 0) + bet; var day = new Date(now()).toISOString().slice(0, 10), dd = S.daily[day] || (S.daily[day] = { wagered: 0, paid: 0, deposited: 0 }); dd.wagered += bet; dd.paid += payout;
       var ws = weekStart(); if (u.week.start !== ws) u.week = { start: ws, profit: 0, wagered: 0 }; u.week.profit += payout - bet; u.week.wagered = (u.week.wagered || 0) + bet;

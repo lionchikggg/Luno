@@ -420,53 +420,58 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
     var MODE_OF = { 'crash/bet': 'rocket', 'mines/start': 'mines', 'upgrade': 'upgrade', 'slots/spin': 'slots', 'plinko': 'plinko', wheel: 'wheel', coin: 'coin', 'tower/start': 'tower', 'hilo/start': 'hilo', roulette: 'roulette', 'balloon/start': 'balloon', 'cups/start': 'cups', 'pick/start': 'pick', 'bj/sit': 'bj', 'bj/solo': 'bj', 'bj/bet': 'bj', 'du/join': 'du' };
     function modeOn(k) { var m = cfg().settings.modes || {}; return m[k] !== 0 && m[k] !== '0' && m[k] !== false; }
 
-    // ---- Кирка: сетка блоков-кнопок, кирка копает, пока не кончится прочность. Весь раунд считает сервер ----
+    // ---- Кирка: бесконечная шахта из блоков-кнопок. Кирка падает сверху, ломает блоки, пока не кончится прочность. Весь раунд считает сервер ----
     var PK = {
-      COLS: 7, ROWS: 44, DOWN: 0.6, R1: 0.944, PRICE: [0, 1.26, 2.29, 4.67],
+      COLS: 7, DOWN: 0.6, R1: 0.9296, PRICE: [0, 1.13, 3.36, 8.3],
       TIER: [{ hp: 100, m: 1, p: 0.635 }, { hp: 150, m: 1.25, p: 0.25 }, { hp: 200, m: 1.5, p: 0.088 }, { hp: 400, m: 2, p: 0.027 }],
-      PAY: { red: 0.05, gold: 0.12, emerald: 0.3, diamond: 0.8 }, COST: { stone: 5, red: 6, gold: 7, emerald: 8, diamond: 9, bed: 3 },
-      P: { red: 0.0652734375, gold: 0.026109375, em: 0.0304609375, di: 0.0130546875, tnt: 0.012, jelly: 0.012, crate: 0.006, bed: 0.015 }
+      PAY: { red: 0.05, gold: 0.12, emerald: 0.3, diamond: 0.8 }, COST: { stone: 5, red: 6, gold: 7, emerald: 8, diamond: 9, bed: 12, bump: 3 },
+      P: { f: 1.05244, red: 0.04, gold: 0.014, em: 0.01, di: 0.0035, tnt: 0.012, jelly: 0.012, crate: 0.006, bed: 0.02, bedFrom: 16, rb: 0.8, rs: 0.1, gb: 0.12, ee: 1.65, de: 2.5 }
     };
     var PK_CH = { stone: 's', red: 'r', gold: 'g', emerald: 'e', diamond: 'd', tnt: 't', jelly: 'j', crate: 'c', bed: 'b', air: '.' };
-    function pkGen(R) {
-      var g = [], r, c, P = PK.P, ks = ['red', 'gold', 'emerald', 'diamond'];
-      for (r = 0; r < PK.ROWS; r++) { g.push([]); for (c = 0; c < PK.COLS; c++) g[r].push('stone'); }
-      for (r = 2; r < PK.ROWS; r++) {
-        var d = r / PK.ROWS, w = { red: P.red * (1 - d * 0.5), gold: P.gold * (0.3 + d), emerald: P.em * Math.pow(d, 1.2), diamond: P.di * Math.pow(d, 2.2) };
-        for (c = 0; c < PK.COLS; c++) {
-          var x = R(), t = null, acc = 0, q;
-          for (q = 0; q < 4; q++) { acc += w[ks[q]]; if (x < acc) { t = ks[q]; break; } }
-          if (t) { var sz = 1 + Math.floor(R() * 3), cr = r, cc = c, i; for (i = 0; i < sz; i++) { if (cr < PK.ROWS && cc < PK.COLS) g[cr][cc] = t; if (R() < 0.5) cc++; else cr++; } }
-          else { var y = R(); if (y < P.tnt) g[r][c] = 'tnt'; else if (y < P.tnt + P.jelly) g[r][c] = 'jelly'; else if (y < P.tnt + P.jelly + P.crate) g[r][c] = 'crate'; else if (y < P.tnt + P.jelly + P.crate + P.bed) g[r][c] = 'bed'; }
-        }
-      }
-      return g;
-    }
-    function pkVein(g, r, c, t) { var out = [], st = [[r, c]]; while (st.length) { var p = st.pop(), y = p[0], x = p[1]; if (y < 0 || y >= PK.ROWS || x < 0 || x >= PK.COLS || g[y][x] !== t) continue; g[y][x] = 'air'; out.push([y, x]); st.push([y + 1, x], [y - 1, x], [y, x + 1], [y, x - 1]); } return out; }
     var pk2 = function (v) { return Math.round(v * 100) / 100; };
     function pkPlay(R, ti, K) { // K — множитель в звёздах: ставка × коэффициент прибыли
-      var g = pkGen(R), rows0 = g.map(function (row) { return row.map(function (v) { return PK_CH[v]; }).join(''); }), hp = PK.TIER[ti].hp, cur = ti, m = PK.TIER[ti].m, bets = 0, r = 1, c = 3, steps = 0, ev = [], maxR = 1;
-      while (hp > 0 && steps++ < 900) {
-        var x = R(), nr = r, nc = c; if (x < PK.DOWN) nr = r + 1; else if (x < PK.DOWN + (1 - PK.DOWN) / 2) nc = c - 1; else nc = c + 1;
-        if (nc < 0 || nc >= PK.COLS) nc = c; if (nr >= PK.ROWS) break;
-        var b = g[nr][nc];
+      var g = [], orig = [], genTo = 0, P = PK.P, ks = ['red', 'gold', 'emerald', 'diamond'], COLS = PK.COLS;
+      function row(r) { while (g.length <= r) { var a = []; for (var c = 0; c < COLS; c++) a.push('stone'); g.push(a); } return g[r]; }
+      function genRow(r) {
+        var d = r / 30, w = { red: P.f * P.red * (P.rb + P.rs * Math.min(d, 3)), gold: P.f * P.gold * (P.gb + Math.min(d, 3)), emerald: P.f * P.em * Math.pow(Math.min(d, 3.2), P.ee), diamond: P.f * P.di * Math.pow(Math.min(d, 3.4), P.de) };
+        for (var c = 0; c < COLS; c++) {
+          if (row(r)[c] !== 'stone') continue;
+          var x = R(), t = null, acc = 0, q;
+          for (q = 0; q < 4; q++) { acc += w[ks[q]]; if (x < acc) { t = ks[q]; break; } }
+          if (t && r >= 2) { var sz = 1 + Math.floor(R() * 3), cr = r, cc = c, i; for (i = 0; i < sz; i++) { if (cc < COLS) row(cr)[cc] = t; if (R() < 0.5) cc++; else cr++; } }
+          else { var y = R(); if (r >= 3 && y < P.tnt) row(r)[c] = 'tnt'; else if (r >= 3 && y < P.tnt + P.jelly) row(r)[c] = 'jelly'; else if (r >= 3 && y < P.tnt + P.jelly + P.crate) row(r)[c] = 'crate'; else if (r >= P.bedFrom && y < P.tnt + P.jelly + P.crate + P.bed * Math.min(1, (r - P.bedFrom) / 25)) row(r)[c] = 'bed'; }
+        }
+        orig[r] = row(r).map(function (v) { return PK_CH[v]; }).join('');
+      }
+      function ensure(r) { while (genTo < r + 14) { genRow(genTo); genTo++; } }
+      function vein(r, c, t) { var out = [], st = [[r, c]]; while (st.length) { var p = st.pop(), y = p[0], x = p[1]; if (y < 0 || x < 0 || x >= COLS) continue; ensure(y); if (row(y)[x] !== t) continue; row(y)[x] = 'air'; out.push([y, x]); st.push([y + 1, x], [y - 1, x], [y, x + 1], [y, x - 1]); } return out; }
+      ensure(0);
+      var hp = PK.TIER[ti].hp, cur = ti, m = PK.TIER[ti].m, bets = 0, r = -1, c = 3, steps = 0, ev = [], maxR = 0;
+      while (hp > 0 && steps++ < 1500) {
+        var x = R(), nr = r, nc = c; if (r < 0) nr = r + 1; else if (x < PK.DOWN) nr = r + 1; else if (x < PK.DOWN + (1 - PK.DOWN) / 2) nc = c - 1; else nc = c + 1;
+        if (nc < 0 || nc >= COLS) nc = c; ensure(nr + 1); var b = nr < 0 ? 'air' : row(nr)[nc];
         if (b === 'air') { r = nr; c = nc; ev.push({ e: 'mv', r: r, c: c }); if (r > maxR) maxR = r; continue; }
-        if (b === 'bed') { hp -= PK.COST.bed; if (x < 0.5) c = Math.max(0, Math.min(PK.COLS - 1, c + (R() < 0.5 ? -1 : 1))); ev.push({ e: 'bed', r: nr, c: nc, pc: c, hp: Math.max(0, hp) }); continue; }
-        if (b === 'stone') { hp -= PK.COST.stone; g[nr][nc] = 'air'; r = nr; c = nc; ev.push({ e: 'st', r: r, c: c, hp: Math.max(0, hp) }); if (r > maxR) maxR = r; continue; }
-        if (b === 'jelly') { g[nr][nc] = 'air'; r = Math.max(1, r - 2); ev.push({ e: 'jelly', r: nr, c: nc, pr: r, pc: c, hp: hp }); continue; }
-        if (b === 'crate') { g[nr][nc] = 'air'; if (cur < 3) { cur++; hp = PK.TIER[cur].hp; m = PK.TIER[cur].m; } else hp = Math.min(PK.TIER[3].hp, hp + 120); r = nr; c = nc; ev.push({ e: 'crate', r: r, c: c, ti: cur, hp: hp }); if (r > maxR) maxR = r; continue; }
+        if (b === 'bed') {
+          if (cur === 3) { hp -= PK.COST.bed; row(nr)[nc] = 'air'; r = nr; c = nc; ev.push({ e: 'bbrk', r: r, c: c, hp: Math.max(0, hp) }); if (r > maxR) maxR = r; }
+          else { hp -= PK.COST.bump; if (x < 0.5) c = Math.max(0, Math.min(COLS - 1, c + (R() < 0.5 ? -1 : 1))); ev.push({ e: 'bed', r: nr, c: nc, pc: c, hp: Math.max(0, hp) }); }
+          continue;
+        }
+        if (b === 'stone') { hp -= PK.COST.stone; row(nr)[nc] = 'air'; r = nr; c = nc; ev.push({ e: 'st', r: r, c: c, hp: Math.max(0, hp) }); if (r > maxR) maxR = r; continue; }
+        if (b === 'jelly') { row(nr)[nc] = 'air'; r = Math.max(-1, r - 2); ev.push({ e: 'jelly', r: nr, c: nc, pr: r, pc: c, hp: hp }); continue; }
+        if (b === 'crate') { row(nr)[nc] = 'air'; if (cur < 3) { cur++; hp = PK.TIER[cur].hp; m = PK.TIER[cur].m; } else hp = Math.min(PK.TIER[3].hp, hp + 120); r = nr; c = nc; ev.push({ e: 'crate', r: r, c: c, ti: cur, hp: hp }); if (r > maxR) maxR = r; continue; }
         if (b === 'tnt') {
-          g[nr][nc] = 'air'; var cells = [], pays = 0, y, xx;
+          row(nr)[nc] = 'air'; var cells = [], y, xx;
           for (y = nr - 1; y <= nr + 1; y++) for (xx = nc - 1; xx <= nc + 1; xx++) {
-            if (y < 0 || y >= PK.ROWS || xx < 0 || xx >= PK.COLS) continue; var t = g[y][xx];
-            if (t === 'stone' || t === 'bed' || t === 'tnt' || t === 'jelly' || t === 'crate') { g[y][xx] = 'air'; cells.push([y, xx, PK_CH[t], 0]); }
-            else if (PK.PAY[t]) { var o = pkVein(g, y, xx, t), pp = pk2(PK.PAY[t] * m * K); bets += o.length * PK.PAY[t] * m; o.forEach(function (q) { cells.push([q[0], q[1], PK_CH[t], pp]); }); }
+            if (y < 0 || xx < 0 || xx >= COLS) continue; ensure(y); var t2 = row(y)[xx];
+            if (t2 === 'stone' || t2 === 'tnt' || t2 === 'jelly' || t2 === 'crate' || (t2 === 'bed' && cur === 3)) { row(y)[xx] = 'air'; cells.push([y, xx, PK_CH[t2], 0]); }
+            else if (PK.PAY[t2]) { var o = vein(y, xx, t2), pp = pk2(PK.PAY[t2] * m * K); bets += o.length * PK.PAY[t2] * m; o.forEach(function (q) { cells.push([q[0], q[1], PK_CH[t2], pp]); }); }
           }
           r = nr; c = nc; ev.push({ e: 'tnt', r: r, c: c, hp: hp, cells: cells }); if (r > maxR) maxR = r; continue;
         }
-        if (PK.PAY[b]) { hp -= PK.COST[b]; var vo = pkVein(g, nr, nc, b); bets += vo.length * PK.PAY[b] * m; r = nr; c = nc; ev.push({ e: 'ore', r: r, c: c, k: PK_CH[b], hp: Math.max(0, hp), p: pk2(PK.PAY[b] * m * K), cells: vo }); if (r > maxR) maxR = r; continue; }
+        if (PK.PAY[b]) { hp -= PK.COST[b]; var vo = vein(nr, nc, b); bets += vo.length * PK.PAY[b] * m; r = nr; c = nc; ev.push({ e: 'ore', r: r, c: c, k: PK_CH[b], hp: Math.max(0, hp), p: pk2(PK.PAY[b] * m * K), cells: vo }); if (r > maxR) maxR = r; continue; }
       }
-      return { ev: ev, bets: bets, rows: rows0.slice(0, Math.min(PK.ROWS, maxR + 9)) };
+      ensure(maxR + 12);
+      return { ev: ev, bets: bets, rows: orig.slice(0, maxR + 11) };
     }
     function pkPub() { return { cols: PK.COLS, tiers: PK.TIER.map(function (t) { return { hp: t.hp, m: t.m, p: t.p }; }), price: PK.PRICE, pay: PK.PAY }; }
     // ---- Башня: 8 этажей, на каждом одна или две ловушки ----

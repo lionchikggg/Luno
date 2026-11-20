@@ -2065,6 +2065,88 @@ body.stm #kkwin.rv,body.stm .kkres.rv{filter:none}
 .kkpick.pop .kki{animation:none}
 .kkpick.pop .kki .kks{animation:kkpopend .42s ease-out forwards;transform-origin:50% 50%}
 .kkpick .kki{transform-origin:0 0}
+
+
+/* ===== v91: финальный дизайн: тёмный фон, новые карточки, баннер ===== */
+html{background-color:#07060f!important;background-image:linear-gradient(180deg,#0f0e20 0%,#0a0a1a 60%,#060512 100%)!important;background-attachment:fixed!important}
+body.toon{background:radial-gradient(800px 460px at 14% -8%,rgba(90,80,200,.10),transparent 60%)!important}
+.bal{background:rgba(26,26,62,.92)!important;border-color:rgba(130,130,210,.3)!important}
+#plus{background:linear-gradient(180deg,#c09cff,#7a48ee)!important;box-shadow:0 3px 0 #3b25a0!important}
+nav,.bn{background:rgba(24,24,58,.92)!important;border-color:rgba(130,130,210,.28)!important}
+nav .on,.mn.on{background:linear-gradient(180deg,#a98cff,#6a45e6)!important;box-shadow:0 4px 14px rgba(110,70,240,.5)!important}
+/* верх главной */
+.hcc h2{font-family:Manrope,Inter,sans-serif!important;font-weight:800!important;letter-spacing:-.01em}
+#freeb{background:url(/hero-bg-m.webp) center/cover no-repeat!important;border:1px solid rgba(170,185,255,.32)!important}
+#hc2{background:url(/lead-bg.webp) center/cover no-repeat!important;border:1px solid rgba(150,175,255,.3)!important}
+#hc3{background:url(/inv-bg.webp) center/cover no-repeat!important;border:1px solid rgba(170,150,255,.3)!important}
+@media (min-width:1000px){#freeb{background-image:url(/hero-bg-w.webp)!important}}
+#freeb h2{font-size:clamp(30px,4.2vw,62px)!important;line-height:1.05;color:#fff}
+#freeb h2 b{background:linear-gradient(90deg,#7fb3ff,#b6d0ff);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+#freeb p,#hc3 p{color:#b9c3f4!important;font-weight:600}
+#freeb .hcb,#hc2 .hcb,#hc3 .hcb{background:rgba(15,20,70,.6)!important;border:1px solid rgba(255,255,255,.14);color:#e6ebff!important;text-transform:uppercase;letter-spacing:.06em;font:800 11px Manrope}
+.hcc .wb,.hcc.dk .wb{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(180deg,#f3eeff,#d6c8ff)!important;color:#2f2a96!important;border-radius:16px;font:800 15px Manrope!important;box-shadow:0 5px 0 #9d8ae8,0 10px 22px rgba(10,10,60,.35)!important;text-shadow:none!important}
+.hcc .wb i{font-style:normal;font-size:22px;line-height:1}
+#hc2 h2,#hc3 h2{font-size:clamp(22px,2.3vw,34px)!important;color:#fff}
+.tmr2{display:flex!important;gap:0!important;margin:8px 0 10px!important}
+.tmr2 div{background:none!important;border:0!important;box-shadow:none!important;padding:0 14px!important;font:800 clamp(22px,2.3vw,34px) Manrope!important;color:#fff;text-align:center;border-left:1px solid rgba(255,255,255,.2)!important;min-width:0!important}
+.tmr2 div:first-child{padding-left:0!important;border-left:0!important}
+.tmr2 small{display:block;font:600 12px Manrope!important;color:#aeb9ee;margin-top:2px}
+.lc{height:54px!important;border-radius:28px!important;padding:0 18px 0 8px!important;border:1px solid rgba(190,160,255,.45)!important;background:linear-gradient(180deg,#8a5cf0,#5230c0)!important;box-shadow:0 6px 0 #2e1a80,0 10px 20px rgba(20,10,80,.4)!important}
+.lc.t3,.lc.t4{background:linear-gradient(180deg,#5f8dff,#3358d8)!important;border-color:rgba(170,205,255,.55)!important;box-shadow:0 6px 0 #1a3090,0 10px 20px rgba(10,20,90,.4)!important}
+.lc.t5{background:linear-gradient(180deg,#ff5ab8,#b3329e)!important;border-color:rgba(255,170,220,.55)!important;box-shadow:0 6px 0 #6a1a64,0 10px 20px rgba(60,10,60,.4)!important}
+.lc .lv{font:800 20px Manrope!important;color:#fff}.lc .lv u{display:none}.lc .lv::after{content:"+";color:#ffd24a;margin-left:6px;font-weight:900}
+#home .gall>h3::after{content:" ★";color:#ffd24a}
+/* ===== карточки игр ===== */
+.game[hidden],#hallw[hidden]{display:none!important}
+.gall{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+.gall>h3,.gall>.shd{grid-column:1/-1}
+#gmain,#hallw,.hall2{display:contents!important}
+#hallw .hh{display:none!important}
+.game{position:relative;display:flex!important;flex-direction:column;justify-content:flex-end;aspect-ratio:378/266!important;min-height:0!important;height:auto!important;padding:0 0 12px 7%!important;border-radius:26px!important;border:1px solid rgba(110,120,230,.32)!important;box-shadow:0 10px 22px rgba(0,0,0,.4)!important;overflow:hidden;background-color:#10143a!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;grid-column:auto!important}
+.game.wide,.game.wide2{grid-column:auto!important}
+.game::before{display:none!important}
+.game::after{display:block!important;content:"";position:absolute;left:0;right:0;bottom:0;height:44%;width:auto!important;top:auto!important;background:linear-gradient(to top,rgba(8,10,44,.55),transparent)!important;border-radius:inherit;pointer-events:none;z-index:1;animation:none!important}
+.game>div,.game>img,.game>i,.game>svg,.game .kon{display:none!important}
+.game strong{position:relative;z-index:3;font:800 15.5px/1.1 Manrope,Inter,sans-serif!important;text-transform:uppercase;letter-spacing:.01em;color:#fff;text-shadow:0 2px 0 rgba(8,10,50,.6),0 4px 12px rgba(0,0,0,.4)}
+.game .sb2,.game span.sb2{position:relative;z-index:3;font:600 10.5px/1.2 Manrope,Inter,sans-serif!important;color:#b8c2f4!important;margin-top:3px}
+.game .nw{display:none!important}
+.game .rmc{position:absolute;right:10px;top:10px;z-index:5;padding:4px 10px;border-radius:12px;background:rgba(255,255,255,.14);font:800 15px Manrope;font-style:normal;color:#fff}
+.game:active{transform:scale(.97)}
+#modes .mgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+@media (min-width:1000px){
+ .gall,#modes .mgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:24px!important}
+ .game{border-radius:30px!important;padding:0 0 16px 7%!important}
+ .game strong{font-size:28px!important}.game .sb2,.game span.sb2{font-size:16px!important;margin-top:4px}
+ .game .rmc{right:18px;top:16px;font-size:26px;padding:6px 16px;border-radius:15px}
+ #home .game[data-g=slots],#home .game[data-g=du],#home .game[data-g=hilo]{display:none!important}
+ #home .game[data-g=rocket]{order:1}#home .game[data-g=upgrade]{order:2}#home .game[data-g=s3]{order:3}#home .game[data-g=pick]{order:4}#home .game[data-g=bj]{order:5}#home .game[data-g=modes]{order:6}
+}
+@media (max-width:999px){
+ #home .game[data-g=du],#home .game[data-g=hilo]{display:none!important}
+ #home .game[data-g=rocket]{order:1}#home .game[data-g=upgrade]{order:2}#home .game[data-g=s3]{order:3}#home .game[data-g=slots]{order:4}#home .game[data-g=pick]{order:5}#home .game[data-g=bj]{order:6}#home .game[data-g=modes]{order:7}
+}
+#home .game[data-g=rocket],#home .gall .game[data-g=rocket],#modes .game[data-g=rocket]{background-image:url(/card-rocket.webp)!important}
+#home .game[data-g=upgrade],#home .gall .game[data-g=upgrade],#modes .game[data-g=upgrade]{background-image:url(/card-upgrade.webp)!important}
+#home .game[data-g=s3],#home .gall .game[data-g=s3],#modes .game[data-g=s3]{background-image:url(/card-s3.webp)!important}
+#home .game[data-g=slots],#home .gall .game[data-g=slots],#modes .game[data-g=slots]{background-image:url(/card-slots.webp)!important}
+#home .game[data-g=pick],#home .gall .game[data-g=pick],#modes .game[data-g=pick]{background-image:url(/card-pick.webp)!important}
+#home .game[data-g=bj],#home .gall .game[data-g=bj],#modes .game[data-g=bj]{background-image:url(/card-bj.webp)!important}
+#home .game[data-g=modes],#home .gall .game[data-g=modes],#modes .game[data-g=modes]{background-image:url(/card-modes.webp)!important}
+#home .game[data-g=du],#home .gall .game[data-g=du],#modes .game[data-g=du]{background-image:url(/card-du.webp)!important}
+#home .game[data-g=hilo],#home .gall .game[data-g=hilo],#modes .game[data-g=hilo]{background-image:url(/card-hilo.webp)!important}
+#home .game[data-g=mines],#home .gall .game[data-g=mines],#modes .game[data-g=mines]{background-image:url(/card-mines.webp)!important}
+#home .game[data-g=wheel],#home .gall .game[data-g=wheel],#modes .game[data-g=wheel]{background-image:url(/card-wheel.webp)!important}
+#home .game[data-g=coin],#home .gall .game[data-g=coin],#modes .game[data-g=coin]{background-image:url(/card-coin.webp)!important}
+#home .game[data-g=tower],#home .gall .game[data-g=tower],#modes .game[data-g=tower]{background-image:url(/card-tower.webp)!important}
+#home .game[data-g=cups],#home .gall .game[data-g=cups],#modes .game[data-g=cups]{background-image:url(/card-cups.webp)!important}
+#home .game[data-g=balloon],#home .gall .game[data-g=balloon],#modes .game[data-g=balloon]{background-image:url(/card-balloon.webp)!important}
+
+#home .game,#home .gall .game,#home .gall #modesc,#modes .game,#home #modesc{background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;background-color:#10143a!important;aspect-ratio:378/266!important;min-height:0!important;height:auto!important;border-radius:26px!important;border:1px solid rgba(110,120,230,.32)!important;box-shadow:0 10px 22px rgba(0,0,0,.4)!important;padding:0 0 12px 7%!important;margin:0!important}
+@media (min-width:1000px){#home .game,#home .gall .game,#home .gall #modesc,#modes .game,#home #modesc{border-radius:30px!important;padding:0 0 16px 7%!important}}
+#home #modesc,#home .gall #modesc,#home #modesc.wide,#home .gall #modesc.wide{background-image:url(/card-modes.webp)!important;background-size:cover!important;background-position:center!important}
+#home .game strong,#modes .game strong,#home .gall .game strong{font-family:Manrope,Inter,sans-serif!important;font-style:normal!important;letter-spacing:.01em!important}
+#home .game .sb2,#modes .game .sb2,#home .gall .game .sb2{font-family:Manrope,Inter,sans-serif!important;font-style:normal!important}
+@media (max-width:999px){#home .game strong,#modes .game strong,#home .gall .game strong{font-size:13px!important;line-height:1.08!important}#home .game .sb2,#modes .game .sb2,#home .gall .game .sb2{font-size:9.5px!important;margin-top:2px!important}#home .game,#home .gall .game,#modes .game,#home #modesc{padding:0 0 10px 6.5%!important}}
 </style></head><body data-mode="home" class="toon"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="su-s" viewBox="0 0 100 100"><path d="M50 4C58 24 92 40 92 62C92 76 82 84 71 84C62 84 55 80 51 73C52 84 57 92 66 96L34 96C43 92 48 84 49 73C45 80 38 84 29 84C18 84 8 76 8 62C8 40 42 24 50 4Z"/></symbol><symbol id="su-h" viewBox="0 0 100 100"><path d="M50 94C28 74 4 56 4 32C4 17 15 7 28 7C38 7 46 12 50 20C54 12 62 7 72 7C85 7 96 17 96 32C96 56 72 74 50 94Z"/></symbol><symbol id="su-d" viewBox="0 0 100 100"><path d="M50 3L86 50L50 97L14 50Z"/></symbol><symbol id="su-c" viewBox="0 0 100 100"><circle cx="50" cy="29" r="21"/><circle cx="27" cy="60" r="21"/><circle cx="73" cy="60" r="21"/><path d="M50 50C50 74 46 88 36 96L64 96C54 88 50 74 50 50Z"/></symbol>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#cfd6ff"/><stop offset="1" stop-color="#8f9dff"/></linearGradient>
@@ -2084,14 +2166,14 @@ body.stm #kkwin.rv,body.stm .kkres.rv{filter:none}
  <div class="seg" id="seg"><button data-m="real">Реальный счёт</button><button data-m="demo">Демо-режим</button></div>
  <div class="dmb" id="dmb" hidden><b>Демо-режим</b><p>Виртуальные звёзды. Шансы в играх такие же, как в реальной игре. Вывод подарков и пополнение недоступны.</p><button class="btn" id="dmr">Пополнить демо-баланс</button></div>
  <div class="hcw"><button class="hnav l" id="hnl" aria-label="Назад" type="button">&#8249;</button><button class="hnav r" id="hnr" aria-label="Дальше" type="button">&#8250;</button><div class="hc" id="hc">
-  <button class="hcc" id="freeb"><span class="hcb">Бесплатный кейс</span><h2>Открой бесплатно</h2><p id="freep">промокод или 5 друзей</p><span class="wb">Открыть бесплатно</span><div class="gift"></div><div class="hpg" id="hpg"></div></button>
+  <button class="hcc" id="freeb"><span class="hcb">Бесплатный кейс</span><h2>Открой <b>бесплатно</b></h2><p id="freep">промокод или 5 друзей</p><span class="wb">Открыть бесплатно <i>›</i></span><div class="gift"></div><div class="hpg" id="hpg"></div></button>
   <button class="hcc dk" id="hc2"><span class="hcb">Конкурс недели</span><h2>Лидеры недели</h2><div class="tmr2" id="hct"></div><p id="hcl" style="max-width:none;margin:0">Загружаю…</p><div class="gift" id="hc2g"></div></button>
   <button class="hcc v3" id="hc3"><span class="hcb">Друзья</span><h2>Приглашай друзей</h2><p id="hc3p"></p><span class="wb">Пригласить</span><div class="gift"></div></button>
  </div></div>
  <div class="hdots" id="hdots"><i class="on"></i><i></i><i></i></div>
  <div class="shd"><h3>Главные призы</h3><span id="prm"></span></div><div class="prz" id="prz"></div>
  <div class="gall" id="gall"><h3>Игры</h3>
- <div class="grid" id="gmain"><button class="game wide c1" data-g="rocket"><div class="art" data-card="rocket"></div><strong>Ракетка</strong><span class="sb2">забери до краша</span></button>
+ <div class="grid" id="gmain"><button class="game wide c1" data-g="rocket"><div class="art" data-card="rocket"></div><em class="rmc">×2.00</em><strong>Ракетка</strong><span class="sb2">забери до краша</span></button>
   <button class="game c4" data-g="upgrade"><div class="art" data-card="upgrade"></div><strong>Апгрейд</strong><span class="sb2">прокачай подарок</span></button>
   <button class="game c6" data-g="s3"><div class="art" data-card="slots3"></div><strong>Слоты</strong><span class="sb2">3 барабана, 5 линий</span></button>
   <button class="game wide c2" data-g="slots"><div class="art" data-card="slots"></div><strong>Спины</strong><span class="sb2">фриспины и ×1000</span></button>
@@ -3256,7 +3338,7 @@ function artS3(){var sy=(CFG.slots3&&CFG.slots3.symbols)||[],pl=sy.filter(functi
  return '<div class="s3box">'+col(['P','D','P','D'],5.2,0.4)+col(['D','P','P','D'],6.6,2.1)+col(['P','P','D','P'],5.8,3.3)+'</div>'}
 var ARTF={rocket:artRocket,mines:artMines,upgrade:artUpgrade,slots:artSpins,plinko:artPlinko,coin:artCoin,slots3:artS3};
 setInterval(function(){if(cur!=='home'||!CFG)return;var e=document.querySelector('.rm');if(!e)return;var h=setInterval.hm||(setInterval.hm={t:0,cap:30,pause:0});
- if(h.pause>0){h.pause--;return}h.t+=.09;var m=Math.exp(h.t*.55);if(m>=h.cap){h.pause=14;h.t=0;h.cap=4+rnd()*((CFG.settings.crashMax||50)-4)}e.textContent='×'+m.toFixed(2)},90);
+ if(h.pause>0){h.pause--;return}h.t+=.09;var m=Math.exp(h.t*.55);if(m>=h.cap){h.pause=14;h.t=0;h.cap=4+rnd()*((CFG.settings.crashMax||50)-4)}e.textContent='×'+m.toFixed(2);document.querySelectorAll('.rmc').forEach(function(c){c.textContent=e.textContent})},90);
 function applyTexts(){var E=CFG.settings.edges||{};$('rnote').textContent='RTP '+Math.round((1-(E.crash||0))*100)+'% · максимум ×'+(CFG.settings.crashMax||50)+' (Луна)';$('cgo').textContent='Бросить · ×'+(2*(1-(E.coin||0))).toFixed(2)}
 function applySkins(){applyTexts();
  document.querySelectorAll('.art[data-card]').forEach(function(e){var c=e.dataset.card,s2=CFG.skins['card_'+c];e.innerHTML=c==='upgrade'?artUpgrade(s2):(s2?'<div class="sk">'+imgH(s2)+'</div>':ARTF[c]())});
@@ -3265,7 +3347,12 @@ function applySkins(){applyTexts();
 function liveRender(list){var box=$('lv');box.innerHTML='';list=(list||[]).filter(function(k){return String(k).indexOf('b:')!==0});
  if(!list.length){for(var i=0;i<4;i++){var p=document.createElement('div');p.className='lc ph';p.innerHTML='<i class="li">'+I.moon+'</i>';box.appendChild(p)}return}
  list.forEach(function(k){var it=CFG.items[k],v=it?it.value:0,t=v>=10000?5:v>=2500?4:v>=600?3:v>=150?2:v>=30?1:0,e=document.createElement('div');e.className='lc t'+t;e.innerHTML='<i class="li">'+ik(k)+'</i><span class="lv">'+fmt(v)+'<u>★</u></span>';box.appendChild(e)})}
-function livePoll(){api('live').then(function(r){if(r.auth)return showGate(r.error);if(r.live)liveRender(r.live)},function(){})}
+function livePoll(){api('live').then(function(r){if(r.auth)return showGate(r.error);if(r.live)liveRender(r.live);if(r.playing)playRender(r.playing)},function(){})}
+/* значки «N играют» на карточках игр (реальные: сколько разных игроков ставили за последние 10 минут) */
+var PLMAP={rocket:'crash',upgrade:'upgrade',s3:'slots3',slots:'slots',pick:'pick',mines:'mines',coin:'coin',wheel:'wheel',tower:'tower',cups:'cups',balloon:'balloon',hilo:'hilo',bj:'blackjack',du:'durak'},PLN={};
+function plWord(n){var a=n%10,b=n%100;return (a===1&&b!==11)?'играет':'играют'}
+function playRender(p){PLN=p||{};document.querySelectorAll('.game[data-g] .kon').forEach(function(k){var g=k.parentNode.dataset.g,n=0;if(g==='modes')['mines','wheel','coin','tower','cups','balloon'].forEach(function(x){n+=PLN[x]||0});else n=PLN[PLMAP[g]]||0;k.querySelector('b').textContent=n;k.querySelector('span').textContent=plWord(n)})}
+(function(){document.querySelectorAll('.game[data-g]').forEach(function(c){if(c.querySelector('.kon'))return;var e=document.createElement('em');e.className='kon';e.innerHTML='<i></i><b>0</b> <span>играют</span>';c.insertBefore(e,c.firstChild)})})();
 
 /* ===== РАКЕТКА: общий онлайн-раунд ===== */
 var PL=[{t:10,n:'Марс',c:'p-mars',s:64,x:'10%'},{t:20,n:'Юпитер',c:'p-jup',s:92,x:'66%'},{t:40,n:'Сатурн',c:'p-sat',s:76,x:'12%'},{t:70,n:'Нептун',c:'p-nep',s:70,x:'64%'},{t:100,n:'Луна',c:'p-moon',s:120,x:'52%'}];
@@ -3615,8 +3702,9 @@ $('bjrack').onclick=function(e){var c=e.target.closest('.rkch');if(!c||!BJ)retur
 
 
 /* на ПК «Дурак» и «Hi-Lo» живут в «Режимах» (копии карточек), на главной их нет */
-(function(){var mg=document.querySelector('#modes .mgrid');if(!mg)return;['#ducard','#hallw [data-g=hilo]'].forEach(function(q){var o=document.querySelector(q);if(!o)return;var c=o.cloneNode(true);c.removeAttribute('id');c.classList.add('pconly');c.onclick=function(){go(c.dataset.g)};mg.appendChild(c)})})();
+(function(){var mg=document.querySelector('#modes .mgrid');if(!mg)return;['#ducard','#hallw [data-g=hilo]','#gmain [data-g=slots]'].forEach(function(q){var o=document.querySelector(q);if(!o)return;var c=o.cloneNode(true);c.removeAttribute('id');c.classList.add('mclone');c.onclick=function(){go(c.dataset.g)};mg.appendChild(c)})})();
 (function(){var mg=document.querySelector('#modes .mgrid'),o=document.querySelector('#home .kkcard');if(!mg||!o)return;var c=o.cloneNode(true);c.removeAttribute('id');c.classList.remove('wide');c.classList.add('phonly');c.onclick=function(){go('pick')};mg.appendChild(c)})();
+document.querySelectorAll('.game[data-g]').forEach(function(c){if(c.querySelector('.kon'))return;var e=document.createElement('em');e.className='kon';e.innerHTML='<i></i><b>0</b> <span>играют</span>';c.insertBefore(e,c.firstChild)});
 /* Live переехал на место «Главных призов» */
 (function(){var lv=document.querySelector('#home .live'),sh=document.querySelector('#home .shd');if(lv&&sh&&sh.parentNode)sh.parentNode.insertBefore(lv,sh)})();
 /* ===== символ ★ везде заменяется картинкой-звездой ===== */

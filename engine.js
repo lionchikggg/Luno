@@ -519,7 +519,7 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
         return { id: u.demo ? String(u.id).slice(1) : u.id, demo: !!u.demo, name: u.name, username: u.username || '', fair: o.fairInfo ? o.fairInfo(u) : null };
       },
       'demo/refill': function (u) { if (!u.demo) throw new Err('Только для демо-счёта'); u.balance = Math.max(u.balance, set('demoBalance')); return { balance: u.balance }; },
-      live: function () { return { live: S.live.slice(-10).reverse() }; },
+      live: function () { var tn = now(), seen = {}, cnt = {}; (S.betlog || []).forEach(function (b) { if (tn - b.t > 10 * 60 * 1000) return; var k = b.g + '|' + b.u; if (seen[k]) return; seen[k] = 1; cnt[b.g] = (cnt[b.g] || 0) + 1; }); return { live: S.live.slice(-10).reverse(), playing: cnt }; }, // playing: сколько разных игроков ставили в игре за последние 10 минут
       'seed/rotate': function (u, b) { if (!o.rotate) throw new Err('Недоступно в демо'); return o.rotate(u, b.clientSeed); },
       coin: function (u, b) {
         var side = b.side ? 1 : 0, bet = take(u, b.bet), res = roll(u) < 0.5 ? 0 : 1, win = res === side;

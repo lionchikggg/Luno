@@ -422,7 +422,7 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
 
     // ---- Кирка: бесконечная шахта из блоков-кнопок. Кирка падает сверху, ломает блоки, пока не кончится прочность. Весь раунд считает сервер ----
     var PK = {
-      COLS: 7, DOWN: 0.84, R1: 0.9851, PRICE: [0, 1.7, 3.25, 5.7],
+      COLS: 7, DOWN: 0.84, R1: 0.9851, PRICE: [0, 1.9, 3.6, 6.4],
       TIER: [{ hp: 100, m: 1, p: 0.635 }, { hp: 150, m: 1.25, p: 0.25 }, { hp: 200, m: 1.5, p: 0.088 }, { hp: 400, m: 2, p: 0.027 }],
       PAY: { red: 0.02, gold: 0.04, emerald: 0.075, diamond: 0.18 }, COST: { stone: 5, red: 6, gold: 7, emerald: 8, diamond: 9, bed: 12, bump: 3 },
       P: { f: 0.20695, red: 0.24, gold: 0.09, em: 0.04, di: 0.012, tnt: 0.03, jelly: 0.02, crate: 0.01, bed: 0.02, bedFrom: 16, rb: 1, gb: 1, ee: 0.9, de: 1.1, bo: 2.6, bor: 14 }
@@ -537,7 +537,7 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
         var bet = Math.floor(+b.bet), buy = Math.floor(+b.buy) || 0; if (!(bet >= set('minBet')) || bet > set('maxBet')) throw new Err('Ставка от ★' + set('minBet') + ' до ★' + set('maxBet'));
         if (buy < 0 || buy > 3) buy = 0; var ti = 3, cost = bet, i;
         if (buy >= 1) { ti = buy; cost = Math.ceil(bet * PK.PRICE[buy]); } else { var x0 = roll(u), a0 = 0; for (i = 0; i < 4; i++) { a0 += PK.TIER[i].p; if (x0 < a0) { ti = i; break; } } }
-        var Cx = Math.min(+set('pickMaxX') || 50, set('maxPayout') / cost); if (Cx < 5) throw new Err('Ставка слишком большая для лимита выплат. Уменьши ставку');
+        var Cx = Math.min(+set('pickMaxX') || 50, set('maxPayout') / cost); if (Cx < 5) throw new Err(buy >= 1 ? 'Для этой бонуски ставка слишком большая. Максимум ★' + Math.max(set('minBet'), Math.floor(set('maxPayout') / (5 * PK.PRICE[buy]))) : 'Ставка слишком большая для лимита выплат. Уменьши ставку');
         if (u.balance < cost) throw new Err('Не хватает звёзд'); u.balance -= cost;
         var kk = (1 - edgeOf('pick')) / PK.R1, rr = pkPlay(function () { return roll(u); }, ti, bet * kk), pf = Math.min(rr.bets * bet * kk, Cx * cost), fl = Math.floor(pf), pi = fl + (roll(u) < pf - fl ? 1 : 0), payout = pay(u, 'pick', cost, pi);
         return { tier: ti, buy: buy, cost: cost, payout: payout, total: pk2(pf), hp0: PK.TIER[ti].hp, rows: rr.rows, ev: rr.ev };

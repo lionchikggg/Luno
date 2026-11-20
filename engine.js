@@ -422,7 +422,7 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
 
     // ---- Кирка: бесконечная шахта из блоков-кнопок. Кирка падает сверху, ломает блоки, пока не кончится прочность. Весь раунд считает сервер ----
     var PK = {
-      COLS: 7, DOWN: 0.84, R1: 0.9492, PRICE: [0, 1.22, 2.26, 3.8],
+      COLS: 7, DOWN: 0.84, R1: 0.9851, PRICE: [0, 1.23, 2.34, 3.99],
       TIER: [{ hp: 100, m: 1, p: 0.635 }, { hp: 150, m: 1.25, p: 0.25 }, { hp: 200, m: 1.5, p: 0.088 }, { hp: 400, m: 2, p: 0.027 }],
       PAY: { red: 0.02, gold: 0.04, emerald: 0.075, diamond: 0.18 }, COST: { stone: 5, red: 6, gold: 7, emerald: 8, diamond: 9, bed: 12, bump: 3 },
       P: { f: 0.20695, red: 0.24, gold: 0.09, em: 0.04, di: 0.012, tnt: 0.03, jelly: 0.02, crate: 0.01, bed: 0.02, bedFrom: 16, rb: 1, gb: 1, ee: 0.9, de: 1.1, bo: 2.6, bor: 14 }
@@ -448,9 +448,8 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
       ensure(0);
       var hp = PK.TIER[ti].hp, cur = ti, m = PK.TIER[ti].m, bets = 0, r = -1, c = 3, steps = 0, ev = [], maxR = 0;
       while (hp > 0 && steps++ < 1500) {
-        var x = R(), nr = r, nc = c; if (r < 0) nr = r + 1; else if (x < PK.DOWN) nr = r + 1; else nc = c + (x < PK.DOWN + (1 - PK.DOWN) / 2 ? -1 : 1);
-        if (nc < 0 || nc >= COLS) nc = c; ensure(nr + 1); var b = nr < 0 ? 'air' : row(nr)[nc];
-        if (nc !== c && b === 'air') { nr = r + 1; nc = c; b = row(nr)[nc]; }
+        var x = R(), nr = r + 1, nc = c; if (r >= 0 && x >= PK.DOWN) nc = c + (x < PK.DOWN + (1 - PK.DOWN) / 2 ? -1 : 1); // всегда вниз; отскок может сдвинуть на соседнюю колонку (диагональ)
+        if (nc < 0 || nc >= COLS) nc = c; ensure(nr + 1); var b = row(nr)[nc];
         if (b === 'air') { r = nr; c = nc; ev.push({ e: 'mv', r: r, c: c }); if (r > maxR) maxR = r; continue; }
         if (b === 'bed') {
           if (cur === 3) { hp -= PK.COST.bed; row(nr)[nc] = 'air'; r = nr; c = nc; ev.push({ e: 'bbrk', h0: hp + PK.COST.bed, r: r, c: c, hp: Math.max(0, hp) }); if (r > maxR) maxR = r; }

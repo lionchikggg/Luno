@@ -98,6 +98,45 @@ function genCases(o){
  var fw=[40,25,15,10,6,4],fr={id:'free',name:'Бесплатный',img:'',hue:0,price:0,free:true,active:true,items:it.slice(0,6).map(function(x,j){return {k:x.k,weight:fw[j]}})};
  var old=C.cases.filter(function(c){return c.id==='free'})[0];if(old){fr.img=old.img||'';fr.name=old.name}
  C.cases=[fr].concat(out)}
+
+function genOne(o){
+ var pool=Object.keys(C.items).filter(function(k){return o.all||/^\/uploads\//.test(C.items[k].img||'')});
+ if(pool.length<15)throw new Error('Нужно минимум 15 подарков с твоими картинками. Сейчас найдено: '+pool.length+'. Загрузи ещё NFT во вкладке «NFT и подарки» (или отметь галочку про стандартные подарки).');
+ var P=Math.max(1,Math.round(o.price)),lim=+C.settings.maxCaseRtp||0.95,target=o.rtp*P;
+ if(!(P>=1))throw new Error('Укажи цену кейса');
+ if(o.rtp>lim)throw new Error('RTP '+(o.rtp*100).toFixed(0)+'% выше лимита из настроек ('+(lim*100).toFixed(0)+'%). Поставь меньше.');
+ var it=pool.map(function(k){return {k:k,v:Math.max(1,+C.items[k].value||1)}}),want=o.prize>0?o.prize:P*20,pj=Math.min(0.2,Math.max(0.0001,o.pj/100));
+ var J=it.slice().sort(function(a,b){return Math.abs(Math.log(a.v/want))-Math.abs(Math.log(b.v/want))})[0];
+ if(J.v*pj>=target*0.85)throw new Error('Главный приз «'+C.items[J.k].name+'» (★'+J.v+') при шансе '+o.pj+'% почти один забирает весь RTP кейса. Уменьши шанс или выбери приз дешевле.');
+ var rest=it.filter(function(x){return x!==J&&x.v<=P*8&&x.v>=Math.max(1,P*0.02)});
+ if(rest.length<14)rest=it.filter(function(x){return x!==J&&x.v<=P*30});
+ if(rest.length<14)rest=it.filter(function(x){return x!==J});
+ var need=(target-J.v*pj)/(1-pj),best=null;
+ function bucket(lo,hi){return rest.filter(function(x){return x.v>lo*P&&x.v<=hi*P})}
+ function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+ for(var tr=0;tr<80&&!best;tr++){
+  var bs=[bucket(0,0.3),bucket(0.3,0.8),bucket(0.8,2),bucket(2,30)],cnt=[6,4,3,1],pick=[];
+  cnt[0]+=Math.round(Math.random()*2-1);cnt[1]+=Math.round(Math.random()*2-1);
+  bs.forEach(function(b,i){pick=pick.concat(shuffle(b).slice(0,Math.max(0,cnt[i])))});
+  var left=shuffle(rest.filter(function(x){return pick.indexOf(x)<0}));while(pick.length<14&&left.length)pick.push(left.pop());
+  pick=pick.slice(0,14);if(pick.length<14)continue;
+  var mn=Math.min.apply(null,pick.map(function(x){return x.v})),mx=Math.max.apply(null,pick.map(function(x){return x.v}));
+  if(!(mn<need*0.97&&mx>need*1.03))continue;
+  var nz=pick.map(function(){return 0.6+Math.random()});
+  var ev=function(a){var w=0,e=0;pick.forEach(function(x,i){var q=nz[i]*Math.pow(x.v,-a);w+=q;e+=q*x.v});return e/w},lo=-8,hi=12,a;
+  if(ev(hi)>need||ev(lo)<need)continue;
+  for(var t=0;t<60;t++){var m=(lo+hi)/2;if(ev(m)>need)lo=m;else hi=m}a=(lo+hi)/2;
+  var ws=pick.map(function(x,i){return nz[i]*Math.pow(x.v,-a)}),sum=ws.reduce(function(p,q){return p+q},0),its=[];
+  pick.forEach(function(x,i){its.push({k:x.k,weight:Math.max(0.01,Math.round((1-pj)*ws[i]/sum*10000)/100)})});
+  its.push({k:J.k,weight:Math.max(0.001,Math.round(pj*10000)/100)});
+  var tot=its.reduce(function(p,q){return p+q.weight},0),big=its.reduce(function(p,q){return q.weight>p.weight?q:p},its[0]);big.weight=Math.round((big.weight+100-tot)*100)/100;
+  var names=['Moon','Star','Comet','Nova','Galaxy','Cosmos','Infinity','Orbit','Eclipse','Aurora','Zenith','Vega','Lunar','Pulsar','Quasar'],used={};C.cases.forEach(function(c){used[c.name]=1});
+  var nm=names.filter(function(n){return !used[n]});nm=nm.length?nm[Math.floor(Math.random()*nm.length)]:'Box '+(C.cases.length+1);
+  its.sort(function(x,y){return (C.items[x.k].value||0)-(C.items[y.k].value||0)});
+  var cs={id:'box'+Date.now().toString(36)+Math.floor(Math.random()*100),name:nm,img:'',hue:Math.floor(Math.random()*300)-100,price:P,free:false,active:true,items:its},rr=rtpOf(cs);
+  if(Math.abs(rr-o.rtp)<0.004&&rr<=lim)best=cs}
+ if(!best)throw new Error('Не получилось подобрать 15 подарков под такой RTP. Добавь больше дешёвых подарков (дешевле ★'+Math.max(1,Math.round(P*0.3))+') или поменяй цену кейса.');
+ return {cs:best,J:J,pj:pj}}
 function vUp(){var v=$('view'),keys=Object.keys(C.items);
  v.appendChild(h('div',{class:'help'},['Здесь выбираешь, какие подарки игроки могут получить в апгрейде как цель. Отметь галочкой нужные. Шанс апгрейда считается автоматически: цена подарка-ставки делить на цену цели, минус твой процент. Новые NFT из вкладки «NFT и подарки» сразу появляются в этом списке.']));
  var set=function(fn){keys.forEach(function(k){C.items[k].up=fn(k)});draw()};
@@ -109,6 +148,11 @@ function vCases(){var v=$('view');v.appendChild(h('p',{class:'m'},['Для ка�
  var maxV=Math.max.apply(null,Object.keys(C.items).map(function(k){return +C.items[k].value||0}).concat([100])),gn=h('input',{type:'number',v:7,min:1,max:10}),gr=h('input',{type:'number',v:88,min:50,max:99}),g1=h('input',{type:'number',v:10,min:10}),g2=h('input',{type:'number',v:Math.max(50,Math.round(maxV/6/10)*10)}),ga=h('input',{type:'checkbox'});
  v.appendChild(h('div',{class:'card'},[h('b',{class:'big'},['Собрать кейсы автоматически']),h('div',{class:'help'},['Кнопка берёт твои загруженные NFT (с твоими картинками) и сама собирает кейсы по возрастанию цены. В каждом кейсе будет от 5 подарков, шансы подбираются так, чтобы тебе оставалась маржа (RTP кейса = заданный процент). Дорогие NFT выпадают редко. После сборки всё можно поправить вручную. Текущие кейсы будут заменены.']),
   h('div',{class:'row'},['Сколько кейсов',gn,'RTP %',gr,'Цена от ★',g1,'до ★',g2]),h('div',{class:'row'},[h('label',{},[ga,' использовать и стандартные подарки, не только мои']),h('button',{class:'b',on:{click:function(){try{if(!confirm('Заменить все текущие кейсы новыми? Промокоды на бесплатный кейс сохранятся.'))return;genCases({n:+gn.value||7,rtp:(+gr.value||88)/100,pmin:+g1.value||10,pmax:+g2.value||500,all:ga.checked});dirty=true;say('Кейсы собраны. Проверь RTP каждого и нажми «Сохранить всё»');draw()}catch(e){alert(e.message)}}}},['Собрать кейсы'])])]));
+ var oP=h('input',{type:'number',v:100,min:1}),oR=h('input',{type:'number',v:88,min:50,max:99}),oPr=h('input',{type:'number',v:'',min:0,placeholder:'авто ×20'}),oPj=h('input',{type:'number',v:0.1,min:0.01,max:20,step:0.01}),oA=h('input',{type:'checkbox'});
+ v.appendChild(h('div',{class:'card'},[h('b',{class:'big'},['Создать один кейс по цене']),h('div',{class:'help'},['Пишешь цену кейса, бот сам берёт 15 разных подарков из твоих NFT, ставит один главный приз (по умолчанию в 20 раз дороже кейса) с очень маленьким шансом и подбирает шансы остальных так, чтобы RTP был заданным. Каждое нажатие даёт другой набор. Новый кейс добавляется к текущим. Потом его можно поправить вручную.']),
+  h('div',{class:'row'},['Цена кейса ★',oP,'RTP %',oR,'Главный приз ★',oPr,'Шанс главного приза %',oPj]),
+  h('div',{class:'row'},[h('label',{},[oA,' использовать и стандартные подарки, не только мои']),h('button',{class:'b',on:{click:function(){try{var res=genOne({price:+oP.value,rtp:(+oR.value||88)/100,prize:+oPr.value||0,pj:+oPj.value||0.1,all:oA.checked});C.cases.push(res.cs);dirty=true;say('Создан кейс «'+res.cs.name+'» за ★'+res.cs.price+': 15 подарков, главный приз «'+C.items[res.J.k].name+'» ★'+res.J.v+' с шансом '+(res.pj*100).toFixed(2)+'%. RTP '+(rtpOf(res.cs)*100).toFixed(1)+'%. Проверь внизу и нажми «Сохранить всё»');draw()}catch(e){alert(e.message)}}}},['Создать кейс'])])]));
+
  C.cases.forEach(function(c,ci){var card=h('div',{class:'card'}),lim=C.settings.maxCaseRtp;
   card.appendChild(h('div',{class:'row'},[h('input',{v:c.name,placeholder:'Название',on:{input:function(){c.name=this.value}}}),h('span',{class:'m'},['id: '+c.id]),'Цена ★',h('input',{type:'number',v:c.price,min:0,on:{input:function(){c.price=+this.value;paint()}}}),h('label',{},[h('input',{type:'checkbox',ck:c.free,on:{change:function(){c.free=this.checked;draw()}}}),' бесплатный (по промокоду)']),h('label',{},[h('input',{type:'checkbox',ck:c.active!==false,on:{change:function(){c.active=this.checked}}}),' показывать'])]));
   card.appendChild(h('div',{class:'row'},['Картинка кейса:',img(function(){return c.img},function(u){c.img=u},draw),h('span',{class:'m'},['Без картинки: сундук, оттенок']),h('input',{type:'number',v:c.hue,on:{input:function(){c.hue=+this.value}}})]));

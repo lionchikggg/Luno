@@ -27,10 +27,10 @@ function fmtT(t){return new Date(t).toLocaleString('ru-RU')}
 var ROLE='owner',WHO='';
 $('go').onclick=function(){T=$('tok').value;api('GET','config').then(function(c){C=c;return api('GET','whoami').then(function(w){ROLE=w.role;WHO=w.name;if(ROLE==='mod'){TABS=[['items','NFT и подарки'],['cases','Кейсы']];tab='items'}else if(!TABS.some(function(t){return t[0]==='mods'})){TABS.push(['bets','Ставки']);TABS.push(['mods','Модераторы'])};sessionStorage.setItem('t',T);$('login').hidden=true;$('app').hidden=false;$('openapp').hidden=false;$('who').hidden=ROLE!=='mod';$('who').textContent='Вы вошли как модератор «'+WHO+'». Вам доступны только NFT и кейсы.';if(ROLE==='mod')draw();else api('GET','stats').then(function(s){ST=s;draw()})})}).catch(function(e){alert(e.message)})};
 try{var s0=sessionStorage.getItem('t');if(s0){$('tok').value=s0;$('go').click()}}catch(e){}
-var TABS=[['start','Начало работы'],['items','NFT и подарки'],['cases','Кейсы'],['s3','Слоты'],['up','Апгрейд'],['skins','Режимы и картинки'],['wheel','Колесо фортуны'],['promos','Промокоды'],['settings','Настройки'],['wd','Выводы'],['gdep','Пополнение подарками'],['users','Игроки'],['stats','Статистика']];
+var TABS=[['start','Начало работы'],['items','NFT и подарки'],['cases','Кейсы'],['cards','Карточки'],['s3','Слоты'],['up','Апгрейд'],['skins','Режимы и картинки'],['wheel','Колесо фортуны'],['promos','Промокоды'],['settings','Настройки'],['wd','Выводы'],['gdep','Пополнение подарками'],['users','Игроки'],['stats','Статистика']];
 var LIVE={start:1,wd:1,gdep:1,users:1,stats:1,mods:1,bets:1};
 function draw(){$('tabs').innerHTML='';TABS.forEach(function(t){var b=h('button',{class:tab===t[0]?'on':'',on:{click:function(){tab=t[0];if(ROLE==='mod'){draw();return}api('GET','stats').then(function(s){ST=s;draw()}).catch(function(){draw()})}}},[t[1]]);if(t[0]==='wd'&&ST&&ST.wdPending)b.appendChild(h('span',{class:'pill'},[''+ST.wdPending]));if(t[0]==='gdep'&&ST&&ST.gdepPending)b.appendChild(h('span',{class:'pill'},[''+ST.gdepPending]));$('tabs').appendChild(b)});
- $('view').innerHTML='';({start:vStart,items:vItems,cases:vCases,s3:vS3,gdep:vGdep,up:vUp,skins:vSkins,promos:vPromos,wheel:vWheel,settings:vSet,wd:vWd,users:vUsers,stats:vStats,mods:vMods,bets:vBets})[tab]();$('save').hidden=!!LIVE[tab]}
+ $('view').innerHTML='';({start:vStart,items:vItems,cases:vCases,cards:vCards,s3:vS3,gdep:vGdep,up:vUp,skins:vSkins,promos:vPromos,wheel:vWheel,settings:vSet,wd:vWd,users:vUsers,stats:vStats,mods:vMods,bets:vBets})[tab]();$('save').hidden=!!LIVE[tab]}
 function img(get,set,rerender){var w=h('span',{class:'row'}),pv=h('img',{class:'pv',src:get()||'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='});
  var f=h('input',{type:'file',accept:'image/png,image/jpeg,image/webp,image/gif',on:{change:function(){var file=f.files[0];if(!file)return;say('Загружаю…');file.arrayBuffer().then(function(b){return api('POST','upload',null,b)}).then(function(r){set(r.url);say('Картинка загружена. Не забудь сохранить.');rerender()}).catch(function(e){say(e.message,1)})}}});
  w.appendChild(pv);w.appendChild(f);if(get())w.appendChild(h('button',{class:'b g',on:{click:function(){set('');rerender()}}},['Убрать']));return w}
@@ -128,6 +128,34 @@ function genOne(o){
   if(Math.abs(rr-o.rtp)<0.004&&rr<=lim)best=cs}
  if(!best)throw new Error('Не получилось подобрать 15 подарков под такой RTP: подарки в диапазоне ★'+minV+'–★'+maxV+' слишком дорогие или слишком дешёвые для среднего ★'+Math.round(need)+'. Добавь подарки разной цены в этом диапазоне или поменяй RTP.');
  return {cs:best,J:J,pj:pj}}
+
+var CARDS=[
+ ['Главная: верхние баннеры',[
+  ['free','Баннер «Открой бесплатно»','Большой баннер вверху главной (первый слайд). Мишка и надписи ложатся поверх картинки, поэтому важное держи справа, а слева оставь свободное место.','2300×760','670×460'],
+  ['leaders','Баннер «Лидеры недели»','Правый верхний баннер (на телефоне второй слайд). Текст и таймер слева, картинка (кубок и т.п.) справа.','1230×370','670×460'],
+  ['invite','Баннер «Приглашай друзей»','Правый нижний баннер (на телефоне третий слайд). Текст и кнопка слева, картинка справа.','1230×370','670×460']]],
+ ['Главная: игры',[
+  ['rocket','Ракетка','Карточка игры на главной. Название и подпись пишутся поверх, поэтому внизу слева оставь спокойный фон.','850×850','720×305'],
+  ['upgrade','Апгрейд','Карточка игры на главной.','850×850','350×360'],
+  ['s3','Слоты','Карточка игры на главной (вместо крутящихся подарков).','850×850','350×360'],
+  ['slots','Спины','Карточка игры на главной (вместо поля с подарками).','850×850','720×305'],
+  ['pick','Кирка','Карточка игры на главной. На телефоне такая же карточка есть и в разделе «Режимы».','850×850','720×305'],
+  ['modes','Режимы','Карточка «Режимы» на главной.','850×850','720×305'],
+  ['bj','Блэкджек','Карточка игры на главной.','850×850','350×305'],
+  ['du','Дурак','Карточка «Карточный зал». На компьютере она не показывается, только на телефоне.',null,'350×305'],
+  ['hilo','Hi-Lo','Карточка «Карточный зал». На компьютере она не показывается, только на телефоне.',null,'720×305']]],
+ ['Раздел «Режимы» (карточки внутри)',[
+  ['mines','Мины','Карточка в разделе «Режимы».','850×850','350×400'],
+  ['wheel','Колесо фортуны','Карточка в разделе «Режимы».','850×850','350×400'],
+  ['coin','Монетка','Карточка в разделе «Режимы».','850×850','350×400'],
+  ['tower','Башня','Карточка в разделе «Режимы».','850×850','350×400'],
+  ['cups','Колпачки','Карточка в разделе «Режимы».','850×850','350×400'],
+  ['balloon','Шарик','Карточка в разделе «Режимы».','850×850','350×400']]]];
+function vCards(){var v=$('view');C.skins=C.skins||{};
+ v.appendChild(h('div',{class:'help'},['Здесь можно заменить картинку на любой карточке главной и раздела «Режимы». Для каждой карточки есть два места: для компьютера и для телефона, рядом написан нужный размер в пикселях. Картинка растягивается на всю карточку, края могут слегка обрезаться, поэтому самое важное держи в середине. Надписи (название игры и подпись) добавятся поверх сами, на картинке текста быть не должно. Если загрузить только одну картинку, она будет и на ПК, и на телефоне. Кнопка «Убрать» возвращает стандартную картинку. Подойдут WEBP, PNG или JPG, лучше до 1 МБ. После загрузки нажми «Сохранить всё».']));
+ CARDS.forEach(function(g){v.appendChild(h('h2',{},[g[0]]));g[1].forEach(function(c){var kp='ci_'+c[0]+'_pc',km='ci_'+c[0]+'_m',pcTxt=c[3]?'Для компьютера: '+c[3]+' px':'На компьютере не показывается',mTxt='Для телефона: '+c[4]+' px';
+  var col=function(t,key,off){return h('div',{style:'flex:1;min-width:230px'},[h('div',{class:'m'},[h('b',{},[t])]),off?h('p',{class:'m'},['Эта карточка на компьютере скрыта.']):img(function(){return C.skins[key]},function(u){C.skins[key]=u},draw)])};
+  v.appendChild(h('div',{class:'card'},[h('div',{class:'row'},[h('b',{class:'big'},[c[1]])]),h('p',{class:'m'},[c[2]]),h('div',{class:'row',style:'align-items:flex-start;gap:24px'},[col(pcTxt,kp,!c[3]),col(mTxt,km,false)])]))})})}
 function vUp(){var v=$('view'),keys=Object.keys(C.items);
  v.appendChild(h('div',{class:'help'},['Здесь выбираешь, какие подарки игроки могут получить в апгрейде как цель. Отметь галочкой нужные. Шанс апгрейда считается автоматически: цена подарка-ставки делить на цену цели, минус твой процент. Новые NFT из вкладки «NFT и подарки» сразу появляются в этом списке.']));
  var set=function(fn){keys.forEach(function(k){C.items[k].up=fn(k)});draw()};

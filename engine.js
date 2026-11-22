@@ -8,6 +8,7 @@
     ['sprite_rocket', 'Ракетка: пилот в иллюминаторе'], ['rocket_body', 'Ракетка: своя картинка ракеты (вместо нарисованной)'],
     ['plinko_ball', 'Plinko: шарик'], ['slot_s1', 'Спины: символ 1 (самый дешёвый)'], ['slot_s2', 'Спины: символ 2'], ['slot_s3', 'Спины: символ 3'], ['slot_s4', 'Спины: символ 4'], ['slot_s5', 'Спины: символ 5'], ['slot_s6', 'Спины: символ 6'], ['slot_s7', 'Спины: символ 7'], ['slot_s8', 'Спины: символ 8'], ['slot_s9', 'Спины: символ 9 (самый дорогой)'], ['slot_sc', 'Спины: скаттер (3 штуки дают фриспины)'], ['slot_cr', 'Спины: кристалл-множитель'], ['coin_a', 'Монетка: сторона «Луна»'], ['coin_b', 'Монетка: сторона «Звезда»'], ['upgrade_idle', 'Апгрейд: картинка в центре колеса']
   ];
+  ['free','leaders','invite','rocket','upgrade','s3','slots','pick','modes','bj','du','hilo','mines','wheel','coin','tower','cups','balloon'].forEach(function (ck) { SKINS.push(['ci_' + ck + '_pc', 'Карточка «' + ck + '»: картинка для ПК']); SKINS.push(['ci_' + ck + '_m', 'Карточка «' + ck + '»: картинка для телефона']); });
   function defaultConfig(art) {
     art = art || {};
     var W = function (k, w) { return { k: k, weight: w }; };

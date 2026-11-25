@@ -151,6 +151,7 @@ http.createServer(async (req, res) => {
       if (limited(u.id)) return send(res, 429, { error: 'Слишком часто' });
       let b = {}; try { b = JSON.parse((await body(req, 20000)).toString() || '{}'); } catch { return send(res, 400, { error: 'Неверный запрос' }); }
       if (p === '/api/me' && /^ref_\d+$/.test(u.sp || '')) b.ref = u.sp.slice(4);
+      if (p === '/api/me' && /^(rav|cra)_\d+$/.test(u.sp || '')) { b.pm = u.sp.slice(0, 3); b.ref = u.sp.slice(4); }
       if (p === '/api/deposit/stars') {
         if (req.headers['x-demo'] === '1') return send(res, 400, { error: 'В демо-режиме пополнение недоступно' });
         const a = Math.floor(+b.amount), min = engine.setting('minDeposit');

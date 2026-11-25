@@ -161,11 +161,36 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
       if (name && u.name !== name) u.name = name; if (username !== undefined && u.username !== username) u.username = username || '';
       return u;
     }
+    // ---- Партнёрка: две модели (RavShare 25% с дохода рефералов, CRA 40% с первого пополнения от 1000 звёзд). Все суммы в звёздах ----
+    function pt(u) { var p = u.pt; if (!p) p = u.pt = { rules: 0, model: '', goal: 100, m: { rav: { avail: 0, withdrawn: 0, all: 0, acc: 0 }, cra: { avail: 0, withdrawn: 0, all: 0, acc: 0 } }, led: [], clk: { rav: [], cra: [] }, refs: { rav: [], cra: [] }, wds: [] }; return p; }
+    function ptEarn(P, m, stars, from) { if (!(stars >= 1)) return; var p = pt(P), M = p.m[m]; M.avail += stars; M.all += stars; p.led.push({ t: now(), m: m, s: stars, f: from }); if (p.led.length > 6000) p.led.splice(0, p.led.length - 6000); }
+    function ptRate(m) { return m === 'cra' ? (+set('ptCraPct') || 0.4) : (+set('ptRavPct') || 0.25); }
+    var PT_MIN_WD = 1500, PT_CRA_MIN = 1000, PT_MON = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'], PT_MONF = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'], PT_MONG = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'], PT_DOW = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'], PT_DOWF = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'], PT_ROM = ['I', 'II', 'III', 'IV'];
+    function ptDay(t) { return Math.floor(t / 864e5); }
+    function ptStats(P, m) {
+      var p = pt(P), M = p.m[m], t = now(), d0 = ptDay(t), today = 0, week = 0, weekN = 0, weekRef = 0;
+      p.led.forEach(function (x) { if (x.m !== m) return; var dd = ptDay(x.t); if (dd === d0) today += x.s; if (dd > d0 - 7) { week += x.s; weekN++; } });
+      p.refs[m].forEach(function (x) { if (x.t > t - 7 * 864e5) weekRef++; });
+      var active = 0, actions = 0, seen = {};
+      p.refs[m].forEach(function (x) { var f = S.users[String(x.id)]; if (f && (f.wagered || 0) > 0) active++; if (f && f.pm && f.pm.cra) actions++; });
+      return { clicks: p.clk[m].length, secondaryCount: m === 'cra' ? actions : active, registered: p.refs[m].length, allTimeStars: Math.floor(M.all), availableStars: Math.floor(M.avail), withdrawnStars: Math.floor(M.withdrawn), todayStars: today, weeklyDeltaReferrals: m === 'cra' ? weekN : weekRef, weeklyDeltaStars: week };
+    }
+    function ptSeries(P, m, period) {
+      var p = pt(P), t = now(), d = new Date(t), led = p.led.filter(function (x) { return x.m === m; }), refs = p.refs[m], out = [], i, y, mo;
+      function sum(a, b) { var s = 0, n = 0; led.forEach(function (x) { if (x.t >= a && x.t < b) { s += x.s; n++; } }); var rr = 0; refs.forEach(function (x) { if (x.t >= a && x.t < b) rr++; }); return { stars: s, referrals: m === 'cra' ? n : rr }; }
+      var day0 = Math.floor(t / 864e5) * 864e5;
+      if (period === 'week') { for (i = 6; i >= 0; i--) { var a = day0 - i * 864e5, dw = new Date(a).getUTCDay(), q = sum(a, a + 864e5); out.push({ label: PT_DOW[dw], fullLabel: PT_DOWF[dw] + ', ' + new Date(a).getUTCDate() + ' ' + PT_MONG[new Date(a).getUTCMonth()], stars: q.stars, referrals: q.referrals }); } }
+      else if (period === 'month') { for (i = 5; i >= 0; i--) { var a2 = day0 - (i * 5 + 4) * 864e5, b2 = a2 + 5 * 864e5, da = new Date(a2), db = new Date(b2 - 864e5), q2 = sum(a2, b2); out.push({ label: da.getUTCDate() + ' ' + PT_MONG[da.getUTCMonth()].slice(0, 3), fullLabel: da.getUTCDate() + '–' + db.getUTCDate() + ' ' + PT_MONG[db.getUTCMonth()], stars: q2.stars, referrals: q2.referrals }); } }
+      else if (period === 'year') { y = d.getUTCFullYear(); mo = d.getUTCMonth(); for (i = 11; i >= 0; i--) { var mm = mo - i, yy = y; while (mm < 0) { mm += 12; yy--; } var q3 = sum(Date.UTC(yy, mm, 1), Date.UTC(yy, mm + 1, 1)); out.push({ label: PT_MON[mm], fullLabel: PT_MONF[mm] + ' ' + yy, stars: q3.stars, referrals: q3.referrals }); } }
+      else { y = d.getUTCFullYear(); var qq = Math.floor(d.getUTCMonth() / 3), first = led.length ? new Date(led[0].t) : d, fq = first.getUTCFullYear() * 4 + Math.floor(first.getUTCMonth() / 3), cq = y * 4 + qq, n = Math.min(16, Math.max(4, cq - fq + 1)); for (i = n - 1; i >= 0; i--) { var k = cq - i, qy = Math.floor(k / 4), qn = k % 4, q4 = sum(Date.UTC(qy, qn * 3, 1), Date.UTC(qy, qn * 3 + 3, 1)); out.push({ label: 'Q' + (qn + 1) + ' ' + String(qy).slice(2), fullLabel: PT_ROM[qn] + ' квартал ' + qy, stars: q4.stars, referrals: q4.referrals }); } }
+      return out;
+    }
     function book(u, game, bet, payout) {
       if (u.demo) return; // демо-игры не попадают ни в статистику, ни в лидеры, ни в Live
       var bl = S.betlog || (S.betlog = []); bl.unshift({ t: now(), u: u.id, n: u.name || u.username || String(u.id), g: game, b: bet, p: payout }); if (bl.length > 400) bl.length = 400; // журнал последних ставок (виден только владельцу в админке)
       var t = S.totals[game] || (S.totals[game] = { n: 0, wagered: 0, paid: 0 }); t.n++; t.wagered += bet; t.paid += payout;
       u.wagered = (u.wagered || 0) + bet; var day = new Date(now()).toISOString().slice(0, 10), dd = S.daily[day] || (S.daily[day] = { wagered: 0, paid: 0, deposited: 0 }); dd.wagered += bet; dd.paid += payout;
+      if (u.pm && u.pm.m === 'rav') { var PP = S.users[String(u.pm.id)]; if (PP && !PP.demo && !PP.banned && PP.id !== u.id) { u.pPool = (u.pPool || 0) + (bet - payout); if (u.pPool > 0) { var pM = pt(PP).m.rav; pM.acc = (pM.acc || 0) + u.pPool * ptRate('rav'); u.pPool = 0; var whole = Math.floor(pM.acc); if (whole >= 1) { pM.acc -= whole; ptEarn(PP, 'rav', whole, u.id); } } } }
       if (u.ref && S.users[u.ref] && !S.users[u.ref].demo) { // RevShare: партнёр получает процент с реальной прибыли от своего друга
         var rp = +set('revPct') || 0, rm = +set('revMonths') || 0;
         if (rp > 0 && (!rm || now() - (u.t0 || 0) <= rm * 30 * 86400e3)) {
@@ -210,6 +235,7 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
     function credit(uid, amount) {
       var u = S.users[String(uid)]; amount = Math.floor(amount); if (!u || !(amount > 0)) return false;
       u.balance += amount; u.deposited = (u.deposited || 0) + amount; S.deposited += amount; var dk = new Date(now()).toISOString().slice(0, 10), dy = S.daily[dk] || (S.daily[dk] = { wagered: 0, paid: 0, deposited: 0 }); dy.deposited += amount;
+      if (u.pm && u.pm.m === 'cra' && !u.pm.cra && amount >= PT_CRA_MIN) { var CP = S.users[String(u.pm.id)]; if (CP && !CP.demo && !CP.banned && CP.id !== u.id && !u.demo) { var ce = Math.floor(amount * ptRate('cra')); if (ce >= 1) { u.pm.cra = 1; ptEarn(CP, 'cra', ce, u.id); } } }
       if (u.ref && S.users[u.ref]) { var bn = Math.floor(amount * set('refPercent')), rf = S.users[u.ref]; if (bn > 0) { rf.balance += bn; rf.refEarned = (rf.refEarned || 0) + bn; } }
       save(); return true;
     }
@@ -517,6 +543,7 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
     function refFreeAvail(u) { return Math.max(0, Math.floor((u.refCount || 0) / REF_NEED) - (u.refUsed || 0)); }
     var H = {
       me: function (u, b) {
+        if ((b.pm === 'rav' || b.pm === 'cra') && b.ref) { var pf = S.users[String(b.ref)]; if (pf && pf.id !== u.id && !u.demo && !pf.demo && !pf.banned) { var dk = pf.id + ':' + b.pm + ':' + ptDay(now()); u.ptk = u.ptk || {}; if (!u.ptk[dk]) { var kk = Object.keys(u.ptk); if (kk.length > 40) delete u.ptk[kk[0]]; u.ptk[dk] = 1; var ck = pt(pf).clk[b.pm]; ck.push(now()); if (ck.length > 5000) ck.splice(0, ck.length - 5000); } if (!u.refSet && !u.pm && !u.ref && u.t0 && now() - u.t0 < 3600e3) { u.refSet = 1; u.pm = { id: pf.id, m: b.pm, t: now() }; pf.refCount = (pf.refCount || 0) + 1; pt(pf).refs[b.pm].push({ id: u.id, t: now() }); } } } else
         if (b.ref && !u.refSet) { u.refSet = 1; var rf = S.users[String(b.ref)]; if (rf && rf.id !== u.id && !u.demo && !rf.demo && u.t0 && now() - u.t0 < 3600e3) { u.ref = rf.id; rf.refCount = (rf.refCount || 0) + 1; } } // считаем только новых игроков, пришедших по ссылке
         return { id: u.demo ? String(u.id).slice(1) : u.id, demo: !!u.demo, name: u.name, username: u.username || '', fair: o.fairInfo ? o.fairInfo(u) : null };
       },
@@ -799,6 +826,19 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
         u.balance -= tot; var ids = []; want.forEach(function (w) { for (var j = 0; j < w.q; j++) { var id = u.nid++; u.inv.push({ id: id, k: w.k, np: 1 }); ids.push(id); } }); S.shopSales = (S.shopSales || 0) + tot;
         return { bought: n, total: tot, ids: ids };
       },
+      'partner/info': function (u) { var p = pt(u); return { rules: p.rules ? 1 : 0, model: p.model || '', goal: p.goal || 100, models: { rav: ptStats(u, 'rav'), cra: ptStats(u, 'cra') }, rates: { rav: ptRate('rav'), cra: ptRate('cra'), craMin: PT_CRA_MIN, minWd: PT_MIN_WD, starUsd: 0.015 } }; },
+      'partner/accept': function (u, b) { if (b.ok !== true) throw new Err('Нужно подтвердить правила и возраст 18+'); pt(u).rules = now(); return { rules: 1 }; },
+      'partner/model': function (u, b) { var p = pt(u); if (!p.rules) throw new Err('Сначала подтверди правила 18+'); if (b.model !== 'rav' && b.model !== 'cra') throw new Err('Неверная модель'); p.model = b.model; return { model: p.model }; },
+      'partner/goal': function (u, b) { var g = Math.floor(+b.goalUsd); if (!(g >= 100) || g > 1000000) throw new Err('Цель от $100'); pt(u).goal = g; return { goal: g }; },
+      'partner/chart': function (u, b) { var m = b.model === 'cra' ? 'cra' : 'rav', per = ['week', 'month', 'year', 'all'].indexOf(b.period) >= 0 ? b.period : 'week'; return { model: m, period: per, series: ptSeries(u, m, per) }; },
+      'partner/withdraw': function (u, b) {
+        var p = pt(u); if (!p.rules) throw new Err('Сначала подтверди правила 18+'); var m = b.model === 'cra' ? 'cra' : 'rav', M = p.m[m], amt = Math.floor(+b.amountStars), method = b.method === 'external' ? 'external' : 'balance';
+        if (!(amt >= PT_MIN_WD)) throw new Err('Минимальный вывод ★' + PT_MIN_WD); if (amt > Math.floor(M.avail)) throw new Err('Недостаточно доступных средств для вывода');
+        var det = String(b.details || '').trim().slice(0, 120); if (method === 'external' && det.length < 2) throw new Err('Укажи @username или реквизиты получателя');
+        M.avail -= amt; M.withdrawn += amt; var rec = { t: now(), m: m, s: amt, method: method };
+        if (method === 'balance') { u.balance += amt; rec.status = 'done'; } else { var q = S.pwd || (S.pwd = []), id = (S.pwdSeq = (S.pwdSeq || 0) + 1); rec.id = id; rec.status = 'pending'; rec.det = det; q.push({ id: id, uid: u.id, user: u.name, username: u.username || '', m: m, s: amt, det: det, status: 'pending', t: now() }); if (o.notify) o.notify('Партнёрская заявка на вывод #' + id + ': ★' + amt + ' (' + (m === 'cra' ? 'CRA' : 'RavShare') + '), реквизиты: ' + det + ', игрок ' + (u.username ? '@' + u.username : u.name) + ', ID ' + u.id); }
+        p.wds.push(rec); if (p.wds.length > 100) p.wds.shift(); return { ok: true, method: method, amount: amt, status: rec.status, id: rec.id || 0 };
+      },
       'inv/sellall': function (u) { var t = 0; u.inv.forEach(function (x) { t += cfg().items[x.k].value; }); u.inv = []; u.balance += t; return { sold: t }; },
       promo: function (u, b) {
         var code = String(b.code || '').trim().toUpperCase(), p = cfg().promos[code];
@@ -811,7 +851,7 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
         return { rows: rows, endsAt: ws + 7 * 864e5, now: now() };
       }
     };
-    var DEMO_NO = ['gdep/info', 'gdep/request', 'wd/info', 'wd/request', 'deposit/info', 'deposit/test', 'ref', 'seed/rotate', 'promo'];
+    var DEMO_NO = ['partner/info', 'partner/accept', 'partner/model', 'partner/goal', 'partner/chart', 'partner/withdraw', 'gdep/info', 'gdep/request', 'wd/info', 'wd/request', 'deposit/info', 'deposit/test', 'ref', 'seed/rotate', 'promo'];
     function handle(path, id, body, name, username, demo) {
       try {
         advance(); bjTick(); duTick(); var u = user(id, name, username, demo), f = H[path]; if (u.round && (u.round.game === 'tower' || u.round.game === 'hilo')) { if (u.round.game === 'tower') u.tw = u.round; else u.hl = u.round; u.round = null; } // свои раунды у Башни и Hi-Lo if (!f) throw new Err('Нет такого метода');

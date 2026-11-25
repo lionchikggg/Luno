@@ -229,6 +229,7 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
       if (have < need) reasons.push('Сначала нужно отыграть пополнения: сделай ставок ещё на ★' + (need - have));
       if (!big && u.balance < fee) reasons.push('Для комиссии за вывод (★' + fee + ') не хватает звёзд на балансе');
       var paid = big && !!(u.wdPaid && u.wdPaid[iid]);
+      var ent = u.inv.filter(function (x) { return x.id === iid; })[0]; if (ent && ent.np) reasons.unshift('Купленный в магазине подарок нельзя вывести сразу: сначала сыграй им в апгрейде хотя бы один раз');
       return { ok: !reasons.length, reasons: reasons, fee: fee, big: big, paid: paid };
     }
     function wdPayOnce(key, uid, iid) { // комиссия за вывод оплачена звёздами Telegram (вызывает сервер после successful_payment)
@@ -790,6 +791,14 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
         if (o.notify) o.notify('Новая заявка на вывод #' + r.id + ': ' + it.name + ' (★' + it.value + ') для @' + u.username + ', ID ' + u.id); if (o.autoPay && set('autoPay') && it.tg) setTimeout(function () { o.autoPay(r, it); }, 0); return { id: r.id, eta: cfg().settings.wdNote, auto: !!(o.autoPay && set('autoPay') && it.tg) }; },
       'wd/list': function (u) { return { list: S.wd.filter(function (x) { return x.uid === u.id; }).slice(-20).reverse().map(function (x) { return { id: x.id, item: x.item, k: x.k, value: x.value, status: x.status, t: x.t, note: x.note || '' }; }) }; },
       'inv/sell': function (u, b) { var i = inv(u, +b.id); if (i < 0) throw new Err('Нет такого подарка'); var v = cfg().items[u.inv[i].k].value; u.inv.splice(i, 1); u.balance += v; return { sold: v }; },
+      'shop/buy': function (u, b) { // покупка подарков за звёзды по их цене; купленные помечаются np: вывести можно только после игры в апгрейде
+        var arr = Array.isArray(b.items) ? b.items : [], C = cfg().items, want = [], tot = 0, n = 0;
+        arr.forEach(function (x) { var k = String(x && x.k), q = Math.floor(+(x && x.qty) || 0), it = C[k]; if (!it || !(q > 0)) return; if (it.shop === false) throw new Err('«' + it.name + '» нельзя купить'); if (!(it.value > 0)) return; q = Math.min(q, 20); want.push({ k: k, q: q, v: it.value }); n += q; tot += q * it.value; });
+        if (!want.length) throw new Err('Выбери подарки для покупки'); if (n > 30) throw new Err('За один раз можно купить не больше 30 подарков');
+        if (u.balance < tot) throw new Err('Не хватает звёзд: нужно ★' + tot);
+        u.balance -= tot; var ids = []; want.forEach(function (w) { for (var j = 0; j < w.q; j++) { var id = u.nid++; u.inv.push({ id: id, k: w.k, np: 1 }); ids.push(id); } }); S.shopSales = (S.shopSales || 0) + tot;
+        return { bought: n, total: tot, ids: ids };
+      },
       'inv/sellall': function (u) { var t = 0; u.inv.forEach(function (x) { t += cfg().items[x.k].value; }); u.inv = []; u.balance += t; return { sold: t }; },
       promo: function (u, b) {
         var code = String(b.code || '').trim().toUpperCase(), p = cfg().promos[code];
@@ -857,7 +866,7 @@ var SLTAB = {"CG":[3,5,8,12,20,35,60,100,200,1000],"SG":[0.7,0.8,0.9,1,1.1,1.2,1
       Object.keys(items).forEach(function (k) {
         var it = items[k]; if (!/^[a-z0-9_]{1,24}$/.test(k)) throw new Err('Ключ предмета: латиница, цифры, _ (' + k + ')');
         if (!(+it.value >= 0) || !String(it.name || '').trim()) throw new Err('У предмета ' + k + ' нужны название и цена'); if (!okImg(it.img || '')) throw new Err('Неверная картинка у предмета ' + k);
-        out.items[k] = { name: String(it.name).slice(0, 40), img: it.img || '', value: Math.floor(+it.value), wd: it.wd !== false && it.wd !== 'false', up: it.up !== false && it.up !== 'false', tg: String(it.tg || '').trim().slice(0, 60) };
+        out.items[k] = { name: String(it.name).slice(0, 40), img: it.img || '', value: Math.floor(+it.value), wd: it.wd !== false && it.wd !== 'false', up: it.up !== false && it.up !== 'false', shop: it.shop !== false && it.shop !== 'false', tg: String(it.tg || '').trim().slice(0, 60) };
       });
       var s3 = n.slots3 || {}, o3 = { symbols: [], bets: [], pair: 0 }, sid = {}, L3 = 0;
       if (!Array.isArray(s3.symbols) || s3.symbols.length < 3 || s3.symbols.length > 10) throw new Err('В слотах нужно от 3 до 10 символов');

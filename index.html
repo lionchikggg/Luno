@@ -5292,11 +5292,18 @@ var BJBUSY=0;
 /* ===== ПК: «Мои подарки / Магазин» и «Цель» в Апгрейде ===== */
 var UPM={tab:'inv',pg:{inv:0,shop:0,tgt:0},cart:{},sig:''};
 function upmOn(){return !!$('upm')}
-function upmInit(){if(!upmOn()||UPM.ready)return;UPM.ready=1;if(innerWidth<1000){var ut=document.querySelector('.uptools');if(ut&&ut.parentNode)ut.parentNode.insertBefore($('upm'),ut.nextSibling);UPM.tab='shop';$('upm').addEventListener('click',upmClick);return}var ctl=$('upmCtl'),q=$('ugq'),ch=$('upchips'),hd=document.querySelector('.uptools .uphd'),rg=$('upr');
- var a1=document.createElement('div');a1.className='upm-a1';var lab=document.createElement('span');lab.className='upm-al';lab.textContent='Добавить ★';a1.appendChild(lab);a1.appendChild($('upv').parentNode);a1.appendChild(rg);var a2=document.createElement('div');a2.className='upm-a2';a2.appendChild(ch);
- ctl.appendChild(q);ctl.appendChild(a1);ctl.appendChild(a2);var uh=$('uphint');if(uh)uh.style.display='none';if(hd)hd.style.display='none';
- var host=innerWidth>=1000?$('upbar2'):$('upmOpts');['ugSnd','ugFast','ugStyle'].forEach(function(id){var b=$(id);if(b)host.appendChild(b)});
- $('upm').addEventListener('click',upmClick)}
+var UPMO=null;
+function upmSave(){if(UPMO)return;UPMO=[];['ugq','upchips','upr','ugSnd','ugFast','ugStyle'].forEach(function(id){var e=$(id);if(e)UPMO.push({e:e,p:e.parentNode,n:e.nextSibling})});var v=$('upv');if(v&&v.parentNode){var pv=v.parentNode;UPMO.push({e:pv,p:pv.parentNode,n:pv.nextSibling})}
+ var ut=document.querySelector('.uptools');UPMO.ut=ut}
+function upmPlace(){var pc=innerWidth>=1000;if(UPM.pcMode===pc)return;UPM.pcMode=pc;upmSave();var ut=UPMO.ut,up=$('upm');
+ if(pc){var ctl=$('upmCtl');if(!ctl.firstChild){var a1=document.createElement('div');a1.className='upm-a1';var lab=document.createElement('span');lab.className='upm-al';lab.textContent='Добавить ★';a1.appendChild(lab);a1.appendChild($('upv').parentNode);a1.appendChild($('upr'));var a2=document.createElement('div');a2.className='upm-a2';a2.appendChild($('upchips'));ctl.appendChild($('ugq'));ctl.appendChild(a1);ctl.appendChild(a2)}
+  var uh=$('uphint'),hd=document.querySelector('.uptools .uphd');if(uh)uh.style.display='none';if(hd)hd.style.display='none';['ugSnd','ugFast','ugStyle'].forEach(function(id){var b=$(id);if(b)$('upbar2').appendChild(b)});
+  if(ut&&ut.parentNode)ut.parentNode.insertBefore(up,ut);if(UPM.tab==='shop')UPM.tab='inv'}
+ else{for(var k=UPMO.length-1;k>=0;k--){var o=UPMO[k];if(o.p)o.p.insertBefore(o.e,(o.n&&o.n.parentNode===o.p)?o.n:null)}var uh2=$('uphint'),hd2=document.querySelector('.uptools .uphd');if(uh2)uh2.style.display='';if(hd2)hd2.style.display='';
+  var ctl2=$('upmCtl');while(ctl2&&ctl2.firstChild)ctl2.removeChild(ctl2.firstChild);if(ut&&ut.parentNode)ut.parentNode.insertBefore(up,ut.nextSibling);UPM.tab='shop'}
+ UPM.sig=''}
+function upmInit(){if(!upmOn())return;if(!UPM.ready){UPM.ready=1;$('upm').addEventListener('click',upmClick);addEventListener('resize',function(){upmPlace();upmRender(true);setTimeout(function(){try{fitPC()}catch(e){}},60)})}upmPlace()}
+
 function upmPage(list,key){var n=Math.max(1,Math.ceil(list.length/12));if(UPM.pg[key]>=n)UPM.pg[key]=n-1;if(UPM.pg[key]<0)UPM.pg[key]=0;return {items:list.slice(UPM.pg[key]*12,UPM.pg[key]*12+12),n:n,i:UPM.pg[key],total:list.length}}
 function upmCell(k,extra,cls,badge){var it=itm(k);return '<div role="button" tabindex="0" class="ucell '+cls+'" '+extra+'><i class="uci">'+ik(k)+'</i><b>'+esc(it.name)+'</b><span>★ '+fmt(it.value)+'</span>'+(badge||'')+'</div>'}
 function upmDots(id,p){var h='';for(var i=0;i<p.n&&p.n>1;i++)h+='<u class="'+(i===p.i?'on':'')+'"></u>';$(id).innerHTML=h}

@@ -93,6 +93,32 @@ function genCases(o){
  C.cases=[fr].concat(out)}
 
 function minFrac(P){var f=0.10+0.20*(Math.log(P)/Math.LN10-3);return Math.min(0.35,Math.max(0.05,f))}
+
+function mkCaseName(){var names=['Moon','Star','Comet','Nova','Galaxy','Cosmos','Infinity','Orbit','Eclipse','Aurora','Zenith','Vega','Lunar','Pulsar','Quasar'],used={};C.cases.forEach(function(c){used[c.name]=1});var nm=names.filter(function(n){return !used[n]});return nm.length?nm[Math.floor(Math.random()*nm.length)]:'Box '+(C.cases.length+1)}
+function genSmall(P,target,lim,it,J,pj,o){
+ /* дешёвый кейс (меньше ★100): все дешёвые подарки несут основной шанс, а оставшиеся места занимают дорогие подарки с очень маленьким шансом */
+ var base=it.filter(function(x){return x!==J&&x.v<=2*P}).sort(function(a,b){return a.v-b.v});
+ if(base.length<2)throw new Error('Для кейса за ★'+P+' нашла только '+base.length+' подарков дешевле ★'+(2*P)+'. Нужно хотя бы 2 дешёвых NFT (лучше 4 и больше). Добавь дешёвые подарки во вкладке «NFT и подарки».');
+ if(base.length>14)base=base.slice(0,14);
+ var maxF=14-base.length,fill=it.filter(function(x){return x!==J&&x.v>2*P&&x.v*0.0005<=target*0.15}).sort(function(a,b){return a.v-b.v}).slice(0,maxF);
+ var fmin=fill.length?fill[0].v:1,fw=fill.map(function(x){return Math.max(0.01,Math.round(0.05*Math.sqrt(fmin/x.v)*100)/100)});
+ var fsum=fw.reduce(function(a,b){return a+b},0)/100,fev=fill.reduce(function(a,x,i){return a+x.v*fw[i]/100},0);
+ var need=(target-fev-J.v*pj)/(1-fsum-pj),mn=base[0].v,mx=base[base.length-1].v;
+ if(!(need>=mn&&need<=mx))throw new Error('Для кейса за ★'+P+' с RTP '+(o.rtp*100).toFixed(0)+'% нужна средняя цена выпадения ★'+Math.round(need)+', а самые дешёвые подарки стоят от ★'+mn+' до ★'+mx+'. Добавь подарки подешевле (около ★'+Math.max(1,Math.round(need*0.5))+'–★'+Math.round(need*1.2)+') или уменьши RTP.');
+ var best=null;
+ for(var tr=0;tr<60&&!best;tr++){
+  var nz=base.map(function(){return 0.85+Math.random()*0.3});
+  var ev=function(a){var w=0,e=0;base.forEach(function(x,i){var q=nz[i]*Math.pow(x.v,-a);w+=q;e+=q*x.v});return e/w},lo=-14,hi=14;
+  if(ev(lo)<need||ev(hi)>need)continue;
+  for(var t=0;t<60;t++){var m=(lo+hi)/2;if(ev(m)>need)lo=m;else hi=m}var a=(lo+hi)/2,ws=base.map(function(x,i){return nz[i]*Math.pow(x.v,-a)}),sum=ws.reduce(function(p,q){return p+q},0),its=[];
+  base.forEach(function(x,i){its.push({k:x.k,weight:Math.max(0.01,Math.round((1-fsum-pj)*ws[i]/sum*10000)/100)})});
+  fill.forEach(function(x,i){its.push({k:x.k,weight:fw[i]})});its.push({k:J.k,weight:Math.max(0.001,Math.round(pj*10000)/100)});
+  var tot=its.reduce(function(p,q){return p+q.weight},0),big=its.reduce(function(p,q){return q.weight>p.weight?q:p},its[0]);big.weight=Math.round((big.weight+100-tot)*100)/100;
+  its.sort(function(x,y){return (C.items[x.k].value||0)-(C.items[y.k].value||0)});
+  var cs={id:'box'+Date.now().toString(36)+Math.floor(Math.random()*100),name:mkCaseName(),img:'',hue:Math.floor(Math.random()*300)-100,price:P,free:false,active:true,items:its},rr=rtpOf(cs);
+  if(Math.abs(rr-o.rtp)<0.004&&rr<=lim)best=cs}
+ if(!best)throw new Error('Не получилось подобрать шансы для дешёвого кейса за ★'+P+'. Добавь ещё дешёвых подарков разной цены или поменяй RTP.');
+ return {cs:best,J:J,pj:pj}}
 function genOne(o){
  var pool=Object.keys(C.items).filter(function(k){return o.all||/^\/uploads\//.test(C.items[k].img||'')});
  if(pool.length<15)throw new Error('Нужно минимум 15 подарков с твоими картинками. Сейчас найдено: '+pool.length+'. Загрузи ещё NFT во вкладке «NFT и подарки» (или отметь галочку про стандартные подарки).');
@@ -100,12 +126,11 @@ function genOne(o){
  if(!(P>=1))throw new Error('Укажи цену кейса');
  if(o.rtp>lim)throw new Error('RTP '+(o.rtp*100).toFixed(0)+'% выше лимита из настроек ('+(lim*100).toFixed(0)+'%). Поставь меньше.');
  var it=pool.map(function(k){return {k:k,v:Math.max(1,+C.items[k].value||1)}}),want=o.prize>0?o.prize:P*20,pj=Math.min(0.2,Math.max(0.0001,o.pj/100));
- var jc=it.filter(function(x){return x.v>=P*3}).sort(function(a,b){return Math.abs(Math.log(a.v/want))-Math.abs(Math.log(b.v/want))});
- if(!jc.length)throw new Error('Для главного приза кейса за ★'+P+' нужен подарок дороже ★'+(P*3)+'. Добавь дорогой подарок во вкладке «NFT и подарки».');
+ var jc=it.filter(function(x){return x.v>=P*3&&x.v*pj<=target*0.5}).sort(function(a,b){return Math.abs(Math.log(a.v/want))-Math.abs(Math.log(b.v/want))});
+ if(!jc.length)throw new Error('Для главного приза кейса за ★'+P+' нужен подарок дороже ★'+(P*3)+', но не дороже ★'+Math.round(target*0.5/pj)+' (при шансе '+o.pj+'%: иначе он один забирает почти весь RTP). Добавь такой подарок во вкладке «NFT и подарки» или уменьши шанс главного приза.');
  var J=jc[0];
- if(J.v*pj>=target*0.85)throw new Error('Главный приз «'+C.items[J.k].name+'» (★'+J.v+') при шансе '+o.pj+'% почти один забирает весь RTP кейса. Уменьши шанс или выбери приз дешевле.');
  var minV=Math.max(1,Math.round(P*minFrac(P))),maxV=P*6,rest=it.filter(function(x){return x!==J&&x.v>=minV&&x.v<=maxV});
- if(rest.length<14)throw new Error('Для кейса за ★'+P+' нужно минимум 14 подарков ценой от ★'+minV+' до ★'+maxV+' (не считая главного приза). Сейчас таких '+rest.length+'. Добавь подарки такой цены во вкладке «NFT и подарки».');
+ if(rest.length<14){if(P<100)return genSmall(P,target,lim,it,J,pj,o);throw new Error('Для кейса за ★'+P+' нужно минимум 14 подарков ценой от ★'+minV+' до ★'+maxV+' (не считая главного приза). Сейчас таких '+rest.length+'. Добавь подарки такой цены во вкладке «NFT и подарки».')}
  var need=(target-J.v*pj)/(1-pj),best=null;
  function bucket(lo,hi){return rest.filter(function(x){return x.v>lo*P&&x.v<=hi*P})}
  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
